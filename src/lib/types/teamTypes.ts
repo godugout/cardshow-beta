@@ -1,89 +1,81 @@
+
 import { User } from './user';
 
 /**
- * Interface for team data
+ * Core team interface
  */
 export interface Team {
   id: string;
   name: string;
   description?: string;
   logoUrl?: string;
+  bannerUrl?: string;
   ownerId: string;
+  owner?: User;
   createdAt: string;
   updatedAt: string;
-  members?: TeamMember[];
   primaryColor?: string;
   secondaryColor?: string;
   tags?: string[];
-  // Extended fields needed by code in other places
-  visibility?: 'public' | 'private' | 'team';
-  banner_url?: string;
-  bannerUrl?: string;
+  members?: TeamMember[];
   website?: string;
   email?: string;
-  status?: string;
+  status?: 'active' | 'inactive' | 'suspended';
+  visibility?: 'public' | 'private' | 'unlisted';
   specialties?: string[];
   settings?: Record<string, any>;
+  isPublic?: boolean;
 }
 
 /**
- * Interface for team members
+ * Team member interface
  */
 export interface TeamMember {
   id: string;
-  teamId: string;
   userId: string;
-  role: 'owner' | 'admin' | 'member' | 'viewer';
+  teamId: string;
+  role: TeamRole;
   joinedAt: string;
+  permissions?: string[];
   user?: User;
-  email?: string;
-  avatarUrl?: string; // Add avatarUrl property for team members
+  avatarUrl?: string;
+  createdAt?: string;
 }
 
 /**
- * Interface for team invitation
+ * Team roles enum
+ */
+export enum TeamRole {
+  OWNER = 'owner',
+  ADMIN = 'admin',
+  MODERATOR = 'moderator',
+  MEMBER = 'member'
+}
+
+/**
+ * Team invitation interface
  */
 export interface TeamInvitation {
   id: string;
   teamId: string;
-  team?: Team;
-  inviterId: string;
-  inviter?: User;
-  email: string;
-  role: 'admin' | 'member' | 'viewer';
+  invitedBy: string;
+  invitedEmail: string;
+  role: TeamRole;
   status: 'pending' | 'accepted' | 'declined' | 'expired';
   createdAt: string;
   expiresAt: string;
-  acceptedAt?: string;
+  team?: Team;
 }
 
 /**
- * Interface for team settings
+ * Team statistics interface
  */
-export interface TeamSettings {
-  teamId: string;
-  allowMemberInvites: boolean;
-  allowMemberCardCreation: boolean;
-  requireContentApproval: boolean;
-  defaultCollectionVisibility: 'public' | 'team' | 'private';
-  brandingSettings: {
-    useCustomBranding: boolean;
-    primaryColor: string;
-    secondaryColor: string;
-    logoPosition: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
-    defaultTemplate?: string;
-  };
-  notificationSettings: {
-    newMember: boolean;
-    newContent: boolean;
-    contentUpdates: boolean;
-  };
-}
-
-// Add UserRole.VIEWER for backward compatibility
-export enum TeamRole {
-  OWNER = 'owner',
-  ADMIN = 'admin',
-  MEMBER = 'member',
-  VIEWER = 'viewer'
+export interface TeamStats {
+  memberCount: number;
+  cardCount: number;
+  collectionCount: number;
+  totalViews: number;
+  totalLikes: number;
+  activeMembers: number;
+  recentActivity: string;
 }

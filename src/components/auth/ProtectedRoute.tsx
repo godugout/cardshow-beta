@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
@@ -30,7 +31,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         context: { 
           path: location.pathname,
           userId: user.id,
-          requiredPermission,
+          requiredPermission: requiredPermission?.name,
           adminOnly
         }
       });
@@ -57,12 +58,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/unauthorized" replace />;
   }
 
-  if (requiredPermission && !hasPermission(requiredPermission)) {
+  if (requiredPermission && !hasPermission(requiredPermission.name)) {
     logger.warn('User lacks required permission', { 
       context: { 
         path: location.pathname, 
         userId: user?.id,
-        requiredPermission
+        requiredPermission: requiredPermission.name
       }
     });
     return <Navigate to="/unauthorized" replace />;

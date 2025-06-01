@@ -1,5 +1,6 @@
-import { Card } from './cardTypes';
-import { Team, TeamMember } from './teamTypes';
+
+import type { Card } from './cardTypes';
+import type { Team, TeamMember } from './teamTypes';
 
 /**
  * Core user interface
@@ -31,7 +32,8 @@ export enum UserRole {
   MANAGER = 'manager',
   USER = 'user',
   GUEST = 'guest',
-  VIEWER = 'viewer'  // Add VIEWER role for backward compatibility
+  VIEWER = 'viewer',
+  CREATOR = 'creator'
 }
 
 /**
@@ -96,7 +98,7 @@ export interface UserSettings {
 }
 
 // Re-exports from other related types
-export { Team, TeamMember };
+export type { Team, TeamMember };
 
 // Export Comment and Collection type from their respective files
 export type { Comment } from './interaction';

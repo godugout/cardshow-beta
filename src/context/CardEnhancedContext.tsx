@@ -755,3 +755,6 @@ export const useCardEnhanced = () => {
   }
   return context;
 };
+
+// Add the missing export alias
+export const useEnhancedCards = useCardEnhanced;

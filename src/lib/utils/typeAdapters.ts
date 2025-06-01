@@ -114,7 +114,7 @@ export function elementUploadToCardElement(upload: ElementUploadMetadata): CardE
     tags: upload.tags || [],
     category: upload.category as string,
     isOfficial: false,
-    position: { x: 0, y: 0 },
+    position: { x: 0, y: 0, z: 0 },
     size: { width: 100, height: 100 },
     rotation: 0,
     opacity: 1,

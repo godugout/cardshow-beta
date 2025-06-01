@@ -1,24 +1,20 @@
 
 import { useAuth } from '@/context/AuthContext';
-
-interface AuthUser {
-  id: string;
-  email: string;
-  role?: string;
-  permissions?: string[];
-}
+import { AuthUser } from '@/context/auth/types';
 
 // Mock implementation of usePermissions
 export function usePermissions() {
   // Get the current user from the auth context
-  const { user } = useAuth() as { user?: AuthUser };
+  const { user } = useAuth();
 
   // Check if the user has a specific permission
   const hasPermission = (permission: string): boolean => {
     if (!user) return false;
     
     // Check if user has explicitly granted permissions
-    if (user.permissions && user.permissions.includes(permission)) {
+    if (user.permissions && user.permissions.some(p => 
+      typeof p === 'string' ? p === permission : p.name === permission
+    )) {
       return true;
     }
     

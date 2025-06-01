@@ -75,3 +75,26 @@ export interface UGCCategory {
   parentId?: string;
   assetCount?: number;
 }
+
+/**
+ * Interface for creator profiles
+ */
+export interface CreatorProfile {
+  id: string;
+  userId: string;
+  displayName: string;
+  bio?: string;
+  avatarUrl?: string;
+  isVerified: boolean;
+  specialties: string[];
+  totalAssets: number;
+  totalSales: number;
+  rating: number;
+  joinedAt: string;
+  socialLinks?: {
+    website?: string;
+    twitter?: string;
+    instagram?: string;
+    discord?: string;
+  };
+}
