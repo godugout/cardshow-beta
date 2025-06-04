@@ -36,7 +36,7 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
   const [selectedAsset, setSelectedAsset] = useState<any | null>(null);
   const [selectedReport, setSelectedReport] = useState<UGCReport | null>(null);
   const [decisionNotes, setDecisionNotes] = useState('');
-  const [decisionStatus, setDecisionStatus] = useState<UGCModerationStatus>(UGCModerationStatus.APPROVED);
+  const [decisionStatus, setDecisionStatus] = useState<UGCModerationStatus>('approved');
   
   // Use hooks for fetching data
   const { useModerationStats, usePendingReports, moderateAsset } = useUGCSystem();
@@ -52,14 +52,15 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
       await moderateAsset.mutateAsync({
         assetId: selectedAsset.id,
         status: decisionStatus as any,
-        moderatorId: 'admin',
-        reason: decisionStatus === UGCModerationStatus.REJECTED ? 'inappropriate' : undefined,
+        moderatorId: 'admin', // In a real app, this would be the current user's ID
+        reason: decisionStatus === 'rejected' ? 'inappropriate' : undefined,
         notes: decisionNotes
       });
       
+      // Close dialog and reset state
       setSelectedAsset(null);
       setDecisionNotes('');
-      setDecisionStatus(UGCModerationStatus.APPROVED);
+      setDecisionStatus('approved');
     } catch (error) {
       console.error('Error moderating asset:', error);
     }
@@ -68,9 +69,13 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
   // Handle report resolution
   const handleResolveReport = async () => {
     if (!selectedReport) return;
+    
+    // In a real implementation, this would call an API
+    // For now, we'll just close the dialog
     setSelectedReport(null);
   };
 
+  // Not an admin view
   if (!isAdmin) {
     return (
       <Card className="w-full">
@@ -145,6 +150,7 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Placeholder for pending content items */}
                 {Array.from({ length: Math.min(stats?.pendingCount || 0, 8) }).map((_, i) => (
                   <Card key={i} className="overflow-hidden cursor-pointer hover:shadow-md">
                     <div className="aspect-square bg-muted relative">
@@ -167,7 +173,7 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
                               title: `Pending Asset #${i+1}`,
                               assetUrl: '/placeholder.jpg'
                             });
-                            setDecisionStatus(UGCModerationStatus.REJECTED);
+                            setDecisionStatus('rejected');
                           }}
                         >
                           <X size={14} />
@@ -182,7 +188,7 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
                               title: `Pending Asset #${i+1}`,
                               assetUrl: '/placeholder.jpg'
                             });
-                            setDecisionStatus(UGCModerationStatus.APPROVED);
+                            setDecisionStatus('approved');
                           }}
                         >
                           <Check size={14} />
@@ -191,6 +197,14 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+            )}
+            
+            {stats && stats.pendingCount > 8 && (
+              <div className="text-center mt-4">
+                <Button variant="outline">
+                  View All {stats.pendingCount} Pending Items
+                </Button>
               </div>
             )}
           </TabsContent>
@@ -209,16 +223,16 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
               <Card>
                 <ScrollArea className="h-[400px]">
                   <div className="p-4">
-                    {reports.map((report) => (
+                    {reports.map((report, i) => (
                       <div 
-                        key={report.id} 
+                        key={i} 
                         className="py-3 border-b last:border-0 flex items-center justify-between cursor-pointer hover:bg-muted/30 p-2 rounded-md"
                         onClick={() => setSelectedReport(report)}
                       >
                         <div className="flex items-center gap-3">
                           <div className="bg-muted rounded-md h-12 w-12 flex-shrink-0"></div>
                           <div>
-                            <h4 className="font-medium">Report #{report.id.slice(0, 8)}</h4>
+                            <h4 className="font-medium">Report #{i+1}</h4>
                             <p className="text-xs text-muted-foreground">
                               Reason: {report.reason}
                             </p>
@@ -258,18 +272,15 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
               
               <div className="space-y-2">
                 <p className="text-sm font-medium">Moderation Decision</p>
-                <Select 
-                  value={decisionStatus} 
-                  onValueChange={(v) => setDecisionStatus(v as UGCModerationStatus)}
-                >
+                <Select value={decisionStatus} onValueChange={(v) => setDecisionStatus(v as UGCModerationStatus)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select decision" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value={UGCModerationStatus.APPROVED}>Approve Content</SelectItem>
-                      <SelectItem value={UGCModerationStatus.REJECTED}>Reject Content</SelectItem>
-                      <SelectItem value={UGCModerationStatus.FLAGGED}>Flag for Review</SelectItem>
+                      <SelectItem value="approved">Approve Content</SelectItem>
+                      <SelectItem value="rejected">Reject Content</SelectItem>
+                      <SelectItem value="flagged">Flag for Review</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -299,10 +310,10 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
               <Button
                 onClick={handleModerateAsset}
                 disabled={moderateAsset.isPending}
-                variant={decisionStatus === UGCModerationStatus.REJECTED ? 'destructive' : 'default'}
+                variant={decisionStatus === 'rejected' ? 'destructive' : 'default'}
               >
-                {decisionStatus === UGCModerationStatus.APPROVED ? 'Approve' : 
-                 decisionStatus === UGCModerationStatus.REJECTED ? 'Reject' : 'Flag'}
+                {decisionStatus === 'approved' ? 'Approve' : 
+                 decisionStatus === 'rejected' ? 'Reject' : 'Flag'}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -335,12 +346,10 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
                     <p className="text-muted-foreground">{selectedReport.reason}</p>
                   </div>
                   
-                  {selectedReport.details && (
-                    <div>
-                      <p className="text-sm font-medium">Details</p>
-                      <p className="text-muted-foreground">{selectedReport.details}</p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-sm font-medium">Details</p>
+                    <p className="text-muted-foreground">{selectedReport.details}</p>
+                  </div>
                   
                   <div className="space-y-1">
                     <div className="flex items-center gap-1 text-sm">
@@ -353,6 +362,30 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
                     </div>
                   </div>
                 </div>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Moderation Decision</p>
+                <Select defaultValue="take_down">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select action" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="take_down">Take Down Content</SelectItem>
+                      <SelectItem value="keep">Keep Content</SelectItem>
+                      <SelectItem value="warning">Issue Warning</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Notes (optional)</p>
+                <Textarea 
+                  placeholder="Add notes about this report resolution..." 
+                  rows={2}
+                />
               </div>
             </div>
             

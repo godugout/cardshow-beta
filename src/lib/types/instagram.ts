@@ -3,12 +3,8 @@
  * Instagram-related types
  */
 
-import { BaseEntity } from './index';
-
-/**
- * Instagram Post definition
- */
-export interface InstagramPost extends BaseEntity {
+export interface InstagramPost {
+  id: string;
   postId?: string;
   username: string;
   caption?: string;
@@ -20,9 +16,6 @@ export interface InstagramPost extends BaseEntity {
   thumbnailUrl?: string;
 }
 
-/**
- * Instagram source information
- */
 export interface InstagramSource {
   username: string;
   lastFetched: string;

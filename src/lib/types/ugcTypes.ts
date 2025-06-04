@@ -1,83 +1,124 @@
 
-import { User } from './user';
+import { ElementType, ElementCategory } from './cardElements';
 
 /**
- * Interface for user-generated content assets
+ * Status of a user-generated content item in the moderation pipeline
+ */
+export type UGCModerationStatus = 
+  | 'pending'      // Initial state, waiting for AI or manual review
+  | 'approved'     // Content has been approved and is public
+  | 'rejected'     // Content has been rejected
+  | 'flagged'      // Content needs additional human review
+  | 'appealed'     // User has appealed a rejection
+  | 'restricted';  // Content is available with restrictions
+
+/**
+ * Reasons for content moderation actions
+ */
+export type UGCModerationReason = 
+  | 'inappropriate'
+  | 'copyright'
+  | 'quality'
+  | 'duplicate'
+  | 'trademark'
+  | 'other';
+
+/**
+ * Metadata about a moderation decision
+ */
+export interface ModerationMetadata {
+  status: UGCModerationStatus;
+  moderator?: string;
+  reason?: UGCModerationReason;
+  notes?: string;
+  reviewDate?: string;
+  aiConfidenceScore?: number;
+  appealAllowed?: boolean;
+}
+
+/**
+ * Pricing model for marketplace items
+ */
+export type PricingModel = 'free' | 'one-time' | 'subscription';
+
+/**
+ * License type for marketplace items
+ */
+export type LicenseType = 'standard' | 'extended' | 'commercial' | 'custom';
+
+/**
+ * Marketplace metadata for a UGC item
+ */
+export interface MarketplaceMetadata {
+  isForSale: boolean;
+  price?: number;
+  pricingModel?: PricingModel;
+  license?: LicenseType;
+  allowModifications?: boolean;
+  downloadLimit?: number;
+  featured?: boolean;
+  featuredUntil?: string;
+  salesCount?: number;
+  rating?: number;
+  ratingCount?: number;
+}
+
+/**
+ * Performance impact assessment of an asset
+ */
+export interface PerformanceMetrics {
+  fileSize: number;          // Size in bytes
+  renderComplexity: number;  // Scale of 1-10
+  memoryUsage: number;       // Estimated memory usage in MB
+  recommendedMaxUses: number; // Recommended max uses per card
+}
+
+/**
+ * User-generated content base interface
  */
 export interface UGCAsset {
   id: string;
-  name: string;
-  title?: string;
+  title: string;
   description?: string;
   assetUrl: string;
   thumbnailUrl?: string;
+  assetType: ElementType;
+  category: ElementCategory;
+  tags: string[];
+  creatorId: string;
   createdAt: string;
   updatedAt: string;
-  creatorId: string;
-  creator?: User;
-  assetType?: string;
-  category?: string;
-  tags?: string[];
-  isOfficial?: boolean;
-  marketplace?: {
-    price?: number;
-    forSale?: boolean;
-    featured?: boolean;
-    isForSale?: boolean;
-    salesCount?: number;
+  version: string;
+  moderation: ModerationMetadata;
+  marketplace?: MarketplaceMetadata;
+  isPublic: boolean;
+  isOfficial: boolean;
+  originalFilename: string;
+  mimeType: string;
+  fileSize: number;
+  dimensions?: {
+    width: number;
+    height: number;
   };
+  performance?: PerformanceMetrics;
 }
 
 /**
- * Enum for UGC moderation status
- */
-export enum UGCModerationStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  FLAGGED = 'flagged'
-}
-
-/**
- * Interface for UGC reports
+ * User-generated content report
  */
 export interface UGCReport {
   id: string;
   assetId: string;
   reporterId: string;
-  reason: string;
-  status: UGCModerationStatus;
-  details?: string;
+  reason: UGCModerationReason;
+  details: string;
+  status: 'open' | 'resolved' | 'rejected';
   createdAt: string;
-  updatedAt: string;
-  asset?: UGCAsset;
-  reporter?: User;
+  resolvedAt?: string;
 }
 
 /**
- * Interface for UGC marketplace settings
- */
-export interface UGCMarketplaceSettings {
-  commissionRate: number;
-  minPrice: number;
-  maxPrice: number;
-  allowedAssetTypes: string[];
-  moderationRequired: boolean;
-}
-
-/**
- * Interface for UGC categories
- */
-export interface UGCCategory {
-  id: string;
-  name: string;
-  description?: string;
-  parentId?: string;
-  assetCount?: number;
-}
-
-/**
- * Interface for creator profiles
+ * Creator profile for the marketplace
  */
 export interface CreatorProfile {
   id: string;
@@ -85,16 +126,15 @@ export interface CreatorProfile {
   displayName: string;
   bio?: string;
   avatarUrl?: string;
-  isVerified: boolean;
-  specialties: string[];
-  totalAssets: number;
+  website?: string;
+  socialLinks?: Record<string, string>;
+  featured?: boolean;
+  verificationStatus: 'unverified' | 'verified' | 'featured';
+  joinedAt: string;
+  assetCount: number;
   totalSales: number;
   rating: number;
-  joinedAt: string;
-  socialLinks?: {
-    website?: string;
-    twitter?: string;
-    instagram?: string;
-    discord?: string;
-  };
+  ratingCount: number;
+  earnings?: number;
+  payoutInfo?: Record<string, any>;
 }

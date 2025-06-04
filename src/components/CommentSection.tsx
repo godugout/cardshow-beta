@@ -10,7 +10,6 @@ import { commentRepository } from '@/lib/data';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { MessageCircle, SendHorizontal, Reply, Trash, Edit } from 'lucide-react';
-import { adaptComment, adaptUser } from '@/lib/utils/typeAdapters';
 
 interface CommentSectionProps {
   cardId?: string;
@@ -49,11 +48,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
       }
       
       if (data) {
-        // Convert the comments to our expected type with proper typing
-        const typedComments: Comment[] = data.map(c => adaptComment(c));
+        // Convert the comments to our expected type
+        const typedComments: Comment[] = data.map(c => ({
+          ...c,
+          userId: c.userId || c.authorId || '', // Handle either userId or authorId
+          user: c.user  // Keep the user object if it exists
+        }));
         setComments(typedComments);
-        
-        // Fetch replies for each comment
         typedComments.forEach(comment => {
           if (comment.id) {
             fetchReplies(comment.id);
@@ -79,8 +80,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
       }
       
       if (data && data.length > 0) {
-        const typedReplies: Comment[] = data.map(c => adaptComment(c));
-        
+        // Convert to our expected type
+        const typedReplies: Comment[] = data.map(c => ({
+          ...c,
+          userId: c.userId || c.authorId || '', // Handle either userId or authorId
+          user: c.user // Keep the user object if it exists
+        }));
         setRepliesByParentId(prev => ({
           ...prev,
           [parentId]: typedReplies
@@ -95,12 +100,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
     if (!user || !newComment.trim()) return;
     
     try {
-      // Support both content and text fields
       const commentData = {
         content: newComment.trim(),
-        text: newComment.trim(),
-        userId: user.id,
         authorId: user.id, // Using authorId for compatibility with different APIs
+        userId: user.id,   // Using userId for our interface
         cardId,
         collectionId,
         teamId,
@@ -120,10 +123,14 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
         setNewComment('');
         
         // Convert to our expected type
-        const typedComment = adaptComment({
+        const typedComment: Comment = {
           ...data,
-          user: user
-        });
+          userId: data.userId || data.authorId || user.id,
+          user: {
+            ...user,
+            id: user.id
+          }
+        };
         
         if (replyTo) {
           setRepliesByParentId(prev => ({
@@ -157,7 +164,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
         toast.success('Comment updated successfully');
         
         // Convert to our expected type
-        const typedComment = adaptComment(data);
+        const typedComment: Comment = {
+          ...data,
+          userId: data.userId || data.authorId || '',
+          user: data.user
+        };
         
         if (typedComment.parentId) {
           setRepliesByParentId(prev => ({
@@ -216,8 +227,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
   
   const startEditing = (comment: Comment) => {
     setEditingId(comment.id);
-    // Support both content and text properties
-    setEditText(comment.content || comment.text || '');
+    setEditText(comment.content);
   };
   
   const cancelEditing = () => {
@@ -244,11 +254,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
       if (commentUser.displayName) return commentUser.displayName.charAt(0);
       if (commentUser.name) return commentUser.name.charAt(0);
       return commentUser.email?.charAt(0) || '?';
-    };
-
-    // Helper function to get comment content
-    const getCommentContent = (comment: Comment) => {
-      return comment.content || comment.text || '';
     };
     
     return (

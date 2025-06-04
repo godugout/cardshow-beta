@@ -37,7 +37,7 @@ export function Toaster() {
                 )}
               </div>
             </div>
-            {action && React.isValidElement(action) ? action : null}
+            {action}
             <ToastClose />
           </Toast>
         )

@@ -1,185 +1,48 @@
-// Import necessary types
-import { Card, CardMarketMetadata } from '@/lib/types/cardTypes';
 
-// Sample card data for testing and development
-export const cardData: Card[] = [
+import { CardData } from '@/types/card';
+
+// Sample card data
+const sampleCardsData: CardData[] = [
   {
-    id: "1",
-    title: "Oakland Roots 2023",
-    description: "A tribute to the vibrant Oakland Roots soccer team",
-    imageUrl: "/images/card-samples/oakland-roots-sample.jpg",
-    thumbnailUrl: "/images/card-samples/oakland-roots-sample.jpg",
-    tags: ["soccer", "oakland", "roots", "2023"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    userId: "user-1",
+    id: '1',
+    title: 'Rickey Henderson Rookie Card',
+    description: 'A classic Rickey Henderson rookie card from 1979.',
+    imageUrl: '/assets/cards/rickey-henderson.jpg',
+    thumbnailUrl: '/assets/cards/thumbnails/rickey-henderson-thumb.jpg',
+    player: 'Rickey Henderson',
+    team: 'Oakland Athletics',
+    year: '1979',
+    tags: ['baseball', 'rookie', 'oakland', 'athletics'],
+    createdAt: '2023-02-15T10:30:00Z',
+    updatedAt: '2023-02-15T10:30:00Z',
+    userId: 'user-1',
+    effects: ['holographic'],
     designMetadata: {
       cardStyle: {
-        template: "gradient",
-        effect: "none",
-        borderRadius: "12px",
-        borderColor: "#32CD32",
-        backgroundColor: "#000000",
-        frameWidth: 4,
-        frameColor: "#32CD32",
-        shadowColor: "rgba(0,0,0,0.5)"
-      },
-      textStyle: {
-        titleColor: "#FFFFFF",
-        titleAlignment: "center",
-        titleWeight: "bold",
-        descriptionColor: "#FFFFFF"
-      },
-      cardMetadata: {
-        category: "sports",
-        series: "2023",
-        cardType: "team"
-      },
-      marketMetadata: {
-        price: 75,
-        currency: "USD",
-        availableForSale: true,
-        editionSize: 500,
-        editionNumber: 123,
-        isPrintable: true,
-        isForSale: true,
-        includeInCatalog: true
-      }
-    }
-  },
-  {
-    id: "2",
-    title: "Golden State Warriors 2017",
-    description: "Celebrating the Warriors' championship season",
-    imageUrl: "/images/card-samples/golden-state-warriors-sample.jpg",
-    thumbnailUrl: "/images/card-samples/golden-state-warriors-sample.jpg",
-    tags: ["basketball", "warriors", "championship", "2017"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    userId: "user-2",
-    designMetadata: {
-      cardStyle: {
-        template: "metallic",
-        effect: "shine",
-        borderRadius: "8px",
-        borderColor: "#FFD700",
-        backgroundColor: "#006D5B",
+        template: 'classic',
+        effect: 'holographic',
+        borderRadius: '10px',
+        borderColor: '#00a33d',
         frameWidth: 3,
-        frameColor: "#FFD700",
-        shadowColor: "rgba(0,0,0,0.4)"
+        shadowColor: 'rgba(0,0,0,0.3)',
+        frameColor: '#ffd700'
       },
       textStyle: {
-        titleColor: "#FFFFFF",
-        titleAlignment: "left",
-        titleWeight: "bold",
-        descriptionColor: "#FFFFFF"
+        titleColor: '#000000',
+        titleAlignment: 'center',
+        titleWeight: 'bold',
+        descriptionColor: '#333333'
       },
       cardMetadata: {
-        category: "sports",
-        series: "2017",
-        cardType: "team"
+        category: 'baseball',
+        series: 'vintage',
+        cardType: 'rookie'
       },
       marketMetadata: {
-        price: 120,
-        currency: "USD",
+        price: 299.99,
+        currency: 'USD',
         availableForSale: true,
-        editionSize: 250,
-        editionNumber: 45,
-        isPrintable: true,
-        isForSale: true,
-        includeInCatalog: true
-      }
-    }
-  },
-  {
-    id: "3",
-    title: "San Francisco Giants 2014",
-    description: "Honoring the Giants' World Series victory",
-    imageUrl: "/images/card-samples/san-francisco-giants-sample.jpg",
-    thumbnailUrl: "/images/card-samples/san-francisco-giants-sample.jpg",
-    tags: ["baseball", "giants", "world series", "2014"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    userId: "user-3",
-    designMetadata: {
-      cardStyle: {
-        template: "vintage",
-        effect: "sepia",
-        borderRadius: "6px",
-        borderColor: "#A52A2A",
-        backgroundColor: "#F5F5DC",
-        frameWidth: 2,
-        frameColor: "#A52A2A",
-        shadowColor: "rgba(0,0,0,0.3)"
-      },
-      textStyle: {
-        titleColor: "#8B4513",
-        titleAlignment: "right",
-        titleWeight: "normal",
-        descriptionColor: "#8B4513"
-      },
-      cardMetadata: {
-        category: "sports",
-        series: "2014",
-        cardType: "team"
-      },
-      marketMetadata: {
-        price: 90,
-        currency: "USD",
-        availableForSale: true,
-        editionSize: 300,
-        editionNumber: 78,
-        isPrintable: true,
-        isForSale: true,
-        includeInCatalog: true
-      }
-    }
-  }
-];
-
-// Update the marketMetadata objects to include the required properties
-export const sampleCardData: Card[] = [
-  {
-    id: "card-1",
-    title: "Mike Trout 2021",
-    description: "Limited Edition Holographic Card",
-    imageUrl: "/placeholder-card.png",
-    thumbnailUrl: "/placeholder-card.png",
-    tags: ["baseball", "angels", "holographic"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    userId: "user-1",
-    player: "Mike Trout",
-    team: "Angels",
-    year: "2021",
-    effects: ["holographic"],
-    designMetadata: {
-      cardStyle: {
-        template: "modern",
-        effect: "holographic",
-        borderRadius: "12px",
-        borderColor: "#ff0000",
-        backgroundColor: "#ffffff",
-        frameWidth: 6,
-        frameColor: "#ff0000",
-        shadowColor: "rgba(0,0,0,0.3)"
-      },
-      textStyle: {
-        titleColor: "#333333",
-        titleAlignment: "center",
-        titleWeight: "bold",
-        descriptionColor: "#666666"
-      },
-      cardMetadata: {
-        category: "sports",
-        series: "2021",
-        cardType: "player"
-      },
-      marketMetadata: {
-        price: 150,
-        currency: "USD",
-        availableForSale: true,
-        editionSize: 100,
+        editionSize: 1000,
         editionNumber: 42,
         isPrintable: true,
         isForSale: true,
@@ -188,47 +51,46 @@ export const sampleCardData: Card[] = [
     }
   },
   {
-    id: "card-2",
-    title: "LeBron James 2012",
-    description: "Miami Heat Championship Card",
-    imageUrl: "/placeholder-card.png",
-    thumbnailUrl: "/placeholder-card.png",
-    tags: ["basketball", "heat", "champion"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    userId: "user-2",
-    player: "LeBron James",
-    team: "Heat",
-    year: "2012",
-    effects: ["refractor"],
+    id: '2',
+    title: 'Mark McGwire Home Run Record',
+    description: 'Commemorative card for Mark McGwire\'s home run record.',
+    imageUrl: '/assets/cards/mark-mcgwire.jpg',
+    thumbnailUrl: '/assets/cards/thumbnails/mark-mcgwire-thumb.jpg',
+    player: 'Mark McGwire',
+    team: 'St. Louis Cardinals',
+    year: '1998',
+    tags: ['baseball', 'record', 'home run', 'cardinals'],
+    createdAt: '2023-02-16T14:45:00Z',
+    updatedAt: '2023-02-16T14:45:00Z',
+    userId: 'user-2',
+    effects: ['gold-foil'],
     designMetadata: {
       cardStyle: {
-        template: "retro",
-        effect: "refractor",
-        borderRadius: "8px",
-        borderColor: "#0000ff",
-        backgroundColor: "#ffff00",
+        template: 'premium',
+        effect: 'gold-foil',
+        borderRadius: '8px',
+        borderColor: '#c41e3a',
         frameWidth: 4,
-        frameColor: "#0000ff",
-        shadowColor: "rgba(0,0,0,0.3)"
+        shadowColor: 'rgba(0,0,0,0.4)',
+        frameColor: '#ffd700'
       },
       textStyle: {
-        titleColor: "#ffffff",
-        titleAlignment: "center",
-        titleWeight: "bold",
-        descriptionColor: "#000000"
+        titleColor: '#c41e3a',
+        titleAlignment: 'center',
+        titleWeight: 'bold',
+        descriptionColor: '#333333'
       },
       cardMetadata: {
-        category: "sports",
-        series: "2012",
-        cardType: "player"
+        category: 'baseball',
+        series: 'commemorative',
+        cardType: 'special'
       },
       marketMetadata: {
-        price: 200,
-        currency: "USD",
+        price: 149.99,
+        currency: 'USD',
         availableForSale: true,
-        editionSize: 50,
-        editionNumber: 12,
+        editionSize: 500,
+        editionNumber: 62,
         isPrintable: true,
         isForSale: true,
         includeInCatalog: true
@@ -236,47 +98,46 @@ export const sampleCardData: Card[] = [
     }
   },
   {
-    id: "card-3",
-    title: "Babe Ruth 1933",
-    description: "New York Yankees Legend",
-    imageUrl: "/placeholder-card.png",
-    thumbnailUrl: "/placeholder-card.png",
-    tags: ["baseball", "yankees", "legend"],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    userId: "user-3",
-    player: "Babe Ruth",
-    team: "Yankees",
-    year: "1933",
-    effects: ["vintage"],
+    id: '3',
+    title: 'Ken Griffey Jr. All-Star',
+    description: 'Ken Griffey Jr. All-Star card with special effects.',
+    imageUrl: '/assets/cards/griffey-jr.jpg',
+    thumbnailUrl: '/assets/cards/thumbnails/griffey-jr-thumb.jpg',
+    player: 'Ken Griffey Jr.',
+    team: 'Seattle Mariners',
+    year: '1994',
+    tags: ['baseball', 'all-star', 'mariners', '90s'],
+    createdAt: '2023-02-17T09:20:00Z',
+    updatedAt: '2023-02-17T09:20:00Z',
+    userId: 'user-1',
+    effects: ['refractor'],
     designMetadata: {
       cardStyle: {
-        template: "classic",
-        effect: "vintage",
-        borderRadius: "6px",
-        borderColor: "#808080",
-        backgroundColor: "#f0f0f0",
-        frameWidth: 2,
-        frameColor: "#808080",
-        shadowColor: "rgba(0,0,0,0.3)"
+        template: 'modern',
+        effect: 'refractor',
+        borderRadius: '12px',
+        borderColor: '#0c2c56',
+        frameWidth: 3,
+        shadowColor: 'rgba(0,0,0,0.3)',
+        frameColor: '#00ccff'
       },
       textStyle: {
-        titleColor: "#800000",
-        titleAlignment: "center",
-        titleWeight: "normal",
-        descriptionColor: "#800000"
+        titleColor: '#0c2c56',
+        titleAlignment: 'center',
+        titleWeight: 'bold',
+        descriptionColor: '#333333'
       },
       cardMetadata: {
-        category: "sports",
-        series: "1933",
-        cardType: "player"
+        category: 'baseball',
+        series: 'all-star',
+        cardType: 'premium'
       },
       marketMetadata: {
-        price: 500,
-        currency: "USD",
-        availableForSale: false,
-        editionSize: 10,
-        editionNumber: 1,
+        price: 199.99,
+        currency: 'USD',
+        availableForSale: true,
+        editionSize: 750,
+        editionNumber: 24,
         isPrintable: true,
         isForSale: true,
         includeInCatalog: true
@@ -285,32 +146,8 @@ export const sampleCardData: Card[] = [
   }
 ];
 
-export const teamData = [
-  {
-    id: "team-1",
-    name: "Golden State Warriors",
-    logoUrl: "/images/team-logos/warriors.png",
-    description: "The Golden State Warriors are an American professional basketball team based in San Francisco.",
-    ownerId: "user-1",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: "team-2",
-    name: "Los Angeles Lakers",
-    logoUrl: "/images/team-logos/lakers.png",
-    description: "The Los Angeles Lakers are an American professional basketball team based in Los Angeles.",
-    ownerId: "user-2",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: "team-3",
-    name: "Boston Celtics",
-    logoUrl: "/images/team-logos/celtics.png",
-    description: "The Boston Celtics are an American professional basketball team based in Boston.",
-    ownerId: "user-3",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
+// Export as default as well as named export for compatibility
+export default sampleCardsData;
+
+// Legacy named export for backward compatibility
+export { sampleCardsData as cardData };

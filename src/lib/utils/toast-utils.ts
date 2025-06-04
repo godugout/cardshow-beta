@@ -1,55 +1,33 @@
 
-import { toast } from "sonner";
-import { ToastVariant } from "@/types/toast";
+import { toast } from '@/hooks/use-toast';
+import { ToastVariant } from '@/types/toast';
 
-// Helper functions for toast notifications
 export const toastUtils = {
-  success: (title: string, description?: string) => {
-    toast.success(title, {
+  show: (title: string, description?: string, variant: ToastVariant = 'default', duration?: number) => {
+    return toast({
+      id: Math.random().toString(36).substring(2, 9),
+      title,
       description,
-      duration: 3000,
+      variant,
+      duration
     });
   },
   
-  error: (title: string, description?: string) => {
-    toast.error(title, {
-      description,
-      duration: 5000,
-    });
+  success: (title: string, description?: string, duration?: number) => {
+    return toastUtils.show(title, description, 'success', duration);
   },
   
-  warning: (title: string, description?: string) => {
-    toast.warning(title, {
-      description,
-      duration: 4000,
-    });
+  error: (title: string, description?: string, duration?: number) => {
+    return toastUtils.show(title, description, 'destructive', duration);
   },
   
-  info: (title: string, description?: string) => {
-    toast.info(title, {
-      description,
-      duration: 3000,
-    });
+  warning: (title: string, description?: string, duration?: number) => {
+    return toastUtils.show(title, description, 'warning', duration);
   },
   
-  custom: (title: string, {
-    description,
-    variant = "default",
-    duration = 3000,
-    action
-  }: {
-    description?: string;
-    variant?: ToastVariant;
-    duration?: number;
-    action?: React.ReactNode;
-  } = {}) => {
-    toast(title, {
-      description,
-      duration,
-      action,
-    });
+  info: (title: string, description?: string, duration?: number) => {
+    return toastUtils.show(title, description, 'info', duration);
   }
 };
 
-// Default export for backward compatibility
 export default toastUtils;

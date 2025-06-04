@@ -1,54 +1,62 @@
+import { TeamMember, User, UserRole } from '@/lib/types';
+import { Team } from '@/lib/types/teamTypes';
 
-import { Team, TeamMember } from '@/lib/types/teamTypes';
+/**
+ * Maps a team record from the database to the Team interface
+ */
+export const mapTeamFromDb = (team: any): Team => ({
+  id: team.id,
+  name: team.name,
+  description: team.description,
+  logoUrl: team.logo_url,
+  logo_url: team.logo_url,
+  banner_url: team.banner_url,
+  ownerId: team.owner_id, // Keep only ownerId
+  status: team.status,
+  website: team.website,
+  email: team.email,
+  specialties: team.specialties,
+  createdAt: team.created_at,
+  updatedAt: team.updated_at,
+  visibility: team.visibility || 'public', // Default visibility
+  
+  // Team fields
+  team_code: team.team_code,
+  primary_color: team.primary_color,
+  secondary_color: team.secondary_color,
+  tertiary_color: team.tertiary_color,
+  founded_year: team.founded_year,
+  city: team.city,
+  state: team.state,
+  country: team.country,
+  stadium: team.stadium,
+  mascot: team.mascot,
+  league: team.league,
+  division: team.division,
+  is_active: team.is_active
+});
 
-export function mapTeamToSupabase(team: Partial<Team>) {
-  return {
-    name: team.name,
-    description: team.description,
-    logo_url: team.logoUrl,
-    banner_url: team.bannerUrl,
-    owner_id: team.ownerId,
-    primary_color: team.primaryColor,
-    secondary_color: team.secondaryColor,
-    tags: team.tags,
-    website: team.website,
-    email: team.email,
-    status: team.status,
-    visibility: team.visibility,
-    specialties: team.specialties,
-    settings: team.settings
+/**
+ * Maps a team member record from the database to the TeamMember interface
+ */
+export const mapTeamMemberFromDb = (member: any): TeamMember => {
+  const user: User = {
+    id: member.user_id,
+    email: member.users?.email,
+    displayName: member.users?.display_name,
+    name: member.users?.full_name,
+    avatarUrl: member.users?.avatar_url,
+    role: UserRole.USER,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
-}
 
-export function mapTeamFromSupabase(data: any): Team {
   return {
-    id: data.id,
-    name: data.name,
-    description: data.description,
-    logoUrl: data.logo_url,
-    bannerUrl: data.banner_url,
-    ownerId: data.owner_id,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
-    primaryColor: data.primary_color,
-    secondaryColor: data.secondary_color,
-    tags: data.tags || [],
-    website: data.website,
-    email: data.email,
-    status: data.status || 'active',
-    visibility: data.visibility || 'public',
-    specialties: data.specialties || [],
-    settings: data.settings || {}
+    id: member.id,
+    teamId: member.team_id,
+    userId: member.user_id,
+    role: member.role,
+    joinedAt: member.joined_at,
+    user
   };
-}
-
-export function mapTeamMemberFromSupabase(data: any): TeamMember {
-  return {
-    id: data.id,
-    userId: data.user_id,
-    teamId: data.team_id,
-    role: data.role,
-    joinedAt: data.joined_at,
-    permissions: data.permissions || []
-  };
-}
+};

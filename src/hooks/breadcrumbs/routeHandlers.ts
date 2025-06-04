@@ -1,106 +1,82 @@
 
-import { BreadcrumbItem } from './types';
-import { Team, User, Collection, Card } from '@/lib/types';
+import { useLocation } from 'react-router-dom';
+import { Team } from '@/lib/types/teamTypes'; 
+import { BreadcrumbItem, BreadcrumbHandlerProps } from './types';
+import { v4 as uuidv4 } from 'uuid';
 
-export const handleTeamRoute = async (teamId: string): Promise<BreadcrumbItem[]> => {
-  try {
-    // Mock team data - in real app, fetch from API
-    const team: Team = {
-      id: teamId,
-      name: 'Oakland Athletics',
-      description: 'Professional baseball team',
-      primaryColor: '#003831',
-      secondaryColor: '#EFB21E',
-      ownerId: 'owner-id',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+// Handle team segment in routes
+export const handleTeamSegment = ({
+  index,
+  pathSegments,
+  segment,
+  currentPath,
+  currentTeam
+}: BreadcrumbHandlerProps): BreadcrumbItem | null => {
+  // If segment follows 'teams' and looks like an ID
+  if (index > 0 && pathSegments[index-1] === 'teams' && segment.match(/^[0-9a-zA-Z-]+$/)) {
+    // If we have the current team data, use it
+    if (currentTeam && currentTeam.id === segment) {
+      return {
+        id: `team-${currentTeam.id}`,
+        path: currentPath,
+        label: currentTeam.name,
+        // Use primary_color instead of brandColor if it exists
+        ...(currentTeam.primary_color && { color: currentTeam.primary_color })
+      };
+    }
+    
+    // Fallback if no team data
+    return {
+      id: `team-${segment}`,
+      path: `${segment}`,
+      label: `Team ${segment.substring(0, 6)}...`
     };
-
-    return [
-      { label: 'Teams', href: '/teams' },
-      { 
-        label: team.name, 
-        href: `/teams/${teamId}`,
-        color: team.primaryColor || '#003831'
-      }
-    ];
-  } catch (error) {
-    console.error('Error fetching team for breadcrumbs:', error);
-    return [
-      { label: 'Teams', href: '/teams' },
-      { label: 'Team', href: `/teams/${teamId}` }
-    ];
   }
+  
+  return null;
 };
 
-export const handleUserRoute = async (userId: string): Promise<BreadcrumbItem[]> => {
-  try {
-    // Mock user data - in real app, fetch from API
-    const user: User = {
-      id: userId,
-      email: 'user@example.com',
-      name: 'User Name',
-      displayName: 'User Display Name',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+// Handle main navigation sections
+export const handleMainSection = ({
+  segment,
+  currentPath,
+}: BreadcrumbHandlerProps): BreadcrumbItem | null => {
+  const mainSections = ['cards', 'collections', 'series', 'decks', 'gallery', 'packs'];
+  
+  if (mainSections.includes(segment)) {
+    return {
+      id: `section-${segment}`,
+      path: currentPath,
+      label: segment.charAt(0).toUpperCase() + segment.slice(1)
     };
-
-    return [
-      { label: 'Users', href: '/users' },
-      { label: user.displayName || user.name || 'User', href: `/users/${userId}` }
-    ];
-  } catch (error) {
-    console.error('Error fetching user for breadcrumbs:', error);
-    return [
-      { label: 'Users', href: '/users' },
-      { label: 'User', href: `/users/${userId}` }
-    ];
   }
+  
+  return null;
 };
 
-export const handleCollectionRoute = async (collectionId: string): Promise<BreadcrumbItem[]> => {
-  try {
-    // Mock collection data - in real app, fetch from API
-    const collection: Collection = {
-      id: collectionId,
-      name: 'Collection Name',
-      ownerId: 'owner-id',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+// Handle complex routes that require special breadcrumb naming
+export const handleComplexRoutes = ({
+  pathSegments,
+  currentPath,
+}: BreadcrumbHandlerProps): BreadcrumbItem | null => {
+  const routePath = pathSegments.join('/');
+  
+  // Special case handling
+  if (routePath === 'teams/new') {
+    return {
+      id: 'new-team',
+      path: currentPath,
+      label: 'Create Team'
     };
-
-    return [
-      { label: 'Collections', href: '/collections' },
-      { label: collection.name, href: `/collections/${collectionId}` }
-    ];
-  } catch (error) {
-    console.error('Error fetching collection for breadcrumbs:', error);
-    return [
-      { label: 'Collections', href: '/collections' },
-      { label: 'Collection', href: `/collections/${collectionId}` }
-    ];
   }
-};
-
-export const handleCardRoute = async (cardId: string): Promise<BreadcrumbItem[]> => {
-  try {
-    // Mock card data - in real app, fetch from API
-    const card: Card = {
-      id: cardId,
-      title: 'Card Title',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+  
+  if (routePath === 'teams/join') {
+    return {
+      id: 'join-team',
+      path: currentPath,
+      label: 'Join Team'
     };
-
-    return [
-      { label: 'Cards', href: '/cards' },
-      { label: card.title || 'Card', href: `/cards/${cardId}` }
-    ];
-  } catch (error) {
-    console.error('Error fetching card for breadcrumbs:', error);
-    return [
-      { label: 'Cards', href: '/cards' },
-      { label: 'Card', href: `/cards/${cardId}` }
-    ];
   }
+  
+  return null;
 };

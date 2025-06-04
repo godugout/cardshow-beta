@@ -1,81 +1,63 @@
 
+import { BaseEntity } from './index';
 import { User } from './user';
 
 /**
- * Core team interface
+ * Team member roles
  */
-export interface Team {
-  id: string;
-  name: string;
-  description?: string;
-  logoUrl?: string;
-  bannerUrl?: string;
-  ownerId: string;
-  owner?: User;
-  createdAt: string;
-  updatedAt: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-  tags?: string[];
-  members?: TeamMember[];
-  website?: string;
-  email?: string;
-  status?: 'active' | 'inactive' | 'suspended';
-  visibility?: 'public' | 'private' | 'unlisted';
-  specialties?: string[];
-  settings?: Record<string, any>;
-  isPublic?: boolean;
+export enum TeamMemberRole {
+  OWNER = 'owner',
+  ADMIN = 'admin',
+  MEMBER = 'member',
+  VIEWER = 'viewer',
 }
 
 /**
  * Team member interface
  */
-export interface TeamMember {
-  id: string;
+export interface TeamMember extends BaseEntity {
   userId: string;
   teamId: string;
-  role: TeamRole;
-  joinedAt: string;
-  permissions?: string[];
+  role: TeamMemberRole;
+  invitedBy?: string;
+  joinedAt?: string;
   user?: User;
-  avatarUrl?: string;
-  createdAt?: string;
 }
 
 /**
- * Team roles enum
+ * Team interface
  */
-export enum TeamRole {
-  OWNER = 'owner',
-  ADMIN = 'admin',
-  MODERATOR = 'moderator',
-  MEMBER = 'member'
-}
-
-/**
- * Team invitation interface
- */
-export interface TeamInvitation {
-  id: string;
-  teamId: string;
-  invitedBy: string;
-  invitedEmail: string;
-  role: TeamRole;
-  status: 'pending' | 'accepted' | 'declined' | 'expired';
-  createdAt: string;
-  expiresAt: string;
-  team?: Team;
-}
-
-/**
- * Team statistics interface
- */
-export interface TeamStats {
-  memberCount: number;
-  cardCount: number;
-  collectionCount: number;
-  totalViews: number;
-  totalLikes: number;
-  activeMembers: number;
-  recentActivity: string;
+export interface Team extends BaseEntity {
+  name: string;
+  description?: string;
+  logoUrl?: string;
+  members?: TeamMember[];
+  ownerId: string;
+  visibility: 'public' | 'private' | 'unlisted';
+  
+  // Additional team properties from DbTeam
+  logo_url?: string;
+  banner_url?: string;
+  status?: string;
+  website?: string;
+  email?: string;
+  specialties?: string[];
+  
+  // Team fields
+  team_code?: string;
+  primary_color?: string;
+  secondary_color?: string;
+  tertiary_color?: string;
+  founded_year?: number;
+  city?: string;
+  state?: string;
+  country?: string;
+  stadium?: string;
+  mascot?: string;
+  league?: string;
+  division?: string;
+  is_active?: boolean;
+  
+  // For display purposes in TeamGallery
+  memberCount?: number;
 }

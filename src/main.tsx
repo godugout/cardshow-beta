@@ -6,11 +6,10 @@ import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from './hooks/useTheme.tsx'
 import { TeamThemeProvider } from './context/ThemeContext.tsx'
 import { BrandThemeProvider } from './context/BrandThemeContext.tsx'
-import { AuthProvider } from './context/auth'
+import { AuthProvider } from './providers/AuthProvider'
 import { HelmetProvider } from 'react-helmet-async'
 import { CardProvider } from './context/CardContext'
-import { SessionProvider } from './providers/session-provider'
-import { Toaster } from '@/components/ui/toaster'
+import { Toaster } from '@/components/ui/toaster' // Adding Toaster for notifications
 import './index.css'
 import './main.css'
 
@@ -21,14 +20,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <ThemeProvider>
           <TeamThemeProvider>
             <BrandThemeProvider>
-              <SessionProvider>
-                <AuthProvider>
-                  <CardProvider>
-                    <App />
-                    <Toaster />
-                  </CardProvider>
-                </AuthProvider>
-              </SessionProvider>
+              <AuthProvider>
+                <CardProvider>
+                  <App />
+                  <Toaster /> {/* Add toast notifications */}
+                </CardProvider>
+              </AuthProvider>
             </BrandThemeProvider>
           </TeamThemeProvider>
         </ThemeProvider>
