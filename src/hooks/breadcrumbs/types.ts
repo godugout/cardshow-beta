@@ -1,15 +1,10 @@
 
-import { BaseEntity } from '@/lib/types';
-import { Team } from '@/lib/types/teamTypes'; // Consistent casing
+import { Team } from '@/lib/types/teamTypes';
 
 export interface BreadcrumbItem {
-  id: string;
   label: string;
-  path: string;
-  icon?: React.ReactNode;
-  parentId?: string;
-  isActive?: boolean;
-  color?: string; // Added color property
+  href?: string;
+  color?: string;
 }
 
 export interface BreadcrumbHandlerProps {

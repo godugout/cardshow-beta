@@ -1,4 +1,3 @@
-
 import { useLocation } from 'react-router-dom';
 import { Team } from '@/lib/types/teamTypes';
 import { BreadcrumbItem, BreadcrumbHandlerProps } from './types';
@@ -8,10 +7,16 @@ import {
   createGenericBreadcrumb 
 } from './commonHandlers';
 import { 
+  handleTeamRoute, 
+  handleUserRoute, 
+  handleCollectionRoute, 
+  handleCardRoute 
+} from './routeHandlers';
+import { 
   handleTeamSegment, 
   handleMainSection, 
   handleComplexRoutes 
-} from './routeHandlers';
+} from './additionalHandlers';
 import { 
   handleSemanticSegments, 
   handleIdSegment 

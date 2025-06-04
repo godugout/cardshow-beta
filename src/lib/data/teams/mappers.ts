@@ -1,51 +1,54 @@
 
-import { Team, TeamMember } from '@/lib/types';
-import { UserRole } from '@/lib/types/user';
+import { Team, TeamMember } from '@/lib/types/teamTypes';
 
-/**
- * Map raw team data to Team interface
- * @param rawTeam Raw team data from database
- * @returns Team object
- */
-export function mapToTeam(rawTeam: any): Team {
+export function mapTeamToSupabase(team: Partial<Team>) {
   return {
-    id: rawTeam.id,
-    name: rawTeam.name,
-    description: rawTeam.description || '',
-    logoUrl: rawTeam.logo_url,
-    members: rawTeam.members || [],
-    createdAt: rawTeam.created_at,
-    updatedAt: rawTeam.updated_at,
-    ownerId: rawTeam.owner_id,
-    settings: rawTeam.settings || {},
-    isPublic: rawTeam.is_public !== false,
-    // Only copy coverImage if needed for legacy support
-    ...(rawTeam.cover_image ? { coverImage: rawTeam.cover_image } : {})
+    name: team.name,
+    description: team.description,
+    logo_url: team.logoUrl,
+    banner_url: team.bannerUrl,
+    owner_id: team.ownerId,
+    primary_color: team.primaryColor,
+    secondary_color: team.secondaryColor,
+    tags: team.tags,
+    website: team.website,
+    email: team.email,
+    status: team.status,
+    visibility: team.visibility,
+    specialties: team.specialties,
+    settings: team.settings
   };
 }
 
-/**
- * Map raw team member data to TeamMember interface
- * @param rawMember Raw team member data from database
- * @returns TeamMember object
- */
-export function mapToTeamMember(rawMember: any): TeamMember {
+export function mapTeamFromSupabase(data: any): Team {
   return {
-    id: rawMember.id,
-    userId: rawMember.user_id,
-    teamId: rawMember.team_id,
-    role: rawMember.role || UserRole.VIEWER, // Using VIEWER instead of USER/Member
-    // Only include name if needed for legacy support
-    ...(rawMember.name ? { name: rawMember.name } : {}),
-    email: rawMember.email,
-    avatarUrl: rawMember.avatar_url,
-    joinedAt: rawMember.joined_at || rawMember.created_at,
-    createdAt: rawMember.created_at,
-    updatedAt: rawMember.updated_at,
-    permissions: rawMember.permissions || []
+    id: data.id,
+    name: data.name,
+    description: data.description,
+    logoUrl: data.logo_url,
+    bannerUrl: data.banner_url,
+    ownerId: data.owner_id,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    primaryColor: data.primary_color,
+    secondaryColor: data.secondary_color,
+    tags: data.tags || [],
+    website: data.website,
+    email: data.email,
+    status: data.status || 'active',
+    visibility: data.visibility || 'public',
+    specialties: data.specialties || [],
+    settings: data.settings || {}
   };
 }
 
-// Make exports available for teamService and teamMembersService
-export const mapTeamFromDb = mapToTeam;
-export const mapTeamMemberFromDb = mapToTeamMember;
+export function mapTeamMemberFromSupabase(data: any): TeamMember {
+  return {
+    id: data.id,
+    userId: data.user_id,
+    teamId: data.team_id,
+    role: data.role,
+    joinedAt: data.joined_at,
+    permissions: data.permissions || []
+  };
+}

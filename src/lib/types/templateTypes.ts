@@ -95,13 +95,17 @@ export enum TemplateCategory {
   DECORATIVE = 'decorative'
 }
 
-// Separate CardTemplate interface
+// Updated CardTemplate interface with missing properties
 export interface CardTemplate {
   id: string;
   name: string;
+  description?: string;
   category: string;
   previewImage: string;
+  thumbnail?: string;
+  thumbnailUrl?: string;
   isOfficial: boolean;
+  popularity?: number;
   layoutData: Record<string, any>;
 }
 

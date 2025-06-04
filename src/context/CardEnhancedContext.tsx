@@ -1,10 +1,20 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Card, Collection, Deck } from '@/lib/types';
 
+interface Series {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface CardEnhancedContextType {
   cards: Card[];
   collections: Collection[];
   decks: Deck[];
+  series: Series[];
+  favorites: Card[];
   loading: boolean;
   error: string | null;
   selectedCard: Card | null;
@@ -25,10 +35,14 @@ interface CardEnhancedContextType {
   createDeck: (name: string, description: string) => Promise<Deck>;
   updateDeck: (id: string, data: Partial<Deck>) => Promise<Deck>;
   deleteDeck: (id: string) => Promise<boolean>;
+  addDeck: (deck: Deck) => Promise<Deck>;
+  addSeries: (series: Series) => Promise<Series>;
+  updateSeries: (id: string, data: Partial<Series>) => Promise<Series>;
   addCardToCollection: (cardId: string, collectionId: string) => Promise<boolean>;
   removeCardFromCollection: (cardId: string, collectionId: string) => Promise<boolean>;
   addCardToDeck: (cardId: string, deckId: string) => Promise<boolean>;
   removeCardFromDeck: (cardId: string, deckId: string) => Promise<boolean>;
+  toggleFavorite: (cardId: string) => Promise<boolean>;
   selectCard: (card: Card | null) => void;
   selectCollection: (collection: Collection | null) => void;
   selectDeck: (deck: Deck | null) => void;
@@ -40,6 +54,8 @@ export const CardEnhancedProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [cards, setCards] = useState<Card[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [decks, setDecks] = useState<Deck[]>([]);
+  const [series, setSeries] = useState<Series[]>([]);
+  const [favorites, setFavorites] = useState<Card[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
@@ -686,6 +702,98 @@ export const CardEnhancedProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
   };
   
+  // Add a deck
+  const addDeck = async (deck: Deck): Promise<Deck> => {
+    setLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 300));
+      setDecks(prev => [...prev, deck]);
+      setError(null);
+      return deck;
+    } catch (err) {
+      setError('Failed to add deck');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Add a series
+  const addSeries = async (newSeries: Series): Promise<Series> => {
+    setLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 300));
+      setSeries(prev => [...prev, newSeries]);
+      setError(null);
+      return newSeries;
+    } catch (err) {
+      setError('Failed to add series');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Update a series
+  const updateSeries = async (id: string, data: Partial<Series>): Promise<Series> => {
+    setLoading(true);
+    try {
+      const seriesIndex = series.findIndex(s => s.id === id);
+      if (seriesIndex === -1) {
+        throw new Error(`Series ${id} not found`);
+      }
+      
+      const updatedSeries = {
+        ...series[seriesIndex],
+        ...data,
+        updatedAt: new Date().toISOString(),
+      };
+      
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      const updatedSeriesArray = [...series];
+      updatedSeriesArray[seriesIndex] = updatedSeries;
+      setSeries(updatedSeriesArray);
+      
+      setError(null);
+      return updatedSeries;
+    } catch (err) {
+      setError(`Failed to update series ${id}`);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Toggle favorite
+  const toggleFavorite = async (cardId: string): Promise<boolean> => {
+    setLoading(true);
+    try {
+      const card = cards.find(c => c.id === cardId);
+      if (!card) {
+        throw new Error(`Card ${cardId} not found`);
+      }
+
+      const isFavorite = favorites.some(f => f.id === cardId);
+      
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      if (isFavorite) {
+        setFavorites(prev => prev.filter(f => f.id !== cardId));
+      } else {
+        setFavorites(prev => [...prev, card]);
+      }
+      
+      setError(null);
+      return !isFavorite;
+    } catch (err) {
+      setError(`Failed to toggle favorite for card ${cardId}`);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   // Select a card
   const selectCard = (card: Card | null) => {
     setSelectedCard(card);
@@ -712,6 +820,8 @@ export const CardEnhancedProvider: React.FC<{ children: ReactNode }> = ({ childr
     cards,
     collections,
     decks,
+    series,
+    favorites,
     loading,
     error,
     selectedCard,
@@ -732,10 +842,14 @@ export const CardEnhancedProvider: React.FC<{ children: ReactNode }> = ({ childr
     createDeck,
     updateDeck,
     deleteDeck,
+    addDeck,
+    addSeries,
+    updateSeries,
     addCardToCollection,
     removeCardFromCollection,
     addCardToDeck,
     removeCardFromDeck,
+    toggleFavorite,
     selectCard,
     selectCollection,
     selectDeck,
