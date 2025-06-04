@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -7,9 +6,9 @@ import { ColorPicker } from '@/components/ui/color-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { useTheme } from 'next-themes';
-import { createToast } from '@/utils/createToast';
+import { createToast } from '@/types/toast';
 
 interface ThemeCustomizerProps {
   className?: string;
@@ -79,29 +78,32 @@ const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ className }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <Card>
-            <CardContent className="space-y-4 pt-6">
+            <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="primary-color">Primary Color</Label>
                 <ColorPicker
+                  id="primary-color"
                   color={primaryColor}
                   onChange={setPrimaryColor}
-                  className="mt-2"
+                  label="Primary Color"
                 />
               </div>
               <div>
                 <Label htmlFor="secondary-color">Secondary Color</Label>
                 <ColorPicker
+                  id="secondary-color"
                   color={secondaryColor}
                   onChange={setSecondaryColor}
-                  className="mt-2"
+                  label="Secondary Color"
                 />
               </div>
               <div>
                 <Label htmlFor="accent-color">Accent Color</Label>
                 <ColorPicker
+                  id="accent-color"
                   color={accentColor}
                   onChange={setAccentColor}
-                  className="mt-2"
+                  label="Accent Color"
                 />
               </div>
               <div>
@@ -135,7 +137,7 @@ const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ className }) => {
         </div>
         <div>
           <Card>
-            <CardContent className="space-y-4 pt-6">
+            <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="custom-css">Custom CSS</Label>
                 <Textarea

@@ -1,74 +1,123 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Database } from 'lucide-react';
 import { useCards } from '@/context/CardContext';
-import { toast } from '@/components/ui/use-toast';
-import { createToast } from '@/utils/createToast';
-import { DEFAULT_CARD_METADATA, DEFAULT_MARKET_METADATA } from '@/lib/utils/cardDefaults';
-
-// Use default import for sampleCardsData
-import sampleCardsData from '@/data/cardData';
+import { useToast } from '@/hooks/use-toast';
+import { createToast } from '@/types/toast';
 
 interface SampleCardsButtonProps {
-  className?: string;
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
 }
 
-const SampleCardsButton: React.FC<SampleCardsButtonProps> = ({ className }) => {
+const SampleCardsButton: React.FC<SampleCardsButtonProps> = ({ variant = 'default' }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const { addCard } = useCards();
+  const { toast } = useToast();
 
+  // Since addSampleCards doesn't exist in context, let's implement it here
   const addSampleCards = async () => {
+    // Mock implementation - in a real app this would fetch sample data
+    const sampleCards = [
+      {
+        id: `sample-${Date.now()}-1`,
+        title: 'Sample Basketball Card',
+        description: 'A sample basketball card',
+        imageUrl: 'https://placehold.co/600x400/orange/white?text=Basketball',
+        tags: ['sample', 'basketball'],
+        userId: 'system',
+        effects: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        designMetadata: {
+          cardStyle: {
+            template: 'classic',
+            effect: 'none',
+            borderRadius: '8px',
+            borderColor: '#000000',
+            shadowColor: 'rgba(0,0,0,0.2)',
+            frameWidth: 2,
+            frameColor: '#000000'
+          },
+          textStyle: {
+            titleColor: '#000000',
+            titleAlignment: 'center',
+            titleWeight: 'bold',
+            descriptionColor: '#333333'
+          },
+          cardMetadata: {},
+          marketMetadata: {}
+        }
+      },
+      {
+        id: `sample-${Date.now()}-2`,
+        title: 'Sample Baseball Card',
+        description: 'A sample baseball card',
+        imageUrl: 'https://placehold.co/600x400/blue/white?text=Baseball',
+        tags: ['sample', 'baseball'],
+        userId: 'system',
+        effects: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        designMetadata: {
+          cardStyle: {
+            template: 'classic',
+            effect: 'none',
+            borderRadius: '8px',
+            borderColor: '#000000',
+            shadowColor: 'rgba(0,0,0,0.2)',
+            frameWidth: 2,
+            frameColor: '#000000'
+          },
+          textStyle: {
+            titleColor: '#000000',
+            titleAlignment: 'center',
+            titleWeight: 'bold',
+            descriptionColor: '#333333'
+          },
+          cardMetadata: {},
+          marketMetadata: {}
+        }
+      }
+    ];
+    
+    // Add the sample cards to the collection
+    for (const card of sampleCards) {
+      await addCard(card);
+    }
+    
+    return sampleCards;
+  };
+
+  const handleClick = async () => {
     try {
-      sampleCardsData.forEach(async (cardData) => {
-        // Make sure we properly adapt the card data to match required CardMetadata format
-        const adaptedCard = {
-          ...cardData,
-          designMetadata: {
-            ...cardData.designMetadata,
-            cardMetadata: {
-              category: cardData.designMetadata?.cardMetadata?.category || DEFAULT_CARD_METADATA.category,
-              series: cardData.designMetadata?.cardMetadata?.series || DEFAULT_CARD_METADATA.series,
-              cardType: cardData.designMetadata?.cardMetadata?.cardType || DEFAULT_CARD_METADATA.cardType
-            },
-            marketMetadata: {
-              isPrintable: false,
-              isForSale: false,
-              includeInCatalog: false,
-              price: cardData.designMetadata?.marketMetadata?.price || 0,
-              currency: cardData.designMetadata?.marketMetadata?.currency || 'USD',
-              availableForSale: cardData.designMetadata?.marketMetadata?.availableForSale || false,
-              editionSize: cardData.designMetadata?.marketMetadata?.editionSize || 1,
-              editionNumber: cardData.designMetadata?.marketMetadata?.editionNumber || 1
-            }
-          }
-        };
-        await addCard(adaptedCard);
+      setIsLoading(true);
+      const cards = await addSampleCards();
+      toast({
+        title: "Sample cards added",
+        description: `${cards.length} sample cards have been added to your collection`,
+        variant: "default" // Changed from "success" to "default"
       });
-      handleSuccess();
     } catch (error) {
-      console.error("Error adding sample cards:", error);
-      handleError();
+      console.error("Failed to add sample cards:", error);
+      toast({
+        title: "Failed to add sample cards",
+        description: "An error occurred while adding sample cards",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleSuccess = () => {
-    toast(createToast({
-      title: 'Sample Cards Added',
-      description: 'Sample cards have been added to your collection.',
-      variant: 'default'
-    }));
-  };
-
-  const handleError = () => {
-    toast(createToast({
-      title: 'Error Adding Cards',
-      description: 'There was a problem adding the sample cards. Please try again.',
-      variant: 'destructive'
-    }));
-  };
-
   return (
-    <Button className={className} onClick={addSampleCards}>
-      Add Sample Cards
+    <Button
+      variant={variant}
+      onClick={handleClick}
+      disabled={isLoading}
+    >
+      <Database className="mr-2 h-4 w-4" />
+      {isLoading ? "Adding..." : "Add Sample Cards"}
     </Button>
   );
 };

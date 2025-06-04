@@ -4,15 +4,6 @@ import { ToastAction } from "@/components/ui/toast";
 
 export type ToastVariant = "default" | "destructive" | "success" | "warning" | "info";
 
-export interface Toast {
-  id: string;
-  title?: React.ReactNode;
-  description?: React.ReactNode;
-  action?: ReactNode;
-  variant?: ToastVariant;
-  duration?: number;
-}
-
 export interface ToasterToast {
   id: string;
   title?: React.ReactNode;

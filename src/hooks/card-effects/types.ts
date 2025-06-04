@@ -1,59 +1,60 @@
 
-import { CardEffect, CardEffectSettings } from '@/lib/types/cardTypes';
+export interface CardEffectSettings {
+  intensity?: number;
+  speed?: number;
+  pattern?: string;
+  color?: string;
+  colorScheme?: string[] | string;
+  animationEnabled?: boolean;
+  [key: string]: any; // Allow for additional properties as needed
+}
 
-export interface PremiumCardEffect extends CardEffect {
-  premium: boolean;
+export interface BaseCardEffect {
+  id: string;
+  name: string;
+  description: string;
   enabled: boolean;
-  description?: string;
+  settings: CardEffectSettings;
+  icon?: string;
   iconUrl?: string;
 }
 
-export interface MaterialSimulation {
-  type: string;
-  intensity: number;
-  reflectivity: number;
-  roughness: number;
-  metalness: number;
-  pattern?: string;
-  color?: string;
-  texture?: string;
-  baseColor?: string;
-  weathering?: number;
+export interface PremiumCardEffect extends BaseCardEffect {
+  premium: boolean;
+  price?: number;
+  category: string;
+  requiresGPU?: boolean;
+  compatibleWith?: string[];
 }
 
-export type CardEffectFunctionParams = {
-  element: HTMLElement;
-  settings: CardEffectSettings;
-  isEnabled: boolean;
-};
-
-export type CardEffectFunction = (params: CardEffectFunctionParams) => void | (() => void);
-
-export interface CardEffectRegistry {
-  [key: string]: CardEffectFunction;
+export interface EffectCategory {
+  id: string;
+  name: string;
+  description: string;
+  effects: PremiumCardEffect[];
 }
 
 export interface CardEffectDefinition {
   id: string;
   name: string;
   description: string;
-  thumbnail: string;
   category: string;
   defaultSettings: CardEffectSettings;
-  cssClass?: string;
-  supportedCardTypes?: string[];
   premium: boolean;
   enabled: boolean;
-  renderer?: (element: HTMLElement, settings: any) => void;
   iconUrl?: string;
+  thumbnail?: string;
+  cssClass?: string;
+  supportedCardTypes?: string[];
+  renderer: (element: HTMLElement, settings: CardEffectSettings) => void;
 }
 
-export type EffectUpdateCallback = (effectIds: string[]) => void;
-
-// Re-export CardEffectSettings from cardTypes for components that import it from here
-export type { CardEffectSettings } from '@/lib/types/cardTypes';
-
-export type CardEffectsResult = {
+export interface UseCardEffectsResult {
+  effects: PremiumCardEffect[];
+  categories: EffectCategory[];
   activeEffects: string[];
-  effectSettings: Record<string, CardEffectSettings>;
-};
+  toggleEffect: (effectId: string) => void;
+  updateEffectSettings: (effectId: string, settings: Partial<CardEffectSettings>) => void;
+  applyEffectsToElement: (element: HTMLElement) => void;
+  effectsLoading: boolean;
+}

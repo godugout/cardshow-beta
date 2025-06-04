@@ -1,46 +1,22 @@
 
-import { ComponentProps } from "react"
-import { ToastActionElement, ToastProps } from "@/components/ui/toast"
+import { ReactNode } from "react";
 
-export type ToastVariant = "default" | "destructive" | "success" | "warning" | "info" | "error";
+export type ToastVariant = "default" | "destructive" | "success" | "warning" | "info";
 
 export interface ToasterToast {
-  id: string
-  title?: string
-  description?: string
-  action?: ToastActionElement
-  variant?: ToastVariant
-  duration?: number
-  open: boolean
-}
-
-export type Toast = Omit<ToasterToast, "id"> & {
-  id?: string
-  open: boolean
-}
-
-export type ToastOptions = Toast
-
-export type ToastIconNames = "Check" | "X" | "AlertTriangle" | "Info" | null;
-
-export interface ToastActionProps extends ComponentProps<"button"> {
-  altText?: string
-}
-
-export const createToast = (config: {
-  title: string;
-  description?: string;
-  action?: ToastActionElement;
+  id: string;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: ReactNode;
   variant?: ToastVariant;
   duration?: number;
-}): Toast => {
-  return {
-    id: Math.random().toString(36).substring(2, 9),
-    title: config.title,
-    description: config.description,
-    action: config.action,
-    variant: config.variant || "default",
-    duration: config.duration || 3000,
-    open: true
-  };
-};
+}
+
+export interface ToasterToastWithId extends ToasterToast {
+  id: string;
+}
+
+export type ToastActionElement = React.ReactElement<{
+  altText: string;
+  onClick: () => void;
+}>;

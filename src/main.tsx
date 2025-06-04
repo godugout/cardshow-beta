@@ -9,8 +9,7 @@ import { BrandThemeProvider } from './context/BrandThemeContext.tsx'
 import { AuthProvider } from './providers/AuthProvider'
 import { HelmetProvider } from 'react-helmet-async'
 import { CardProvider } from './context/CardContext'
-import { Toaster } from '@/components/ui/toaster'
-import { UserPreferencesProvider } from './context/UserPreferencesContext'
+import { Toaster } from '@/components/ui/toaster' // Adding Toaster for notifications
 import './index.css'
 import './main.css'
 
@@ -22,12 +21,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <TeamThemeProvider>
             <BrandThemeProvider>
               <AuthProvider>
-                <UserPreferencesProvider>
-                  <CardProvider>
-                    <App />
-                    <Toaster />
-                  </CardProvider>
-                </UserPreferencesProvider>
+                <CardProvider>
+                  <App />
+                  <Toaster /> {/* Add toast notifications */}
+                </CardProvider>
               </AuthProvider>
             </BrandThemeProvider>
           </TeamThemeProvider>

@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { Card } from '@/lib/types/cardTypes';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ColorPicker } from '@/components/ui/color-picker';
+import ColorPicker from '@/components/ui/color-picker';
 
 interface DesignStepProps {
   cardData: Partial<Card>;
@@ -37,7 +38,7 @@ const EFFECT_OPTIONS = [
 ];
 
 const DesignStep: React.FC<DesignStepProps> = ({ cardData, onUpdate }) => {
-  // Ensure we have design metadata with default values
+  // Ensure we have design metadata
   const designMetadata = cardData.designMetadata || {
     cardStyle: {
       template: 'classic',
@@ -74,19 +75,10 @@ const DesignStep: React.FC<DesignStepProps> = ({ cardData, onUpdate }) => {
   };
 
   // Get card style with fallback
-  const cardStyle = designMetadata.cardStyle || {
-    template: 'classic',
-    effect: 'none',
-    borderRadius: '8px',
-    borderColor: '#000000',
-    backgroundColor: '#FFFFFF',
-    shadowColor: 'rgba(0,0,0,0.2)',
-    frameWidth: 2,
-    frameColor: '#000000'
-  };
+  const cardStyle = designMetadata.cardStyle || {};
 
   // Handle card style changes
-  const handleStyleChange = (property: string, value: any) => {
+  const handleStyleChange = (property: keyof typeof cardStyle, value: any) => {
     onUpdate({
       designMetadata: {
         ...designMetadata,

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 
-interface BrandColorPickerProps {
+interface ColorPickerProps {
   id?: string;
   color: string;
   value?: never; // Explicitly disallow value prop to prevent misuse
@@ -12,8 +12,7 @@ interface BrandColorPickerProps {
   colors?: string[];
 }
 
-// Renamed to BrandColorPicker to avoid conflicts with the UI component
-const BrandColorPicker: React.FC<BrandColorPickerProps> = ({
+const ColorPicker: React.FC<ColorPickerProps> = ({
   id,
   color,
   onChange,
@@ -60,4 +59,4 @@ const BrandColorPicker: React.FC<BrandColorPickerProps> = ({
   );
 };
 
-export default BrandColorPicker;
+export default ColorPicker;

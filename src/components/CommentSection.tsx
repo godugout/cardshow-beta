@@ -48,12 +48,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
       }
       
       if (data) {
-        // Convert the comments to our expected type
-        const typedComments: Comment[] = data.map(c => ({
-          ...c,
-          userId: c.userId || c.authorId || '', // Handle either userId or authorId
-          user: c.user  // Keep the user object if it exists
-        }));
+        // Ensure we're using a consistent type
+        const typedComments = data as Comment[];
         setComments(typedComments);
         typedComments.forEach(comment => {
           if (comment.id) {
@@ -80,12 +76,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
       }
       
       if (data && data.length > 0) {
-        // Convert to our expected type
-        const typedReplies: Comment[] = data.map(c => ({
-          ...c,
-          userId: c.userId || c.authorId || '', // Handle either userId or authorId
-          user: c.user // Keep the user object if it exists
-        }));
+        // Handle type consistency
+        const typedReplies = data as Comment[];
         setRepliesByParentId(prev => ({
           ...prev,
           [parentId]: typedReplies
@@ -100,10 +92,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
     if (!user || !newComment.trim()) return;
     
     try {
-      const commentData = {
+      const commentData: Partial<Comment> = {
         content: newComment.trim(),
-        authorId: user.id, // Using authorId for compatibility with different APIs
-        userId: user.id,   // Using userId for our interface
+        userId: user.id,
         cardId,
         collectionId,
         teamId,
@@ -122,15 +113,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
         toast.success('Comment posted successfully');
         setNewComment('');
         
-        // Convert to our expected type
-        const typedComment: Comment = {
-          ...data,
-          userId: data.userId || data.authorId || user.id,
-          user: {
-            ...user,
-            id: user.id
-          }
-        };
+        // Ensure type consistency by casting
+        const typedComment = data as Comment;
         
         if (replyTo) {
           setRepliesByParentId(prev => ({
@@ -163,12 +147,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
       if (data) {
         toast.success('Comment updated successfully');
         
-        // Convert to our expected type
-        const typedComment: Comment = {
-          ...data,
-          userId: data.userId || data.authorId || '',
-          user: data.user
-        };
+        // Ensure type consistency by casting
+        const typedComment = data as Comment;
         
         if (typedComment.parentId) {
           setRepliesByParentId(prev => ({
@@ -237,32 +217,30 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
   
   const renderCommentItem = (comment: Comment, isReply = false) => {
     const isEditing = editingId === comment.id;
-    const commentUserId = comment.userId || comment.authorId || '';
-    const isOwnComment = user && commentUserId === user.id;
+    const isOwnComment = user && comment.userId === user.id;
     const replies = repliesByParentId[comment.id] || [];
-    const commentUser = comment.user;
     
     // Helper function to get display name
-    const getDisplayName = (commentUser?: User) => {
-      if (!commentUser) return 'Anonymous';
-      return commentUser.displayName || commentUser.name || commentUser.username || 'Anonymous';
+    const getDisplayName = (user?: User) => {
+      if (!user) return 'Anonymous';
+      return user.displayName || user.name || user.username || 'Anonymous';
     };
     
     // Helper function to get avatar initial
-    const getAvatarInitial = (commentUser?: User) => {
-      if (!commentUser) return '?';
-      if (commentUser.displayName) return commentUser.displayName.charAt(0);
-      if (commentUser.name) return commentUser.name.charAt(0);
-      return commentUser.email?.charAt(0) || '?';
+    const getAvatarInitial = (user?: User) => {
+      if (!user) return '?';
+      if (user.displayName) return user.displayName.charAt(0);
+      if (user.name) return user.name.charAt(0);
+      return user.email?.charAt(0) || '?';
     };
     
     return (
       <div key={comment.id} className={`${isReply ? 'ml-8 mt-2' : 'mt-4'}`}>
         <div className="flex items-start gap-3">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={commentUser?.avatarUrl} alt={getDisplayName(commentUser)} />
+            <AvatarImage src={comment.user?.avatarUrl} alt={getDisplayName(comment.user)} />
             <AvatarFallback>
-              {getAvatarInitial(commentUser)}
+              {getAvatarInitial(comment.user)}
             </AvatarFallback>
           </Avatar>
           
@@ -270,7 +248,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ cardId, collectionId, t
             <div className="flex items-center justify-between">
               <div>
                 <span className="font-medium text-sm">
-                  {getDisplayName(commentUser)}
+                  {getDisplayName(comment.user)}
                 </span>
                 <span className="text-muted-foreground text-xs ml-2">
                   {comment.createdAt && formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}

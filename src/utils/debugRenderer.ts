@@ -1,90 +1,72 @@
 
 /**
- * Helper utility for debugging rendering performance in development
+ * Helper functions for debugging rendering issues
  */
 
-// Track render times by component
-const renderCounts: Record<string, number> = {};
-const renderTimes: Record<string, number> = {};
+export const logRenderingInfo = (componentName: string, details?: Record<string, any>) => {
+  // Only log in development mode
+  if (process.env.NODE_ENV !== 'development') {
+    return;
+  }
 
-/**
- * Logs information about component renders for performance debugging
- * @param componentName Name of the component being rendered
- * @param props Optional props to log (for checking what causes re-renders)
- */
-export const logRenderingInfo = (
+  console.log(
+    `%c[${componentName}]%c rendered${details ? ':' : ''}`,
+    'color: #8B5CF6; font-weight: bold;',
+    'color: inherit;',
+  );
+
+  if (details && Object.keys(details).length > 0) {
+    console.log(
+      '%c Details:',
+      'color: #8B5CF6;',
+      details
+    );
+  }
+};
+
+export const traceRenderCause = (componentName: string) => {
+  // Only trace in development mode
+  if (process.env.NODE_ENV !== 'development') {
+    return;
+  }
+
+  console.log(
+    `%c[${componentName}]%c render trace:`,
+    'color: #EC4899; font-weight: bold;',
+    'color: inherit;',
+  );
+  console.trace();
+};
+
+export const measureRenderTime = (
   componentName: string, 
-  props?: Record<string, any>
+  callback: () => void
 ) => {
-  if (process.env.NODE_ENV !== 'development') return;
-  
-  // Update render count
-  renderCounts[componentName] = (renderCounts[componentName] || 0) + 1;
-  
-  // Track render time
-  const now = performance.now();
-  const lastRender = renderTimes[componentName];
-  renderTimes[componentName] = now;
-  
-  const timeSinceLastRender = lastRender ? now - lastRender : null;
-  
-  // Log render information
-  console.group(`%c🔄 Render: ${componentName} (${renderCounts[componentName]})`);
-  
-  if (timeSinceLastRender !== null) {
-    const color = timeSinceLastRender < 100 
-      ? 'color: green' 
-      : timeSinceLastRender < 500 
-        ? 'color: orange'
-        : 'color: red; font-weight: bold';
-    
-    console.log(`%cTime since last render: ${timeSinceLastRender.toFixed(2)}ms`, color);
+  // Only measure in development mode
+  if (process.env.NODE_ENV !== 'development') {
+    callback();
+    return;
   }
+
+  const startTime = performance.now();
+  callback();
+  const endTime = performance.now();
   
-  if (props) {
-    console.log('Props:', props);
-  }
-  
-  console.groupEnd();
+  console.log(
+    `%c[${componentName}]%c rendered in %c${(endTime - startTime).toFixed(2)}ms`,
+    'color: #8B5CF6; font-weight: bold;',
+    'color: inherit;',
+    'color: #10B981; font-weight: bold;'
+  );
 };
 
-/**
- * Reset all the rendering stats (useful for testing specific workflows)
- */
-export const resetRenderingStats = () => {
-  Object.keys(renderCounts).forEach(key => {
-    delete renderCounts[key];
-    delete renderTimes[key];
-  });
-};
-
-/**
- * Log a summary of all render counts
- */
-export const logRenderingSummary = () => {
-  if (process.env.NODE_ENV !== 'development') return;
-  
-  console.group('📊 Rendering Summary');
-  
-  Object.entries(renderCounts)
-    .sort(([, a], [, b]) => b - a)
-    .forEach(([component, count]) => {
-      console.log(`${component}: ${count} renders`);
-    });
-  
-  console.groupEnd();
-};
-
-/**
- * Debug utility for logging objects with a label
- * @param label Label to identify the debug output
- * @param obj Object to log
- */
 export const debugObject = (label: string, obj: any) => {
-  if (process.env.NODE_ENV !== 'development') return;
-  
-  console.group(`🔍 Debug: ${label}`);
-  console.log(obj);
+  // Only debug in development mode
+  if (process.env.NODE_ENV !== 'development') {
+    return;
+  }
+
+  console.group(`%c${label}`, 'color: #8B5CF6; font-weight: bold;');
+  console.dir(obj);
   console.groupEnd();
 };
-

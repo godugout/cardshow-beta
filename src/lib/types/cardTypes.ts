@@ -6,6 +6,7 @@
 
 import { BaseEntity, JsonValue } from './index';
 import { Reaction, Comment } from './interaction';
+import { User } from './user';
 
 /**
  * Fabric Swatch definition for card memorabilia
@@ -40,12 +41,12 @@ export interface CardStyle {
   template: string;      // Required
   effect: string;        // Required
   borderRadius: string;  // Required
+  borderWidth?: number;
   borderColor: string;   // Required
-  backgroundColor?: string; // Added this property
+  backgroundColor?: string;
   shadowColor: string;   // Required
   frameWidth: number;    // Required
   frameColor: string;    // Required
-  borderWidth?: number;
   [key: string]: JsonValue | undefined;
 }
 
@@ -75,7 +76,6 @@ export interface CardEffect {
   className?: string;
   category?: string;
   description?: string;
-  iconUrl?: string; // Added for compatibility
 }
 
 /**
@@ -87,7 +87,6 @@ export interface CardEffectSettings {
   pattern?: string;
   color?: string;
   animationEnabled?: boolean;
-  colorScheme?: string | string[];
   [key: string]: JsonValue | undefined;
 }
 
@@ -134,9 +133,9 @@ export interface MarketMetadata {
   lastSoldPrice?: number;
   currentAskingPrice?: number;
   estimatedMarketValue?: number;
-  isPrintable: boolean;      // Required
-  isForSale: boolean;       // Required
-  includeInCatalog: boolean; // Required
+  isPrintable: boolean;      
+  isForSale: boolean;       
+  includeInCatalog: boolean; 
   price?: number;
   currency?: string;
   availableForSale?: boolean;
@@ -153,9 +152,9 @@ export interface CardMetadata {
   serialNumber?: string;
   certification?: string;
   gradeScore?: string;
-  category: string;      // Required
-  series: string;        // Required
-  cardType: string;      // Required
+  category?: string;      
+  series?: string;        
+  cardType?: string;      
   cardStyle?: CardStyle;
   textStyle?: TextStyle;
   effects?: string[];
@@ -224,9 +223,9 @@ export type CardRarity = 'common' | 'uncommon' | 'rare' | 'ultra-rare' | 'legend
  */
 export interface BaseCard extends BaseEntity {
   title: string;
-  description: string;
+  description: string; // Making description required for consistency
   imageUrl: string;
-  thumbnailUrl: string;
+  thumbnailUrl: string; // Making thumbnailUrl required for consistency
   image?: string; // Legacy support for older components
   tags: string[];
   collectionId?: string;
@@ -240,16 +239,16 @@ export interface BaseCard extends BaseEntity {
   viewCount?: number;
   
   // Baseball card properties
-  player?: string; // Required for baseball cards
-  team?: string;  // Required for baseball cards
-  year?: string;  // Required for baseball cards
+  player?: string;
+  team?: string;
+  year?: string;
   jersey?: string;
   set?: string;
   cardNumber?: string;
   cardType?: string;
-  artist?: string;
+  artist?: string; // For backward compatibility
   backgroundColor?: string;
-  textColor?: string;
+  textColor?: string; // Added for backward compatibility
   specialEffect?: string;
   fabricSwatches?: FabricSwatch[];
   stats?: CardStats;
@@ -286,11 +285,7 @@ export interface CardTemplate {
   description?: string;
   thumbnail: string;
   thumbnailUrl?: string; // Added for backward compatibility
-  imageUrl?: string; // Added for backward compatibility
   category: string;
-  tags?: string[]; // Added for TemplateSelector
-  sport?: string; // Added for SettingsPanel
-  style?: string; // Added for SettingsPanel
   isOfficial?: boolean; // Added for filtering
   popularity?: number; // Added for sorting
   designDefaults: {

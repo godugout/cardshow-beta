@@ -11,16 +11,12 @@ export const useToast = () => {
     variant: "success" | "error" | "warning" | "info" | "destructive" = "info", 
     duration?: number
   ) => {
-    // Map error to destructive if needed
-    const mappedVariant = variant === "error" ? "destructive" as ToastVariant : variant as ToastVariant;
-    
     toast({
       id: Math.random().toString(36).substring(2, 9),
       title,
       description,
-      variant: mappedVariant,
-      duration,
-      open: true
+      variant,
+      duration
     })
   }
   
@@ -28,7 +24,7 @@ export const useToast = () => {
     success: (title: string, description: string, duration?: number) => 
       showToast(title, description, "success", duration),
     error: (title: string, description: string, duration?: number) => 
-      showToast(title, description, "destructive", duration),
+      showToast(title, description, "error", duration),
     warning: (title: string, description: string, duration?: number) => 
       showToast(title, description, "warning", duration),
     info: (title: string, description: string, duration?: number) => 
