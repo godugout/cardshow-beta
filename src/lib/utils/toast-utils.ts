@@ -1,11 +1,12 @@
 
-import { toast } from '@/hooks/use-toast';
-import { ToastVariant } from '@/types/toast';
+import { useToast } from '@/hooks/use-toast';
+import { ToastVariant, createToast } from '@/types/toast';
 
 export const toastUtils = {
   show: (title: string, description?: string, variant: ToastVariant = 'default', duration?: number) => {
-    return toast({
-      id: Math.random().toString(36).substring(2, 9),
+    // This is a utility function that can't use hooks directly
+    // Instead, we'll create a toast object that can be used by components
+    return createToast({
       title,
       description,
       variant,
