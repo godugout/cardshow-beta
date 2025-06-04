@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Plus, Upload, X } from 'lucide-react';
@@ -5,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Switch } from "@/components/ui/switch"; // Fixed import
-import { ElementType, ElementCategory } from '@/lib/types/cardElements';
+import { Switch } from "@/components/ui/switch";
+import { ElementType, ElementCategory, ElementUploadMetadata } from '@/lib/types/cardElements';
 import { storageOperations } from '@/lib/supabase/storage';
 import { toast } from 'sonner';
 
@@ -19,7 +20,7 @@ const AssetUploader: React.FC<AssetUploaderProps> = ({ onUploadComplete }) => {
     name: '',
     description: '',
     tags: [],
-    category: '',
+    category: ElementCategory.OTHER,
     isOfficial: false,
     isPremium: false,
   });
@@ -34,7 +35,7 @@ const AssetUploader: React.FC<AssetUploaderProps> = ({ onUploadComplete }) => {
     frame: ['png', 'svg'],
     badge: ['png', 'svg', 'webp'],
     overlay: ['png', 'svg'],
-    decoration: ['png', 'svg', 'webp'] // Added decoration type
+    decoration: ['png', 'svg', 'webp']
   };
   
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -42,9 +43,16 @@ const AssetUploader: React.FC<AssetUploaderProps> = ({ onUploadComplete }) => {
     setSelectedFile(file);
   }, []);
   
+  const acceptedFileTypes = Object.values(elementTypes)
+    .flat()
+    .reduce((acc, ext) => {
+      acc[`image/${ext}`] = [];
+      return acc;
+    }, {} as Record<string, string[]>);
+  
   const {getRootProps, getInputProps, isDragActive} = useDropzone({
     onDrop,
-    accept: Object.values(elementTypes).flatMap(extensions => extensions.map(ext => `image/${ext}`)),
+    accept: acceptedFileTypes,
     multiple: false
   });
   
@@ -76,7 +84,7 @@ const AssetUploader: React.FC<AssetUploaderProps> = ({ onUploadComplete }) => {
     setUploading(true);
     
     try {
-      // Upload the file - use storageOperations.uploadImage instead of uploadAsset
+      // Upload the file - use storageOperations.uploadImage
       const uploadResult = await storageOperations.uploadImage(
         selectedFile,
         `assets/${selectedElementType}/${Date.now()}-${selectedFile.name}`
@@ -84,7 +92,7 @@ const AssetUploader: React.FC<AssetUploaderProps> = ({ onUploadComplete }) => {
       
       if (!uploadResult.data) {
         toast.error('Upload failed: Could not upload file');
-        setIsUploading(false);
+        setUploading(false);
         return;
       }
       
@@ -99,7 +107,7 @@ const AssetUploader: React.FC<AssetUploaderProps> = ({ onUploadComplete }) => {
         name: '',
         description: '',
         tags: [],
-        category: '',
+        category: ElementCategory.OTHER,
         isOfficial: false,
         isPremium: false,
       });
@@ -166,14 +174,16 @@ const AssetUploader: React.FC<AssetUploaderProps> = ({ onUploadComplete }) => {
             
             <div>
               <Label htmlFor="asset-category">Category</Label>
-              <Input
-                type="text"
+              <select
                 id="asset-category"
-                name="category"
+                className="w-full rounded-md border border-gray-200 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
                 value={metadata.category}
-                onChange={handleMetadataChange}
-                placeholder="Category"
-              />
+                onChange={(e) => setMetadata(prev => ({ ...prev, category: e.target.value as ElementCategory }))}
+              >
+                {Object.values(ElementCategory).map((category) => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
             </div>
           </div>
           

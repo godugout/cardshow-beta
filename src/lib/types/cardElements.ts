@@ -122,6 +122,7 @@ export interface ElementPlacementOptions {
   grid?: number;
   constrainToCanvas?: boolean;
   autoScale?: boolean;
+  position?: ElementPosition;
 }
 
 export interface ElementUploadMetadata {
@@ -131,10 +132,14 @@ export interface ElementUploadMetadata {
   category: ElementCategory;
   isOfficial?: boolean;
   isPremium?: boolean;
-  dimensions?: {  // Added dimensions property
+  dimensions?: {
     width?: number;
     height?: number;
   };
+  mimeType?: string;
+  isAnimated?: boolean;
+  fileName?: string;
+  hasTransparency?: boolean;
 }
 
 export interface ElementLibraryCollection {

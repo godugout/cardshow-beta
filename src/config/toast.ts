@@ -1,55 +1,17 @@
 
 import { cva } from "class-variance-authority";
-import type { ToastVariant } from "@/types/toast";
 
-/**
- * Toast icon configuration for different toast variants
- */
-export const toastIconConfig: Record<string, string | null> = {
-  default: null,
-  success: "Check",
-  error: "X",
-  warning: "AlertTriangle",
-  info: "Info",
-  destructive: "X",
-};
-
-/**
- * Default colors for the color picker
- */
-export const DEFAULT_COLORS = [
-  '#000000', // Black
-  '#FFFFFF', // White
-  '#F87171', // Red
-  '#FB923C', // Orange
-  '#FBBF24', // Amber
-  '#34D399', // Green
-  '#22D3EE', // Cyan
-  '#60A5FA', // Blue
-  '#818CF8', // Indigo
-  '#A78BFA', // Violet
-  '#E879F9', // Pink
-];
-
-/**
- * Toast styles using cva for variants
- */
 export const toastStyles = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-4 shadow-lg transition-all",
+  "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full",
   {
     variants: {
       variant: {
-        default: "border-slate-200 bg-white text-slate-900",
+        default: "border bg-background text-foreground",
         destructive:
-          "destructive group border-red-600 bg-red-600 text-slate-50",
-        success:
-          "success group border-green-600 bg-green-600 text-slate-50",
-        warning:
-          "warning group border-yellow-600 bg-yellow-500 text-slate-50",
-        info:
-          "info group border-blue-600 bg-blue-600 text-slate-50",
-        error:
-          "error group border-red-600 bg-red-600 text-slate-50",
+          "destructive group border-destructive bg-destructive text-destructive-foreground",
+        success: "border-green-200 bg-green-50 text-green-900",
+        warning: "border-yellow-200 bg-yellow-50 text-yellow-900",
+        info: "border-blue-200 bg-blue-50 text-blue-900",
       },
     },
     defaultVariants: {
@@ -57,3 +19,11 @@ export const toastStyles = cva(
     },
   }
 );
+
+export const toastIconConfig = {
+  default: "Info",
+  destructive: "X",
+  success: "Check",
+  warning: "AlertTriangle",
+  info: "Info",
+};
