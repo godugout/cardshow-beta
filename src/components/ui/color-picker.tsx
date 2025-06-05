@@ -6,14 +6,20 @@ interface ColorPickerProps {
   color: string;
   onChange: (color: string) => void;
   className?: string;
+  colors?: string[];
 }
 
-const ColorPicker: React.FC<ColorPickerProps> = ({ color, onChange, className }) => {
+export const ColorPicker: React.FC<ColorPickerProps> = ({ 
+  color, 
+  onChange, 
+  className,
+  colors = ['#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff', '#888888']
+}) => {
   return (
     <div className={cn("flex flex-wrap gap-2", className)}>
       {/* Predefined color palette */}
       <div className="flex gap-1 flex-wrap">
-        {['#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff', '#888888'].map((presetColor) => (
+        {colors.map((presetColor) => (
           <button
             key={presetColor}
             type="button"
@@ -35,5 +41,3 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ color, onChange, className })
     </div>
   );
 };
-
-export default ColorPicker;
