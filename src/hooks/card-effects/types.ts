@@ -1,53 +1,35 @@
 
+/**
+ * Card Effects System Types
+ */
+
+export type EffectCategory = 'holographic' | 'prismatic' | 'refractor' | 'metallic' | 'vintage' | 'special';
+
 export interface CardEffectSettings {
   intensity?: number;
   speed?: number;
-  pattern?: string;
   color?: string;
-  colorScheme?: string[] | string;
-  animationEnabled?: boolean;
+  opacity?: number;
+  scale?: number;
+  rotation?: number;
   [key: string]: any;
 }
 
-export interface BaseCardEffect {
+export interface PremiumCardEffect {
   id: string;
   name: string;
   description: string;
+  category: EffectCategory;
   enabled: boolean;
   settings: CardEffectSettings;
-  icon?: string;
+  className?: string;
   iconUrl?: string;
+  isPremium?: boolean;
+  previewUrl?: string;
 }
 
-export interface PremiumCardEffect extends BaseCardEffect {
-  premium: boolean;
-  price?: number;
-  category: string;
-  requiresGPU?: boolean;
-  compatibleWith?: string[];
-}
-
-export interface EffectCategory {
-  id: string;
-  name: string;
-  description: string;
-  effects: PremiumCardEffect[];
-}
-
-export interface CardEffectDefinition {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  defaultSettings: CardEffectSettings;
-  premium: boolean;
-  enabled: boolean;
-  iconUrl?: string;
-  thumbnail?: string;
-  cssClass?: string;
-  supportedCardTypes?: string[];
-  renderer: (element: HTMLElement, settings: CardEffectSettings) => void;
-}
+// Re-export as CardEffect for backward compatibility
+export type CardEffect = PremiumCardEffect;
 
 export interface UseCardEffectsResult {
   effects: PremiumCardEffect[];
@@ -58,22 +40,3 @@ export interface UseCardEffectsResult {
   applyEffectsToElement: (element: HTMLElement) => void;
   effectsLoading: boolean;
 }
-
-export interface MaterialSimulation {
-  id: string;
-  name: string;
-  type: 'metal' | 'glass' | 'fabric' | 'holographic' | 'mesh' | 'synthetic' | 'canvas';
-  properties: {
-    roughness: number;
-    metalness: number;
-    reflectivity: number;
-    opacity: number;
-  };
-  enabled: boolean;
-  textureUrl?: string;
-  baseColor?: string;
-  weathering?: number;
-  roughness?: number;
-  metalness?: number;
-}
-

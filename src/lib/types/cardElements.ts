@@ -3,14 +3,14 @@
  * Definition for card elements like stickers, logos, etc.
  */
 export type ElementType = 'sticker' | 'logo' | 'frame' | 'badge' | 'overlay' | 'decoration';
-export type ElementCategory = string;
+export type ElementCategoryType = string;
 
 export interface CardElement {
   id: string;
   name: string;
   description?: string;
   type: ElementType;
-  category: ElementCategory;
+  category: ElementCategoryType;
   url: string;
   thumbnailUrl?: string;
   assetUrl?: string;

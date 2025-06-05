@@ -37,7 +37,6 @@ export function toast(props: ToastProps, options?: ToastOptions): string {
     case 'info':
       sonnerToast.info(title, { ...toastOptions, description });
       break;
-    case 'error':
     case 'destructive':
       sonnerToast.error(title, { ...toastOptions, description });
       break;

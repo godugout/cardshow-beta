@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -7,7 +6,7 @@ import { ColorPicker } from '@/components/ui/color-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useTheme } from 'next-themes';
 
 interface ThemeCustomizerProps {
@@ -42,7 +41,6 @@ const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ className }) => {
     localStorage.setItem('customCss', customCss);
 
     toast({
-      id: Math.random().toString(36).substring(2, 9),
       title: "Theme updated",
       description: "Your theme settings have been saved"
     });
@@ -68,7 +66,6 @@ const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ className }) => {
     localStorage.removeItem('customCss');
 
     toast({
-      id: Math.random().toString(36).substring(2, 9),
       title: "Theme reset",
       description: "Theme has been reset to default values"
     });

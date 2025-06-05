@@ -31,7 +31,6 @@ export const useEditorState = ({
     ) => {
       if (!canvasRef.current || !editorImgRef.current) {
         toast({
-          id: Math.random().toString(36).substring(2, 9),
           variant: "warning",
           title: "Cannot add selection",
           description: "Canvas or image reference is not available"
@@ -57,7 +56,6 @@ export const useEditorState = ({
       setSelectedAreas(prev => [...prev, newArea]);
       
       toast({
-        id: Math.random().toString(36).substring(2, 9),
         variant: "success",
         title: "Selection area added",
         description: `Added new selection area (#${selectedAreas.length + 1})`,
@@ -73,7 +71,6 @@ export const useEditorState = ({
       const removed = updated.splice(index, 1)[0];
       
       toast({
-        id: Math.random().toString(36).substring(2, 9),
         variant: "info",
         title: "Selection area removed",
         description: `Removed selection area (#${removed.id})`,
@@ -88,7 +85,6 @@ export const useEditorState = ({
     setIsDetecting(true);
     
     toast({
-      id: Math.random().toString(36).substring(2, 9),
       variant: "info",
       title: "Detection started",
       description: "Analyzing image for face detection...",
@@ -102,7 +98,6 @@ export const useEditorState = ({
     setIsProcessing(true);
     
     toast({
-      id: Math.random().toString(36).substring(2, 9),
       variant: "info",
       title: "Processing started",
       description: "Enhancing selected areas...",
@@ -113,7 +108,6 @@ export const useEditorState = ({
       setIsProcessing(false);
       
       toast({
-        id: Math.random().toString(36).substring(2, 9),
         variant: "success",
         title: "Processing complete",
         description: `Successfully enhanced ${selectedAreas.length} selection areas`,
