@@ -107,7 +107,7 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
     { title: 'Text', component: <TextStep cardData={cardData} onUpdate={handleUpdate} /> },
     { title: 'Design', component: <DesignStep cardData={cardData} onUpdate={handleUpdate} /> },
     { title: 'Effects', component: <EffectsStep cardData={cardData} onUpdateEffects={handleEffectUpdate} /> },
-    { title: 'Finalize', component: <FinalizeStep cardData={cardData} onUpdate={handleUpdate} /> },
+    { title: 'Finalize', component: <FinalizeStep cardData={cardData} onUpdate={handleUpdate} onComplete={handleComplete} onCancel={onCancel} /> },
     { title: 'Preview', component: <PreviewStep cardData={cardData} /> },
   ];
 

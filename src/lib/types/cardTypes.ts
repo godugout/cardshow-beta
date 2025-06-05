@@ -103,6 +103,87 @@ export interface CardEffect {
 }
 
 /**
+ * Card layer definition for design elements
+ */
+export interface CardLayer {
+  id: string;
+  type: 'image' | 'text' | 'shape' | 'effect';
+  content: string | any;
+  position: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  size: {
+    width: number | 'auto';
+    height: number | 'auto';
+  };
+  rotation: number;
+  opacity: number;
+  zIndex: number;
+  visible?: boolean;
+  style?: Record<string, any>;
+  locked?: boolean;
+  effectIds?: string[];
+  textStyle?: {
+    fontFamily?: string;
+    fontSize?: number;
+    fontWeight?: string;
+    color?: string;
+    textAlign?: string;
+  };
+  imageUrl?: string;
+  shapeType?: string;
+  color?: string;
+  [key: string]: any;
+}
+
+/**
+ * Hotspot data for interactive elements
+ */
+export interface HotspotData {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  action: string;
+  metadata?: Record<string, any>;
+}
+
+/**
+ * Fabric swatch definition
+ */
+export interface FabricSwatch {
+  id: string;
+  name: string;
+  color: string;
+  texture?: string;
+  material?: string;
+  imageUrl?: string;
+}
+
+/**
+ * Oakland memory data
+ */
+export interface OaklandMemoryData {
+  title: string;
+  description: string;
+  date?: string;
+  opponent?: string;
+  score?: string;
+  location?: string;
+  section?: string;
+  memoryType?: string;
+  attendees?: string[];
+  tags?: string[];
+  imageUrl?: string;
+  historicalContext?: string;
+  personalSignificance?: string;
+  template?: string;
+}
+
+/**
  * Base Card interface containing common properties
  */
 export interface BaseCard extends BaseEntity {
@@ -131,6 +212,8 @@ export interface BaseCard extends BaseEntity {
   cardType?: string;
   artist?: string; 
   backgroundColor?: string;
+  borderColor?: string;
+  borderRadius?: string;
   textColor?: string; 
   specialEffect?: string;
   
@@ -139,6 +222,7 @@ export interface BaseCard extends BaseEntity {
   cardStyle?: string;
   backTemplate?: string;
   designMetadata: DesignMetadata;
+  fabricSwatches?: FabricSwatch[];
   
   // Market data
   price?: number;
@@ -174,6 +258,9 @@ export interface CardTemplate {
     textStyle?: Partial<TextStyle>;
     effects?: string[];
   };
+  previewUrl?: string;
+  sport?: string;
+  style?: string;
 }
 
 export const DEFAULT_CARD_STYLE: CardStyle = {

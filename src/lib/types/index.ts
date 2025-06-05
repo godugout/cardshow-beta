@@ -1,12 +1,10 @@
 
-// Generic types used across the application
-export type JsonValue = 
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | { [key: string]: JsonValue };
+/**
+ * Central type definitions for CRD App
+ */
+
+// Base types
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
 export interface BaseEntity {
   id: string;
@@ -14,35 +12,24 @@ export interface BaseEntity {
   updatedAt: string;
 }
 
-// Instagram related types
-export interface InstagramPost {
-  id: string;
-  caption: string;
-  mediaUrl: string;
-  permalink: string;
-  timestamp: string;
-  username: string;
-  mediaType?: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
-  thumbnailUrl?: string;
-  postId?: string;
-  children?: InstagramMediaItem[];
+// Re-export all card-related types
+export * from './cardTypes';
+export * from './user';
+export * from './interaction';
+export * from './collection';
+
+// Additional utility types
+export interface ApiResponse<T = any> {
+  data?: T;
+  error?: string;
+  success: boolean;
 }
 
-export interface InstagramMediaItem {
-  id: string;
-  mediaType: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
-  mediaUrl: string;
-  permalink: string;
-  thumbnail?: string;
-}
-
-export interface InstagramApiResponse {
-  data: InstagramPost[];
-  paging?: {
-    cursors: {
-      before: string;
-      after: string;
-    };
-    next?: string;
+export interface PaginatedResponse<T = any> extends ApiResponse<T[]> {
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
   };
 }

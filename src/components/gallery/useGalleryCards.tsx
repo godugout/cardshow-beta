@@ -2,7 +2,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCards } from '@/context/CardContext';
-import { Card } from '@/lib/types';
+import { Card } from '@/lib/types/cardTypes';
 import { toast } from 'sonner';
 
 export const useGalleryCards = () => {
@@ -20,6 +20,8 @@ export const useGalleryCards = () => {
 
   // Sort cards based on the selected sort order
   const sortedCards = useMemo(() => {
+    if (!Array.isArray(cards)) return [];
+    
     return [...cards].sort((a, b) => {
       switch (sortOrder) {
         case 'newest':
@@ -60,7 +62,7 @@ export const useGalleryCards = () => {
             description: card.description || ''
           } : undefined
         }
-      };
+      } as Card;
     });
     
     // Debug info

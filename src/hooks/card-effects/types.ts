@@ -70,4 +70,6 @@ export interface MaterialSimulation {
     opacity: number;
   };
   enabled: boolean;
+  textureUrl?: string;
+  baseColor?: string;
 }

@@ -8,9 +8,10 @@ import { Upload } from 'lucide-react';
 interface ElementUploadFormProps {
   onUpload: (elementData: any) => void;
   onCancel: () => void;
+  onElementCreated?: () => void;
 }
 
-const ElementUploadForm: React.FC<ElementUploadFormProps> = ({ onUpload, onCancel }) => {
+const ElementUploadForm: React.FC<ElementUploadFormProps> = ({ onUpload, onCancel, onElementCreated }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -28,6 +29,11 @@ const ElementUploadForm: React.FC<ElementUploadFormProps> = ({ onUpload, onCance
     };
 
     onUpload(elementData);
+    
+    // Call the optional callback
+    if (onElementCreated) {
+      onElementCreated();
+    }
   };
 
   return (
@@ -75,7 +81,7 @@ const ElementUploadForm: React.FC<ElementUploadFormProps> = ({ onUpload, onCance
           Upload
         </Button>
       </div>
-    </form>
+    </div>
   );
 };
 

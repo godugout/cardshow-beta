@@ -32,7 +32,7 @@ const PreviewStep: React.FC<PreviewStepProps> = ({ cardData }) => {
         <TabsContent value="visual" className="space-y-4">
           <div className="flex justify-center">
             <CardPreview 
-              card={cardData}
+              cardData={cardData as Card}
               effectClasses={generateEffectClasses()}
               className="max-w-[280px]"
             />
