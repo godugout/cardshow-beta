@@ -1,5 +1,5 @@
 
-import { PremiumCardEffect, EffectCategory } from './types';
+import { PremiumCardEffect, EffectCategory, EffectCategoryInfo } from './types';
 
 // Utility functions for card effects
 
@@ -65,62 +65,62 @@ export const getBasicEffects = (): PremiumCardEffect[] => [
   {
     id: 'holographic',
     name: 'Holographic',
-    category: 'premium',
+    category: 'holographic' as EffectCategory,
     settings: {
       intensity: 0.8,
       speed: 1.2,
     },
     description: 'Stunning holographic rainbow effect',
-    premium: false,
+    isPremium: false,
     enabled: true,
     iconUrl: '/icons/holographic.svg'
   },
   {
     id: 'refractor',
     name: 'Refractor',
-    category: 'premium',
+    category: 'refractor' as EffectCategory,
     settings: {
       intensity: 0.9,
       speed: 0.8,
       pattern: 'diagonal'
     },
     description: 'Premium refractor light effect',
-    premium: true,
+    isPremium: true,
     enabled: true,
     iconUrl: '/icons/refractor.svg'
   },
   {
     id: 'superfractor',
     name: 'Superfractor',
-    category: 'premium',
+    category: 'refractor' as EffectCategory,
     settings: {
       intensity: 1.0,
       speed: 1.5,
       pattern: 'radial'
     },
     description: 'Ultra-rare superfractor effect',
-    premium: true,
+    isPremium: true,
     enabled: true,
     iconUrl: '/icons/superfractor.svg'
   },
   {
     id: 'prizm',
     name: 'Prizm',
-    category: 'premium',
+    category: 'prismatic' as EffectCategory,
     settings: {
       intensity: 0.7,
       speed: 1.0,
       pattern: 'linear'
     },
     description: 'Classic Prizm rainbow effect',
-    premium: true,
+    isPremium: true,
     enabled: true,
     iconUrl: '/icons/prizm.svg'
   },
   {
     id: 'cracked-ice',
     name: 'Cracked Ice',
-    category: 'premium',
+    category: 'special' as EffectCategory,
     settings: {
       intensity: 0.6,
       speed: 0.5,
@@ -128,120 +128,120 @@ export const getBasicEffects = (): PremiumCardEffect[] => [
       animationEnabled: true
     },
     description: 'Unique cracked ice pattern',
-    premium: true,
+    isPremium: true,
     enabled: true,
     iconUrl: '/icons/cracked-ice.svg'
   },
   {
     id: 'mosaic',
     name: 'Mosaic',
-    category: 'premium',
+    category: 'special' as EffectCategory,
     settings: {
       intensity: 0.8,
       speed: 0.3,
       pattern: 'geometric'
     },
     description: 'Geometric mosaic effect',
-    premium: true,
+    isPremium: true,
     enabled: true,
     iconUrl: '/icons/mosaic.svg'
   },
   {
     id: 'gold-foil',
     name: 'Gold Foil',
-    category: 'foil',
+    category: 'metallic' as EffectCategory,
     settings: {
       intensity: 0.9,
       speed: 0.7,
       color: '#FFD700'
     },
     description: 'Luxurious gold foil finish',
-    premium: false,
+    isPremium: false,
     enabled: true,
     iconUrl: '/icons/gold-foil.svg'
   },
   {
     id: 'silver-foil',
     name: 'Silver Foil',
-    category: 'foil',
+    category: 'metallic' as EffectCategory,
     settings: {
       intensity: 0.8,
       speed: 0.6,
       color: '#C0C0C0'
     },
     description: 'Classic silver foil effect',
-    premium: false,
+    isPremium: false,
     enabled: true,
     iconUrl: '/icons/silver-foil.svg'
   },
   {
     id: 'chrome',
     name: 'Chrome',
-    category: 'metallic',
+    category: 'metallic' as EffectCategory,
     settings: {
       intensity: 1.0,
       speed: 0.4
     },
     description: 'Mirror-like chrome finish',
-    premium: false,
+    isPremium: false,
     enabled: true,
     iconUrl: '/icons/chrome.svg'
   },
   {
     id: 'vintage',
     name: 'Vintage',
-    category: 'classic',
+    category: 'vintage' as EffectCategory,
     settings: {
       intensity: 0.5,
       speed: 0.2,
       pattern: 'aged'
     },
     description: 'Classic vintage card look',
-    premium: false,
+    isPremium: false,
     enabled: true,
     iconUrl: '/icons/vintage.svg'
   },
   {
     id: 'sepia',
     name: 'Sepia',
-    category: 'classic',
+    category: 'vintage' as EffectCategory,
     settings: {
       intensity: 0.6,
       speed: 0.1
     },
     description: 'Warm sepia tone effect',
-    premium: false,
+    isPremium: false,
     enabled: true,
     iconUrl: '/icons/sepia.svg'
   },
   {
     id: 'neon',
     name: 'Neon Glow',
-    category: 'modern',
+    category: 'special' as EffectCategory,
     settings: {
       intensity: 0.9,
       speed: 2.0,
       animationEnabled: true
     },
     description: 'Electric neon glow effect',
-    premium: true,
+    isPremium: true,
     enabled: true,
     iconUrl: '/icons/neon.svg'
   }
 ];
 
-export const getEffectCategories = (): EffectCategory[] => [
+export const getEffectCategories = (): EffectCategoryInfo[] => [
   {
-    id: 'premium',
-    name: 'Premium Effects',
-    description: 'High-end holographic and refractor effects',
-    effects: getBasicEffects().filter(e => e.category === 'premium')
+    id: 'holographic',
+    name: 'Holographic Effects',
+    description: 'Rainbow holographic effects',
+    effects: getBasicEffects().filter(e => e.category === 'holographic')
   },
   {
-    id: 'foil',
-    name: 'Foil Effects',
-    description: 'Metallic foil finishes',
-    effects: getBasicEffects().filter(e => e.category === 'foil')
+    id: 'refractor',
+    name: 'Refractor Effects',
+    description: 'High-end refractor effects',
+    effects: getBasicEffects().filter(e => e.category === 'refractor')
   },
   {
     id: 'metallic',
@@ -250,15 +250,15 @@ export const getEffectCategories = (): EffectCategory[] => [
     effects: getBasicEffects().filter(e => e.category === 'metallic')
   },
   {
-    id: 'classic',
+    id: 'vintage',
     name: 'Classic Effects',
     description: 'Traditional vintage looks',
-    effects: getBasicEffects().filter(e => e.category === 'classic')
+    effects: getBasicEffects().filter(e => e.category === 'vintage')
   },
   {
-    id: 'modern',
-    name: 'Modern Effects',
-    description: 'Contemporary digital effects',
-    effects: getBasicEffects().filter(e => e.category === 'modern')
+    id: 'special',
+    name: 'Special Effects',
+    description: 'Unique and modern effects',
+    effects: getBasicEffects().filter(e => e.category === 'special')
   }
 ];
