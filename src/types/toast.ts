@@ -32,6 +32,5 @@ export interface ToasterToastWithId extends ToasterToast {
 
 // Create toast function
 export function createToast(props: ToastProps) {
-  // This is a simple implementation - in a real app you'd integrate with your toast system
   console.log('Toast:', props);
 }

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Card, Collection } from '@/lib/types';
@@ -88,7 +87,7 @@ export function useCards() {
         }
       }
       
-      // Cards loaded successfully - no toast notification needed
+      // Cards loaded successfully - no toast notification, just console log
       
     } catch (err) {
       const error = err as Error;
