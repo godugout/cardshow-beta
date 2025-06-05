@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import CardDesignerCanvas from './CardDesignerCanvas';
@@ -32,6 +31,7 @@ const CardDesigner: React.FC<CardDesignerProps> = ({
       const defaultLayers: CardLayer[] = [
         {
           id: generateId(),
+          name: 'Base Image',
           type: 'image',
           content: '',
           position: { x: 50, y: 50, z: 0 },
@@ -59,6 +59,7 @@ const CardDesigner: React.FC<CardDesignerProps> = ({
   const addLayer = useCallback((type: 'image' | 'text' | 'shape') => {
     const newLayer: CardLayer = {
       id: generateId(),
+      name: `${type.charAt(0).toUpperCase() + type.slice(1)} Layer`,
       type,
       content: type === 'text' ? 'New Text' : '',
       position: { x: 50, y: 50, z: layers.length },
@@ -141,6 +142,7 @@ const CardDesigner: React.FC<CardDesignerProps> = ({
         const newLayer = { 
           ...layer, 
           id: generateId(),
+          name: `${layer.name} Copy`,
           position: { 
             ...layer.position, 
             x: layer.position.x + 10, 

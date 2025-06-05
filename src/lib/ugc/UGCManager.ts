@@ -1,5 +1,5 @@
 
-import { CardElement } from '@/lib/types/cardElements';
+import { ElementType, ElementCategory } from '@/lib/types/cardElements';
 
 export interface CreatorProfile {
   id: string;
@@ -20,10 +20,18 @@ export interface UGCAsset {
   creatorId: string;
   tags: string[];
   category: string;
+  assetType: ElementType;
+  isOfficial: boolean;
   isPublic: boolean;
   downloadCount: number;
   rating: number;
   ratingCount: number;
+  marketplace?: {
+    isForSale: boolean;
+    price?: number;
+    currency?: string;
+    featured: boolean;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -43,6 +51,7 @@ export class UGCManager {
       description?: string;
       tags: string[];
       category: string;
+      assetType: ElementType;
       isPublic: boolean;
     },
     creatorId: string
@@ -57,10 +66,16 @@ export class UGCManager {
       creatorId,
       tags: metadata.tags,
       category: metadata.category,
+      assetType: metadata.assetType,
+      isOfficial: false,
       isPublic: metadata.isPublic,
       downloadCount: 0,
       rating: 0,
       ratingCount: 0,
+      marketplace: {
+        isForSale: false,
+        featured: false
+      },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };

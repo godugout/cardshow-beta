@@ -5,7 +5,7 @@
 
 import { JsonValue } from '@/lib/types';
 // Import the consolidated CardLayer from main types
-export { CardLayer, CardEffect } from '@/lib/types/cardTypes';
+export type { CardLayer, CardEffect } from '@/lib/types/cardTypes';
 
 export interface CardDesignState {
   title: string;
