@@ -41,7 +41,15 @@ const CardDesigner: React.FC<CardDesignerProps> = ({
           zIndex: 0,
           visible: true,
           locked: false,
-          effectIds: []
+          blendMode: 'normal',
+          transform: {
+            x: 50,
+            y: 50,
+            rotation: 0,
+            scaleX: 1,
+            scaleY: 1,
+            z: 0
+          }
         }
       ];
       setLayers(defaultLayers);
@@ -69,7 +77,15 @@ const CardDesigner: React.FC<CardDesignerProps> = ({
       zIndex: layers.length,
       visible: true,
       locked: false,
-      effectIds: []
+      blendMode: 'normal',
+      transform: {
+        x: 50,
+        y: 50,
+        rotation: 0,
+        scaleX: 1,
+        scaleY: 1,
+        z: layers.length
+      }
     };
     
     setLayers(prev => [...prev, newLayer]);

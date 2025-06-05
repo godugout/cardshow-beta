@@ -42,7 +42,7 @@ export function useLayers({ initialLayers = [], onChange }: UseLayersOptions = {
         break;
     }
     
-    // Create the new layer
+    // Create the new layer with all required properties
     const newLayer: CardLayer = {
       id: options.id || uuidv4(),
       name: options.name || name,
@@ -62,13 +62,26 @@ export function useLayers({ initialLayers = [], onChange }: UseLayersOptions = {
       zIndex: layers.length + 1,
       visible: options.visible !== undefined ? options.visible : true,
       locked: options.locked || false,
+      blendMode: 'normal',
+      transform: {
+        x: 200,
+        y: 250,
+        rotation: 0,
+        scaleX: 1,
+        scaleY: 1,
+        z: layers.length + 1
+      },
       ...(type === 'text' && {
         textStyle: options.textStyle || {
           fontFamily: 'Arial',
           fontSize: 18,
           fontWeight: 'normal',
           color: '#000000',
-          textAlign: 'center'
+          textAlign: 'center',
+          titleColor: '#000000',
+          titleAlignment: 'center',
+          titleWeight: 'bold',
+          descriptionColor: '#333333'
         }
       }),
       ...(type === 'shape' && {

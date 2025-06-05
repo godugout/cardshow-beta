@@ -64,6 +64,7 @@ export interface CardLayer {
     rotation: number;
     scaleX: number;
     scaleY: number;
+    z: number;
   };
   position: {
     x: number;
@@ -83,6 +84,10 @@ export interface CardLayer {
     fontWeight: string;
     color: string;
     textAlign: string;
+    titleColor?: string;
+    titleAlignment?: string;
+    titleWeight?: string;
+    descriptionColor?: string;
   };
   color?: string;
   shapeType?: string;
@@ -115,7 +120,7 @@ export interface HotspotData {
     text?: string;
     url?: string;
     imageUrl?: string;
-  } | string;
+  };
   type: 'text' | 'image' | 'video' | 'link';
   visible?: boolean;
   style?: {
@@ -178,11 +183,26 @@ export interface CardMetadata {
   cardNumber?: string;
 }
 
+export interface OaklandMemoryMetadata {
+  date?: string;
+  opponent?: string;
+  score?: string;
+  location?: string;
+  section?: string;
+  memoryType?: string;
+  attendees?: string[];
+  template?: string;
+  teamId?: string;
+  historicalContext?: string;
+  personalSignificance?: string;
+}
+
 export interface DesignMetadata {
   cardStyle?: CardStyle;
   textStyle?: TextStyle;
   marketMetadata?: MarketMetadata;
   cardMetadata?: CardMetadata;
+  oaklandMemory?: OaklandMemoryMetadata;
   effects?: string[];
   effectSettings?: Record<string, any>;
   effectClasses?: string;
@@ -265,6 +285,13 @@ export interface EnhancedCard extends Card {
   id: string;
   title: string;
   imageUrl: string;
+  description?: string;
+  tags: string[];
+  userId: string;
+  effects: string[];
+  createdAt: string;
+  updatedAt: string;
+  designMetadata: CardDesignMetadata;
 }
 
 // Default values

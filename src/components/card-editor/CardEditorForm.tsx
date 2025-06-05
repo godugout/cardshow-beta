@@ -10,7 +10,7 @@ import { useCards } from '@/context/CardContext';
 import { toast } from 'sonner';
 import TagInput from './TagInput';
 import ImageSelector from './ImageSelector';
-import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/types/cardTypes';
 
 interface CardEditorFormProps {
   card?: Card;
