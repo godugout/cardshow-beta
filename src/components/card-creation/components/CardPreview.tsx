@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { Card } from '@/lib/types/cardTypes';
-import { DEFAULT_CARD_STYLE, DEFAULT_TEXT_STYLE } from '@/lib/types/cardTypes';
+import { Card, DEFAULT_CARD_STYLE, DEFAULT_TEXT_STYLE } from '@/lib/types/cardTypes';
 
 interface CardPreviewProps {
   cardData: Card;

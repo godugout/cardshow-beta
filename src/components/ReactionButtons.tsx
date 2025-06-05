@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/context/auth';
-import { Reaction } from '@/lib/types';
+import { Reaction } from '@/lib/types/cardTypes';
 import { reactionRepository } from '@/lib/data';
 import { toast } from 'sonner';
 import { Heart, ThumbsUp, MessageCircle, Star, Award, Share } from 'lucide-react';
@@ -111,7 +110,7 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
         setReactions(prev => prev.filter(r => r.userId !== user.id));
       } else {
         // Add or update reaction
-        const targetType = cardId ? 'card' : collectionId ? 'collection' : 'comment';
+        const targetType = cardId ? 'card' : 'comment';
         const targetId = cardId || collectionId || commentId || '';
         
         const data = await reactionRepository.create({
