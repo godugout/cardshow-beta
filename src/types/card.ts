@@ -23,6 +23,7 @@ export interface CardData {
   jersey?: string;
   set?: string;
   year?: string;
+  player?: string; // Added player property
   specialEffect?: string;
   cardType?: string;
   artist?: string;
@@ -36,6 +37,7 @@ export interface CardData {
       frameColor: string;
       frameWidth: number;
       shadowColor: string;
+      backgroundColor?: string; // Added backgroundColor as optional
     };
     textStyle: {
       titleColor: string;

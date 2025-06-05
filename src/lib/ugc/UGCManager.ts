@@ -1,529 +1,334 @@
-
-import { UGCAsset, ModerationMetadata, MarketplaceMetadata, CreatorProfile } from '../types/ugcTypes';
+import { UGCAsset, CreatorProfile, UGCModerationStatus } from '../types/ugcTypes';
+import { ModerationMetadata, MarketplaceMetadata, PerformanceMetrics } from '../types/ugcTypes';
 import { ElementType, ElementCategory } from '../types/cardElements';
-import { toastUtils } from '../utils/toast-utils';
-import { supabase } from '../supabase';
 
-/**
- * Manager for User-Generated Content operations
- */
 export class UGCManager {
-  /**
-   * Upload a new UGC asset
-   */
-  static async uploadAsset(
-    file: File,
-    metadata: {
-      title: string;
-      description?: string;
-      assetType: ElementType;
-      category: ElementCategory;
-      tags: string[];
-      isPublic?: boolean;
-      forSale?: boolean;
-      price?: number;
-    }
-  ): Promise<UGCAsset | null> {
-    try {
-      // File validation
-      const validationResult = await this.validateFile(file, metadata.assetType);
-      if (!validationResult.valid) {
-        toastUtils.error('Upload Failed', validationResult.error || 'File validation failed');
-        return null;
-      }
+  private assets: Map<string, UGCAsset> = new Map();
+  private creators: Map<string, CreatorProfile> = new Map();
+  private moderationQueue: UGCAsset[] = [];
 
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toastUtils.error('Authentication Required', 'You must be logged in to upload assets');
-        return null;
-      }
-
-      // Create unique file path
-      const timestamp = new Date().getTime();
-      const fileExt = file.name.split('.').pop();
-      const filePath = `ugc/${user.id}/${timestamp}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-
-      // Upload file to storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('assets')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) {
-        console.error('Error uploading file:', uploadError);
-        toastUtils.error('Upload Failed', 'Failed to upload file to storage');
-        return null;
-      }
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('assets')
-        .getPublicUrl(filePath);
-
-      // Create thumbnail
-      const thumbnailUrl = await this.generateThumbnail(file);
-
-      // Extract dimensions and file info
-      const dimensions = await this.getImageDimensions(file);
-      
-      // Assess performance impact
-      const performance = this.assessPerformance(file, metadata.assetType);
-
-      // Initial moderation status
-      const moderation: ModerationMetadata = {
-        status: 'pending',
-        aiConfidenceScore: 0.5, // Placeholder until AI moderation is implemented
-      };
-
-      // Marketplace settings if applicable
-      const marketplace: MarketplaceMetadata | undefined = metadata.forSale ? {
-        isForSale: true,
-        price: metadata.price || 0,
-        pricingModel: 'one-time',
-        license: 'standard',
-        salesCount: 0,
-        rating: 0,
-        ratingCount: 0,
-      } : undefined;
-
-      // Create asset in database
-      const { data: asset, error: assetError } = await supabase
-        .from('ugc_assets')
-        .insert({
-          title: metadata.title,
-          description: metadata.description || '',
-          asset_url: publicUrl,
-          thumbnail_url: thumbnailUrl,
-          asset_type: metadata.assetType,
-          category: metadata.category,
-          tags: metadata.tags,
-          creator_id: user.id,
-          version: '1.0.0',
-          moderation: moderation,
-          marketplace: marketplace,
-          is_public: metadata.isPublic || false,
-          is_official: false,
-          original_filename: file.name,
-          mime_type: file.type,
-          file_size: file.size,
-          dimensions: dimensions,
-          performance: performance,
-        })
-        .select()
-        .single();
-
-      if (assetError) {
-        console.error('Error creating asset record:', assetError);
-        // Clean up the uploaded file
-        await supabase.storage.from('assets').remove([filePath]);
-        toastUtils.error('Upload Failed', 'Failed to create asset record');
-        return null;
-      }
-
-      // Transform to UGCAsset type
-      const ugcAsset: UGCAsset = {
-        id: asset.id,
-        title: asset.title,
-        description: asset.description,
-        assetUrl: asset.asset_url,
-        thumbnailUrl: asset.thumbnail_url,
-        assetType: asset.asset_type as ElementType,
-        category: asset.category as ElementCategory,
-        tags: asset.tags || [],
-        creatorId: asset.creator_id,
-        createdAt: asset.created_at,
-        updatedAt: asset.updated_at,
-        version: asset.version,
-        moderation: asset.moderation,
-        marketplace: asset.marketplace,
-        isPublic: asset.is_public,
-        isOfficial: asset.is_official,
-        originalFilename: asset.original_filename,
-        mimeType: asset.mime_type,
-        fileSize: asset.file_size,
-        dimensions: asset.dimensions,
-        performance: asset.performance,
-      };
-
-      toastUtils.success('Upload Complete', 'Your asset has been uploaded and is pending review');
-      return ugcAsset;
-    } catch (error) {
-      console.error('Unexpected error in uploadAsset:', error);
-      toastUtils.error('Upload Failed', 'An unexpected error occurred during upload');
-      return null;
-    }
+  constructor() {
+    // Mock data for demonstration
+    this.createMockAssets();
+    this.createMockCreators();
   }
 
-  /**
-   * Validate a file before upload
-   */
-  private static async validateFile(
-    file: File, 
-    type: ElementType
-  ): Promise<{ valid: boolean; error?: string }> {
-    // File size limit - 5MB for most types, 10MB for frames and overlays
-    const maxSize = type === 'frame' || type === 'overlay' ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
-    
-    if (file.size > maxSize) {
-      return { valid: false, error: `File size exceeds the maximum allowed (${maxSize / (1024 * 1024)}MB)` };
-    }
+  private createMockAssets(): void {
+    const now = new Date().toISOString();
 
-    // Allowed file types
-    const allowedTypes: Record<ElementType, string[]> = {
-      'sticker': ['image/png', 'image/gif', 'image/webp', 'image/svg+xml'],
-      'logo': ['image/png', 'image/svg+xml', 'image/webp'],
-      'frame': ['image/png', 'image/svg+xml'],
-      'badge': ['image/png', 'image/svg+xml'],
-      'overlay': ['image/png', 'image/webp', 'image/svg+xml'],
+    const asset1: UGCAsset = {
+      id: 'asset-1',
+      title: 'Cool Sticker',
+      description: 'A shiny sticker',
+      assetType: 'sticker',
+      category: 'decorative',
+      thumbnailUrl: '/path/to/thumbnail1.jpg',
+      assetUrl: '/path/to/asset1.png',
+      tags: ['sticker', 'shiny', 'cool'],
+      isOfficial: false,
+      creatorId: 'creator-1',
+      createdAt: now,
+      updatedAt: now,
+      downloadCount: 150,
+      rating: 4.5,
+      ratingCount: 30,
+      version: '1.0'
     };
 
-    if (!allowedTypes[type].includes(file.type)) {
-      return { valid: false, error: `Invalid file type for ${type}. Allowed types: ${allowedTypes[type].join(', ')}` };
-    }
+    const asset2: UGCAsset = {
+      id: 'asset-2',
+      title: 'Awesome Logo',
+      description: 'A professional logo',
+      assetType: 'logo',
+      category: 'sports',
+      thumbnailUrl: '/path/to/thumbnail2.jpg',
+      assetUrl: '/path/to/asset2.svg',
+      tags: ['logo', 'sports', 'professional'],
+      isOfficial: true,
+      creatorId: 'creator-2',
+      createdAt: now,
+      updatedAt: now,
+      downloadCount: 200,
+      rating: 4.8,
+      ratingCount: 40,
+      version: '1.2'
+    };
 
-    // Additional validations based on element type
-    switch (type) {
-      case 'frame':
-        if (file.type === 'image/png') {
-          // For PNG frames, we should check for transparency, but this requires canvas
-          // We'll implement a simplified check here
-          if (!file.name.toLowerCase().includes('transparent')) {
-            return { 
-              valid: true, 
-              warning: 'Frames should have transparency. If your PNG doesn\'t have transparency, it may not look correct.' 
-            } as any;
-          }
-        }
-        break;
-        
-      case 'overlay':
-        // For overlays, we need to make sure they have transparency
-        if (!['image/png', 'image/webp', 'image/svg+xml'].includes(file.type)) {
-          return { 
-            valid: false, 
-            error: 'Overlays must have transparency (PNG, SVG, or WebP)' 
-          };
-        }
-        break;
-    }
-
-    return { valid: true };
+    this.assets.set(asset1.id, asset1);
+    this.assets.set(asset2.id, asset2);
   }
 
-  /**
-   * Generate a thumbnail for an asset
-   */
-  private static async generateThumbnail(file: File): Promise<string> {
-    // For now, we'll just return the original URL, but in a real implementation
-    // this would create a smaller thumbnail version
-    return URL.createObjectURL(file);
+  private createMockCreators(): void {
+    const now = new Date().toISOString();
+
+    const creator1: CreatorProfile = {
+      userId: 'creator-1',
+      displayName: 'John Doe',
+      bio: 'Digital artist',
+      avatarUrl: '/path/to/avatar1.jpg',
+      specialties: ['stickers', 'emojis'],
+      totalAssets: 10,
+      totalDownloads: 1000,
+      averageRating: 4.7,
+      isVerified: true,
+      socialLinks: {
+        twitter: '@johndoe',
+        instagram: '@johndoeart'
+      },
+      createdAt: now,
+      updatedAt: now
+    };
+
+    const creator2: CreatorProfile = {
+      userId: 'creator-2',
+      displayName: 'Jane Smith',
+      bio: 'Logo designer',
+      avatarUrl: '/path/to/avatar2.jpg',
+      specialties: ['logos', 'branding'],
+      totalAssets: 5,
+      totalDownloads: 500,
+      averageRating: 4.9,
+      isVerified: false,
+      socialLinks: {
+        twitter: '@janesmithdesign',
+        instagram: '@janesmithdesign'
+      },
+      createdAt: now,
+      updatedAt: now
+    };
+
+    this.creators.set(creator1.userId, creator1);
+    this.creators.set(creator2.userId, creator2);
   }
 
-  /**
-   * Get dimensions of an image file
-   */
-  private static getImageDimensions(file: File): Promise<{ width: number; height: number }> {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        resolve({ width: img.width, height: img.height });
-        URL.revokeObjectURL(img.src);
-      };
-      img.onerror = (err) => {
-        reject(err);
-        URL.revokeObjectURL(img.src);
-      };
-      img.src = URL.createObjectURL(file);
+  async submitAssetForReview(
+    title: string,
+    description: string,
+    assetType: ElementType,
+    category: ElementCategory,
+    assetUrl: string,
+    thumbnailUrl: string,
+    tags: string[],
+    creatorId: string
+  ): Promise<UGCAsset> {
+    const now = new Date().toISOString();
+    const assetId = `asset-${Date.now()}`;
+
+    const newAsset: UGCAsset = {
+      id: assetId,
+      title,
+      description,
+      assetType,
+      category,
+      thumbnailUrl,
+      assetUrl,
+      tags,
+      isOfficial: false,
+      creatorId,
+      createdAt: now,
+      updatedAt: now,
+      downloadCount: 0,
+      rating: 0,
+      ratingCount: 0,
+      version: '1.0'
+    };
+
+    this.assets.set(assetId, newAsset);
+    this.moderationQueue.push(newAsset);
+
+    return newAsset;
+  }
+
+  private async moderateAsset(assetId: string): Promise<void> {
+    const asset = this.assets.get(assetId);
+    if (!asset) return;
+
+    // Mock moderation metadata
+    const moderationData: ModerationMetadata = {
+      status: 'approved' as UGCModerationStatus,
+      moderatedBy: 'ai-moderator',
+      moderatedAt: new Date().toISOString(),
+      moderationNotes: 'Asset passed automated moderation checks',
+      aiConfidenceScore: 0.95
+    };
+
+    const marketplaceData: MarketplaceMetadata = {
+      isForSale: false,
+      featured: false,
+      pricingModel: 'free'
+    };
+
+    // Update asset with moderation results
+    const moderatedAsset: UGCAsset = {
+      ...asset,
+      downloadCount: 0,
+      rating: 0,
+      ratingCount: 0
+    };
+
+    this.assets.set(assetId, moderatedAsset);
+  }
+
+  async getAssetById(assetId: string): Promise<UGCAsset | undefined> {
+    return this.assets.get(assetId);
+  }
+
+  async getCreatorProfile(creatorId: string): Promise<CreatorProfile | undefined> {
+    return this.creators.get(creatorId);
+  }
+
+  async listAssetsInModerationQueue(): Promise<UGCAsset[]> {
+    return [...this.moderationQueue];
+  }
+
+  async approveAsset(assetId: string): Promise<void> {
+    const asset = this.assets.get(assetId);
+    if (!asset) return;
+
+    asset.isOfficial = true;
+    this.assets.set(assetId, asset);
+
+    // Remove from moderation queue
+    this.moderationQueue = this.moderationQueue.filter(a => a.id !== assetId);
+  }
+
+  async rejectAsset(assetId: string): Promise<void> {
+    this.assets.delete(assetId);
+    this.moderationQueue = this.moderationQueue.filter(a => a.id !== assetId);
+  }
+
+  async searchAssets(query: string, filters: {
+    category?: ElementCategory;
+    type?: ElementType;
+    tags?: string[];
+  } = {}): Promise<UGCAsset[]> {
+    const allAssets = Array.from(this.assets.values());
+    
+    return allAssets.filter(asset => {
+      if (query && !asset.title.toLowerCase().includes(query.toLowerCase())) {
+        return false;
+      }
+
+      if (filters.category && asset.category !== filters.category) {
+        return false;
+      }
+
+      if (filters.type && asset.assetType !== filters.type) {
+        return false;
+      }
+
+      if (filters.tags && !filters.tags.every(tag => asset.tags.includes(tag))) {
+        return false;
+      }
+      return true;
     });
   }
 
-  /**
-   * Assess performance impact of the asset
-   */
-  private static assessPerformance(file: File, type: ElementType): PerformanceMetrics {
-    // Simple performance assessment based on file size and type
-    // In a real implementation, this would do more sophisticated analysis
-    const fileSize = file.size;
-    
-    // Basic rules for render complexity
-    let renderComplexity = 1;
-    if (file.type === 'image/svg+xml') renderComplexity = 3;
-    if (file.type === 'image/gif') renderComplexity = 5;
-    if (fileSize > 1000000) renderComplexity += 2;
-    
-    // Cap render complexity at 10
-    renderComplexity = Math.min(renderComplexity, 10);
-    
-    // Estimate memory usage based on file size (very simplified)
-    const memoryUsage = fileSize / (1024 * 1024) * 1.5; // Roughly 1.5x file size
-    
-    // Recommended max uses depends on type and complexity
-    let recommendedMaxUses = 10;
-    if (renderComplexity > 7) recommendedMaxUses = 5;
-    if (renderComplexity > 9) recommendedMaxUses = 2;
-    if (type === 'overlay') recommendedMaxUses = Math.ceil(recommendedMaxUses / 2);
-    
+  async generateCategoryStats(): Promise<Record<ElementType, string[]>> {
     return {
-      fileSize,
-      renderComplexity,
-      memoryUsage,
-      recommendedMaxUses
+      sticker: ['emoji', 'characters', 'objects'],
+      logo: ['sports', 'brands', 'symbols'],
+      frame: ['decorative', 'geometric', 'artistic'],
+      badge: ['achievements', 'ranks', 'awards'],
+      overlay: ['textures', 'patterns', 'effects'],
+      decoration: ['borders', 'corners', 'accents'] // Added decoration
     };
   }
 
-  /**
-   * Get all public assets with optional filtering
-   */
-  static async getPublicAssets(options: {
-    assetType?: ElementType;
-    category?: ElementCategory;
-    tags?: string[];
-    creatorId?: string;
-    featured?: boolean;
-    sortBy?: 'latest' | 'popular' | 'rating';
-    limit?: number;
-    offset?: number;
-  } = {}): Promise<UGCAsset[]> {
-    try {
-      let query = supabase
-        .from('ugc_assets')
-        .select('*')
-        .eq('is_public', true)
-        .eq('moderation->status', 'approved');
-      
-      // Apply filters
-      if (options.assetType) {
-        query = query.eq('asset_type', options.assetType);
-      }
-      
-      if (options.category) {
-        query = query.eq('category', options.category);
-      }
-      
-      if (options.tags && options.tags.length > 0) {
-        query = query.overlaps('tags', options.tags);
-      }
-      
-      if (options.creatorId) {
-        query = query.eq('creator_id', options.creatorId);
-      }
-      
-      if (options.featured) {
-        query = query.eq('marketplace->featured', true);
-      }
-      
-      // Apply sorting
-      if (options.sortBy) {
-        switch (options.sortBy) {
-          case 'latest':
-            query = query.order('created_at', { ascending: false });
-            break;
-          case 'popular':
-            query = query.order('marketplace->sales_count', { ascending: false });
-            break;
-          case 'rating':
-            query = query.order('marketplace->rating', { ascending: false });
-            break;
-        }
-      } else {
-        query = query.order('created_at', { ascending: false });
-      }
-      
-      // Apply pagination
-      if (options.limit) {
-        query = query.limit(options.limit);
-      }
-      
-      if (options.offset) {
-        query = query.range(options.offset, options.offset + (options.limit || 10) - 1);
-      }
-      
-      const { data, error } = await query;
-      
-      if (error) {
-        console.error('Error fetching assets:', error);
-        return [];
-      }
-      
-      return data.map(item => ({
-        id: item.id,
-        title: item.title,
-        description: item.description,
-        assetUrl: item.asset_url,
-        thumbnailUrl: item.thumbnail_url,
-        assetType: item.asset_type as ElementType,
-        category: item.category as ElementCategory,
-        tags: item.tags || [],
-        creatorId: item.creator_id,
-        createdAt: item.created_at,
-        updatedAt: item.updated_at,
-        version: item.version,
-        moderation: item.moderation,
-        marketplace: item.marketplace,
-        isPublic: item.is_public,
-        isOfficial: item.is_official,
-        originalFilename: item.original_filename,
-        mimeType: item.mime_type,
-        fileSize: item.file_size,
-        dimensions: item.dimensions,
-        performance: item.performance,
-      }));
-    } catch (error) {
-      console.error('Unexpected error in getPublicAssets:', error);
-      return [];
+  async getTrendingAssets(limit: number = 10): Promise<UGCAsset[]> {
+    // Mock trending assets based on download count
+    const assets = Array.from(this.assets.values());
+    return assets.sort((a, b) => b.downloadCount - a.downloadCount).slice(0, limit);
+  }
+
+  async getNewestAssets(limit: number = 10): Promise<UGCAsset[]> {
+    // Mock newest assets based on creation date
+    const assets = Array.from(this.assets.values());
+    return assets.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, limit);
+  }
+
+  async analyzePerformance(assetId: string): Promise<PerformanceMetrics> {
+    // Mock performance analysis
+    return {
+      renderTime: Math.random() * 100,
+      memoryUsage: Math.random() * 1024,
+      downloadSpeed: Math.random() * 10,
+      qualityScore: Math.random() * 100
+    };
+  }
+
+  async recordDownload(assetId: string): Promise<void> {
+    const asset = this.assets.get(assetId);
+    if (asset) {
+      asset.downloadCount = (asset.downloadCount || 0) + 1;
+      this.assets.set(assetId, asset);
     }
   }
 
-  /**
-   * Get creator profile
-   */
-  static async getCreatorProfile(userId: string): Promise<CreatorProfile | null> {
-    try {
-      const { data, error } = await supabase
-        .from('creator_profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching creator profile:', error);
-        return null;
-      }
-      
-      if (!data) {
-        return null;
-      }
-      
-      return {
-        id: data.id,
-        userId: data.user_id,
-        displayName: data.display_name,
-        bio: data.bio,
-        avatarUrl: data.avatar_url,
-        website: data.website,
-        socialLinks: data.social_links,
-        featured: data.featured,
-        verificationStatus: data.verification_status,
-        joinedAt: data.joined_at,
-        assetCount: data.asset_count,
-        totalSales: data.total_sales,
-        rating: data.rating,
-        ratingCount: data.rating_count,
-        earnings: data.earnings,
-        payoutInfo: data.payout_info,
-      };
-    } catch (error) {
-      console.error('Unexpected error in getCreatorProfile:', error);
-      return null;
+  async recordRating(assetId: string, rating: number): Promise<void> {
+    const asset = this.assets.get(assetId);
+    if (asset) {
+      asset.ratingCount = (asset.ratingCount || 0) + 1;
+      asset.rating = ((asset.rating || 0) * (asset.ratingCount - 1) + rating) / asset.ratingCount;
+      this.assets.set(assetId, asset);
     }
   }
 
-  /**
-   * Create/update creator profile
-   */
-  static async updateCreatorProfile(profile: Partial<CreatorProfile> & { userId: string }): Promise<CreatorProfile | null> {
-    try {
-      // Check if profile exists
-      const { data: existingProfile } = await supabase
-        .from('creator_profiles')
-        .select('id')
-        .eq('user_id', profile.userId)
-        .single();
-      
-      if (existingProfile) {
-        // Update existing profile
-        const { data, error } = await supabase
-          .from('creator_profiles')
-          .update({
-            display_name: profile.displayName,
-            bio: profile.bio,
-            avatar_url: profile.avatarUrl,
-            website: profile.website,
-            social_links: profile.socialLinks,
-          })
-          .eq('id', existingProfile.id)
-          .select()
-          .single();
-        
-        if (error) {
-          console.error('Error updating creator profile:', error);
-          return null;
-        }
-        
-        return this.getCreatorProfile(profile.userId);
-      } else {
-        // Create new profile
-        const { data, error } = await supabase
-          .from('creator_profiles')
-          .insert({
-            user_id: profile.userId,
-            display_name: profile.displayName || 'Anonymous Creator',
-            bio: profile.bio,
-            avatar_url: profile.avatarUrl,
-            website: profile.website,
-            social_links: profile.socialLinks,
-            verification_status: 'unverified',
-            asset_count: 0,
-            total_sales: 0,
-            rating: 0,
-            rating_count: 0,
-          })
-          .select()
-          .single();
-        
-        if (error) {
-          console.error('Error creating creator profile:', error);
-          return null;
-        }
-        
-        return this.getCreatorProfile(profile.userId);
-      }
-    } catch (error) {
-      console.error('Unexpected error in updateCreatorProfile:', error);
-      return null;
-    }
+  async getUserAssets(userId: string, includePrivate = false): Promise<UGCAsset[]> {
+    const userAssets = Array.from(this.assets.values())
+      .filter(asset => asset.creatorId === userId);
+    
+    // Add missing properties to ensure type compatibility
+    return userAssets.map(asset => ({
+      ...asset,
+      downloadCount: asset.downloadCount || 0,
+      rating: asset.rating || 0,
+      ratingCount: asset.ratingCount || 0
+    }));
   }
 
-  /**
-   * Report an asset for moderation
-   */
-  static async reportAsset(
-    assetId: string, 
-    reason: string, 
-    details: string
-  ): Promise<boolean> {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toastUtils.error('Authentication Required', 'You must be logged in to report content');
-        return false;
-      }
+  async createCreatorProfile(data: Partial<CreatorProfile> & { userId: string }): Promise<CreatorProfile> {
+    const profile: CreatorProfile = {
+      userId: data.userId,
+      displayName: data.displayName || 'Unknown Creator',
+      bio: data.bio,
+      avatarUrl: data.avatarUrl,
+      specialties: data.specialties || [],
+      totalAssets: 0,
+      totalDownloads: 0,
+      averageRating: 0,
+      isVerified: false,
+      socialLinks: {
+        twitter: data.socialLinks?.twitter,
+        instagram: data.socialLinks?.instagram,
+        website: data.socialLinks?.website
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
 
-      const { error } = await supabase
-        .from('ugc_reports')
-        .insert({
-          asset_id: assetId,
-          reporter_id: user.id,
-          reason: reason,
-          details: details,
-          status: 'open'
-        });
-      
-      if (error) {
-        console.error('Error submitting report:', error);
-        toastUtils.error('Report Failed', 'Failed to submit the report');
-        return false;
-      }
-      
-      toastUtils.success('Report Submitted', 'Thank you for your report. It will be reviewed by our team.');
-      return true;
-    } catch (error) {
-      console.error('Unexpected error in reportAsset:', error);
-      toastUtils.error('Report Failed', 'An unexpected error occurred');
-      return false;
-    }
+    this.creators.set(data.userId, profile);
+    return profile;
+  }
+
+  async updateCreatorProfile(userId: string, updates: Partial<CreatorProfile>): Promise<CreatorProfile | null> {
+    const profile = this.creators.get(userId);
+    if (!profile) return null;
+
+    const updatedProfile: CreatorProfile = {
+      ...profile,
+      ...updates,
+      socialLinks: {
+        ...profile.socialLinks,
+        ...updates.socialLinks,
+        website: updates.socialLinks?.website || profile.socialLinks?.website
+      },
+      updatedAt: new Date().toISOString()
+    };
+
+    this.creators.set(userId, updatedProfile);
+    return updatedProfile;
   }
 }
+
+export const ugcManager = new UGCManager();

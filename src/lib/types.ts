@@ -10,6 +10,26 @@ export * from './types/user';
 export * from './types/interaction';
 export * from './types/collection';
 
+// Define base types used throughout the application
+
+export interface BaseEntity {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
+// Make sure SearchFilters is properly defined as an object type
+export interface SearchFilters {
+  category?: string;
+  tags?: string[];
+  type?: string;
+  rarity?: string;
+  minPrice?: number;
+  maxPrice?: number;
+}
+
 // Keep the utility function for backward compatibility
 import { DesignMetadata } from './types/cardTypes';
 

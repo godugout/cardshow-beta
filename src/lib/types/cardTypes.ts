@@ -22,7 +22,7 @@ export interface CardStyle {
   borderRadius: string;  
   borderWidth?: number;
   borderColor: string;   
-  backgroundColor?: string;
+  backgroundColor?: string; // Added backgroundColor as optional
   shadowColor: string;   
   frameWidth: number;    
   frameColor: string;    
@@ -321,7 +321,7 @@ export const DEFAULT_CARD_STYLE: CardStyle = {
   borderRadius: '8px',
   borderWidth: 2,
   borderColor: '#000000',
-  backgroundColor: '#FFFFFF',
+  backgroundColor: '#FFFFFF', // Added backgroundColor to default
   shadowColor: 'rgba(0,0,0,0.2)',
   frameWidth: 2,
   frameColor: '#000000',
@@ -334,7 +334,7 @@ export const DEFAULT_TEXT_STYLE: TextStyle = {
   color: '#000000',
   titleColor: '#000000',
   titleAlignment: 'center',
-  titleWeight: 'bold',
+  titleWeight: 'bold', // Added titleWeight
   descriptionColor: '#333333',
 };
 

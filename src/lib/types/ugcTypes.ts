@@ -17,6 +17,7 @@ export interface UGCAsset {
   downloadCount: number;
   rating: number;
   ratingCount: number;
+  version?: string; // Added version property
   marketplace?: {
     isForSale: boolean;
     price?: number;
@@ -38,7 +39,7 @@ export interface CreatorProfile {
   socialLinks?: {
     twitter?: string;
     instagram?: string;
-    website?: string;
+    website?: string; // Added website property
   };
   createdAt: string;
   updatedAt: string;
@@ -73,6 +74,7 @@ export interface ModerationMetadata {
   moderatedAt?: string;
   moderationNotes?: string;
   violationReason?: string;
+  aiConfidenceScore?: number; // Added aiConfidenceScore property
 }
 
 export interface MarketplaceMetadata {
@@ -82,6 +84,7 @@ export interface MarketplaceMetadata {
   featured?: boolean;
   salesCount?: number;
   revenue?: number;
+  pricingModel?: string; // Added pricingModel property
 }
 
 // Add performance metrics interface
@@ -90,4 +93,25 @@ export interface PerformanceMetrics {
   memoryUsage: number;
   downloadSpeed: number;
   qualityScore: number;
+}
+
+// Add CreationHistoryItem interface
+export interface CreationHistoryItem {
+  id: string;
+  cardId: string;
+  effectsUsed: string[];
+  elementsUsed: string[];
+  timeSpent: number;
+  createdAt: string;
+}
+
+// Add UserStyleProfile interface with favoriteTemplates
+export interface UserStyleProfile {
+  userId: string;
+  preferredColors: string[];
+  preferredEffects: string[];
+  favoriteTemplates: string[]; // Added favoriteTemplates property
+  styleCategories: string[];
+  createdAt: string;
+  updatedAt: string;
 }
