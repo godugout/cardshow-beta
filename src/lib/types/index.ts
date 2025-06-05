@@ -37,11 +37,17 @@ export interface PaginatedResponse<T = any> extends ApiResponse<T[]> {
 // Instagram types
 export interface InstagramPost {
   id: string;
+  postId: string;
+  username: string;
+  caption?: string;
   imageUrl: string;
-  caption: string;
+  permalink: string;
+  timestamp: string;
+  mediaType: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
+  mediaUrl: string;
+  thumbnailUrl?: string;
   likes: number;
   comments: number;
-  timestamp: string;
   userId: string;
 }
 

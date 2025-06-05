@@ -63,13 +63,13 @@ const InstagramCard = ({ post, username, onClick, effects = [] }: InstagramCardP
               <div className="flex items-center">
                 <Heart className="h-4 w-4 mr-1" />
                 <span className="text-xs">
-                  {Math.floor(Math.random() * 1000) + 10}
+                  {post.likes || Math.floor(Math.random() * 1000) + 10}
                 </span>
               </div>
               <div className="flex items-center">
                 <MessageCircle className="h-4 w-4 mr-1" />
                 <span className="text-xs">
-                  {Math.floor(Math.random() * 100)}
+                  {post.comments || Math.floor(Math.random() * 100)}
                 </span>
               </div>
             </div>

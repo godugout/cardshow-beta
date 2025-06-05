@@ -55,12 +55,17 @@ const InstagramCollectionCreator: React.FC = () => {
         postId: post.id,
         username: username,
         caption: post.caption || '',
-        imageUrl: post.media_url,
+        imageUrl: post.mediaUrl,
         permalink: post.permalink,
         timestamp: post.timestamp,
-        mediaType: post.media_type,
-        mediaUrl: post.media_url,
-        thumbnailUrl: post.thumbnail_url || post.media_url,
+        mediaType: post.mediaType,
+        mediaUrl: post.mediaUrl,
+        thumbnailUrl: post.thumbnailUrl || post.mediaUrl,
+        likes: 0,
+        comments: 0,
+        userId: 'user-1',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       }));
       
       setInstagramPosts(posts);

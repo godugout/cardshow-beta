@@ -57,9 +57,20 @@ export const useGalleryCards = () => {
         designMetadata: {
           ...card.designMetadata,
           oaklandMemory: card.designMetadata?.oaklandMemory ? {
-            ...card.designMetadata.oaklandMemory,
             title: card.title || '',
-            description: card.description || ''
+            description: card.description || '',
+            date: card.designMetadata.oaklandMemory.date,
+            opponent: card.designMetadata.oaklandMemory.opponent,
+            score: card.designMetadata.oaklandMemory.score,
+            location: card.designMetadata.oaklandMemory.location,
+            section: card.designMetadata.oaklandMemory.section,
+            memoryType: card.designMetadata.oaklandMemory.memoryType,
+            attendees: card.designMetadata.oaklandMemory.attendees,
+            tags: card.designMetadata.oaklandMemory.tags,
+            imageUrl: card.designMetadata.oaklandMemory.imageUrl,
+            historicalContext: card.designMetadata.oaklandMemory.historicalContext,
+            personalSignificance: card.designMetadata.oaklandMemory.personalSignificance,
+            template: card.designMetadata.oaklandMemory.template
           } : undefined
         }
       };

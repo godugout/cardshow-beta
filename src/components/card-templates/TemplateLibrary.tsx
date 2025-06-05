@@ -72,7 +72,7 @@ export const TEMPLATE_LIBRARY: CardTemplate[] = [
 ];
 
 // Export the CardTemplate type
-export type { CardTemplate };
+export { CardTemplate };
 
 // Default export for compatibility
 export default TEMPLATE_LIBRARY;

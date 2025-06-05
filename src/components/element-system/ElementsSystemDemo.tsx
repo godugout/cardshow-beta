@@ -177,6 +177,18 @@ const ElementsSystemDemo: React.FC = () => {
     toastUtils.success('Design Saved', 'Your design has been saved');
   };
 
+  // Handle file upload
+  const handleUpload = (elementData: any) => {
+    console.log('Uploading element:', elementData);
+    toastUtils.success('Element Uploaded', 'New element has been uploaded');
+    setActiveTab("browse");
+  };
+
+  // Handle cancel upload
+  const handleCancelUpload = () => {
+    setActiveTab("browse");
+  };
+
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
@@ -294,6 +306,8 @@ const ElementsSystemDemo: React.FC = () => {
               </TabsContent>
               <TabsContent value="upload" className="m-0">
                 <ElementUploadForm 
+                  onUpload={handleUpload}
+                  onCancel={handleCancelUpload}
                   onElementCreated={() => {
                     toastUtils.success('Element Created', 'New element added to the library');
                     setActiveTab("browse");

@@ -86,20 +86,28 @@ export interface DesignMetadata {
   marketMetadata: MarketMetadata;
   effects?: string[];
   effectClasses?: string;
-  oaklandMemory?: {
-    date?: string;
-    opponent?: string;
-    score?: string;
-    location?: string;
-    section?: string;
-    memoryType?: string;
-    attendees?: string[];
-    imageUrl?: string;
-    historicalContext?: string;
-    personalSignificance?: string;
-    template?: string;
-  };
+  oaklandMemory?: OaklandMemoryData;
   [key: string]: JsonValue | undefined;
+}
+
+/**
+ * Oakland memory data
+ */
+export interface OaklandMemoryData {
+  title: string;
+  description: string;
+  date?: string;
+  opponent?: string;
+  score?: string;
+  location?: string;
+  section?: string;
+  memoryType?: string;
+  attendees?: string[];
+  tags?: string[];
+  imageUrl?: string;
+  historicalContext?: string;
+  personalSignificance?: string;
+  template?: string;
 }
 
 /**
@@ -182,26 +190,6 @@ export interface FabricSwatch {
   year?: string;
   team?: string;
   position?: string;
-}
-
-/**
- * Oakland memory data
- */
-export interface OaklandMemoryData {
-  title: string;
-  description: string;
-  date?: string;
-  opponent?: string;
-  score?: string;
-  location?: string;
-  section?: string;
-  memoryType?: string;
-  attendees?: string[];
-  tags?: string[];
-  imageUrl?: string;
-  historicalContext?: string;
-  personalSignificance?: string;
-  template?: string;
 }
 
 /**
