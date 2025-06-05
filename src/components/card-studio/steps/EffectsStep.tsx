@@ -22,7 +22,7 @@ const EffectsStep: React.FC<EffectsStepProps> = ({ cardData, onUpdateEffects }) 
 
   // Load effects on component mount
   useEffect(() => {
-    setStandardEffects(getEffectsByCategory('standard'));
+    setStandardEffects(getEffectsByCategory('metallic'));
     setPremiumEffects(getEffectsByCategory('premium'));
   }, []);
 
@@ -66,9 +66,9 @@ const EffectsStep: React.FC<EffectsStepProps> = ({ cardData, onUpdateEffects }) 
         onClick={() => toggleEffect(effect.id)}
       >
         <div className="aspect-[2.5/3.5] bg-gray-100 mb-2 rounded-md overflow-hidden">
-          {effect.thumbnail ? (
+          {effect.thumbnailUrl ? (
             <img 
-              src={effect.thumbnail} 
+              src={effect.thumbnailUrl} 
               alt={effect.name} 
               className="w-full h-full object-cover"
             />
@@ -135,16 +135,16 @@ const EffectsStep: React.FC<EffectsStepProps> = ({ cardData, onUpdateEffects }) 
               </div>
               
               <div className="space-y-6">
-                {selectedEffect.defaultSettings.intensity !== undefined && (
+                {selectedEffect.settings?.intensity !== undefined && (
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <Label>Effect Intensity</Label>
                       <span className="text-sm text-gray-500">
-                        {Math.round(selectedEffect.defaultSettings.intensity * 100)}%
+                        {Math.round((selectedEffect.settings.intensity || 0) * 100)}%
                       </span>
                     </div>
                     <Slider 
-                      defaultValue={[selectedEffect.defaultSettings.intensity * 100]}
+                      defaultValue={[(selectedEffect.settings.intensity || 0) * 100]}
                       max={100}
                       step={1}
                       className="w-full"
@@ -152,16 +152,16 @@ const EffectsStep: React.FC<EffectsStepProps> = ({ cardData, onUpdateEffects }) 
                   </div>
                 )}
                 
-                {selectedEffect.defaultSettings.speed !== undefined && (
+                {selectedEffect.settings?.speed !== undefined && (
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <Label>Animation Speed</Label>
                       <span className="text-sm text-gray-500">
-                        {Math.round(selectedEffect.defaultSettings.speed * 100)}%
+                        {Math.round((selectedEffect.settings.speed || 0) * 100)}%
                       </span>
                     </div>
                     <Slider 
-                      defaultValue={[selectedEffect.defaultSettings.speed * 100]}
+                      defaultValue={[(selectedEffect.settings.speed || 0) * 100]}
                       max={100}
                       step={1}
                       className="w-full"
@@ -169,23 +169,23 @@ const EffectsStep: React.FC<EffectsStepProps> = ({ cardData, onUpdateEffects }) 
                   </div>
                 )}
                 
-                {selectedEffect.defaultSettings.animationEnabled !== undefined && (
+                {selectedEffect.settings?.animationEnabled !== undefined && (
                   <div className="flex items-center justify-between">
                     <Label>Enable Animation</Label>
                     <Switch 
-                      checked={selectedEffect.defaultSettings.animationEnabled}
+                      checked={selectedEffect.settings.animationEnabled || false}
                     />
                   </div>
                 )}
                 
-                {selectedEffect.defaultSettings.pattern && (
+                {selectedEffect.settings?.pattern && (
                   <div className="space-y-2">
                     <Label>Pattern Style</Label>
                     <div className="flex flex-wrap gap-2">
                       {['linear', 'radial', 'angular'].map(pattern => (
                         <Badge 
                           key={pattern}
-                          variant={pattern === selectedEffect.defaultSettings.pattern ? "default" : "outline"}
+                          variant={pattern === selectedEffect.settings.pattern ? "default" : "outline"}
                           className="cursor-pointer"
                         >
                           {pattern}
@@ -196,12 +196,12 @@ const EffectsStep: React.FC<EffectsStepProps> = ({ cardData, onUpdateEffects }) 
                 )}
                 
                 {/* Simple color scheme display */}
-                {selectedEffect.defaultSettings.colorScheme && (
+                {selectedEffect.settings?.colorScheme && (
                   <div className="space-y-2">
                     <Label>Color Scheme</Label>
                     <div className="flex gap-1">
-                      {Array.isArray(selectedEffect.defaultSettings.colorScheme) ? (
-                        selectedEffect.defaultSettings.colorScheme.map((color, index) => (
+                      {Array.isArray(selectedEffect.settings.colorScheme) ? (
+                        selectedEffect.settings.colorScheme.map((color, index) => (
                           <div 
                             key={index}
                             className="w-8 h-8 rounded-full"
@@ -211,7 +211,7 @@ const EffectsStep: React.FC<EffectsStepProps> = ({ cardData, onUpdateEffects }) 
                       ) : (
                         <div 
                           className="w-8 h-8 rounded-full"
-                          style={{ backgroundColor: selectedEffect.defaultSettings.colorScheme }}
+                          style={{ backgroundColor: selectedEffect.settings.colorScheme }}
                         />
                       )}
                     </div>

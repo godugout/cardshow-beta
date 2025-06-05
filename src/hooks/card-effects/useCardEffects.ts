@@ -1,15 +1,35 @@
 
-import { useState, useCallback, useMemo } from 'react';
-import { PremiumCardEffect, EffectCategory, CardEffectSettings, UseCardEffectsResult } from './types';
-import { getBasicEffects, getEffectCategories, applyEffectToElement } from './utils';
+import { useState, useEffect, useCallback } from 'react';
+import { PremiumCardEffect, CardEffectSettings, UseCardEffectsResult, EffectCategory } from './types';
+import { getBasicEffects, getEffectCategories } from './utils';
 
 export const useCardEffects = (): UseCardEffectsResult => {
+  const [effects, setEffects] = useState<PremiumCardEffect[]>([]);
+  const [categories, setCategories] = useState<EffectCategory[]>([]);
   const [activeEffects, setActiveEffects] = useState<string[]>([]);
-  const [effectsLoading, setEffectsLoading] = useState(false);
+  const [effectsLoading, setEffectsLoading] = useState(true);
 
-  // Get all available effects
-  const effects = useMemo(() => getBasicEffects(), []);
-  const categories = useMemo(() => getEffectCategories(), []);
+  // Initialize effects
+  useEffect(() => {
+    const loadEffects = async () => {
+      try {
+        // In a real app, this might be an API call
+        const allEffects = getBasicEffects();
+        setEffects(allEffects);
+        
+        // Extract unique categories from effects
+        const uniqueCategories = [...new Set(allEffects.map(effect => effect.category))];
+        setCategories(uniqueCategories);
+        
+        setEffectsLoading(false);
+      } catch (error) {
+        console.error('Failed to load effects:', error);
+        setEffectsLoading(false);
+      }
+    };
+
+    loadEffects();
+  }, []);
 
   const toggleEffect = useCallback((effectId: string) => {
     setActiveEffects(prev => {
@@ -22,27 +42,37 @@ export const useCardEffects = (): UseCardEffectsResult => {
   }, []);
 
   const updateEffectSettings = useCallback((effectId: string, settings: Partial<CardEffectSettings>) => {
-    // Find the effect and update its settings
-    const effectIndex = effects.findIndex(e => e.id === effectId);
-    if (effectIndex !== -1) {
-      effects[effectIndex].settings = {
-        ...effects[effectIndex].settings,
-        ...settings
-      };
-    }
-  }, [effects]);
+    setEffects(prev => prev.map(effect => {
+      if (effect.id === effectId) {
+        return {
+          ...effect,
+          settings: {
+            ...effect.settings,
+            ...settings
+          }
+        };
+      }
+      return effect;
+    }));
+  }, []);
 
+  // Apply effects to a DOM element
   const applyEffectsToElement = useCallback((element: HTMLElement) => {
-    if (!element) return;
-    
-    // Clear existing effects
+    // Clear existing effect classes
     element.className = element.className.replace(/effect-\w+/g, '');
     
     // Apply active effects
     activeEffects.forEach(effectId => {
       const effect = effects.find(e => e.id === effectId);
-      if (effect) {
-        applyEffectToElement(element, effectId, effect.settings);
+      if (effect && effect.enabled) {
+        if (effect.className) {
+          element.classList.add(effect.className);
+        }
+        
+        // Apply settings as CSS custom properties
+        Object.entries(effect.settings).forEach(([key, value]) => {
+          element.style.setProperty(`--${key}`, String(value));
+        });
       }
     });
   }, [activeEffects, effects]);
@@ -57,3 +87,5 @@ export const useCardEffects = (): UseCardEffectsResult => {
     effectsLoading
   };
 };
+
+export default useCardEffects;

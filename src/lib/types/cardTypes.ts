@@ -162,7 +162,7 @@ export interface CardLayer {
 }
 
 /**
- * Hotspot data for interactive elements - with required action property
+ * Hotspot data for interactive elements - with action now optional
  */
 export interface HotspotData {
   id: string;
@@ -170,7 +170,7 @@ export interface HotspotData {
   y: number;
   width: number;
   height: number;
-  action: string;
+  action?: string; // Made optional
   metadata?: Record<string, any>;
   type?: string;
   content?: string;

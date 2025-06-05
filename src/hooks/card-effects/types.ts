@@ -3,7 +3,7 @@
  * Card Effects System Types
  */
 
-export type EffectCategory = 'holographic' | 'prismatic' | 'refractor' | 'metallic' | 'vintage' | 'special' | 'premium' | 'foil' | 'classic' | 'modern';
+export type EffectCategory = 'holographic' | 'prismatic' | 'refractor' | 'metallic' | 'vintage' | 'special' | 'premium' | 'foil' | 'classic' | 'modern' | 'standard';
 
 export interface CardEffectSettings {
   intensity?: number;
@@ -12,6 +12,9 @@ export interface CardEffectSettings {
   opacity?: number;
   scale?: number;
   rotation?: number;
+  pattern?: string;
+  animationEnabled?: boolean;
+  colorScheme?: string[];
   [key: string]: any;
 }
 
@@ -26,15 +29,22 @@ export interface PremiumCardEffect {
   iconUrl?: string;
   isPremium?: boolean;
   previewUrl?: string;
+  thumbnailUrl?: string;
 }
 
 // Re-export as CardEffect for backward compatibility
 export type CardEffect = PremiumCardEffect;
 
-// Add CardEffectDefinition for compatibility
+// Add CardEffectDefinition for compatibility with effects registry
 export interface CardEffectDefinition extends PremiumCardEffect {
   displayName?: string;
   thumbnailUrl?: string;
+  defaultSettings?: CardEffectSettings;
+  thumbnail?: string; // For backward compatibility
+  premium?: boolean;
+  cssClass?: string;
+  supportedCardTypes?: string[];
+  renderer?: (element: HTMLElement, settings: any) => void;
 }
 
 // Material simulation types
