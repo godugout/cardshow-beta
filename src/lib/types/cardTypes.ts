@@ -273,6 +273,48 @@ export interface CardTemplate {
   style?: string;
 }
 
+// Card data interface for compatibility with existing code
+export interface CardData {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  thumbnailUrl?: string;
+  tags: string[];
+  userId: string;
+  teamId?: string;
+  collectionId?: string;
+  isPublic?: boolean;
+  effects: string[];
+  rarity?: CardRarity;
+  createdAt: string;
+  updatedAt: string;
+  
+  // Baseball card properties
+  player?: string;
+  team?: string;
+  year?: string;
+  jersey?: string;
+  set?: string;
+  cardNumber?: string;
+  cardType?: string;
+  artist?: string;
+  backgroundColor?: string;
+  borderColor?: string;
+  borderRadius?: string;
+  textColor?: string;
+  specialEffect?: string;
+  
+  // Design properties
+  designMetadata?: DesignMetadata;
+  fabricSwatches?: FabricSwatch[];
+  
+  // Market data
+  price?: number;
+  estimatedValue?: string;
+  condition?: string;
+}
+
 export const DEFAULT_CARD_STYLE: CardStyle = {
   template: 'classic',
   effect: 'none',

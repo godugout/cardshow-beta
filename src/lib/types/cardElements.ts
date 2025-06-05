@@ -90,12 +90,20 @@ export interface ElementUploadMetadata {
   mimeType: string;
   uploadedBy: string;
   uploadedAt: string;
+  fileName?: string;
+  dimensions?: {
+    width: number;
+    height: number;
+  };
+  hasTransparency?: boolean;
+  isAnimated?: boolean;
 }
 
 export interface ElementPosition {
   x: number;
   y: number;
   z?: number;
+  rotation?: number;
 }
 
 export interface ElementSize {
@@ -109,6 +117,11 @@ export interface ElementTransform {
   size: ElementSize;
   rotation?: number;
   opacity?: number;
+  translateX?: number;
+  translateY?: number;
+  rotate?: number;
+  scaleX?: number;
+  scaleY?: number;
 }
 
 export interface ElementPlacementOptions {
@@ -116,4 +129,7 @@ export interface ElementPlacementOptions {
   gridSize?: number;
   constrainToBounds?: boolean;
   allowOverlap?: boolean;
+  position?: ElementPosition;
+  size?: ElementSize;
+  style?: Record<string, any>;
 }
