@@ -1,3 +1,4 @@
+
 import { Card } from '@/lib/types/cardTypes';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 
@@ -13,7 +14,6 @@ export const sampleCards: Card[] = [
     effects: ['holographic'],
     createdAt: '2023-01-15T00:00:00Z',
     updatedAt: '2023-01-15T00:00:00Z',
-    name: 'Mike Trout',
     team: 'Los Angeles Angels',
     jersey: '27',
     year: '2023',
@@ -37,7 +37,6 @@ export const sampleCards: Card[] = [
     effects: ['prismatic'],
     createdAt: '2023-02-01T00:00:00Z',
     updatedAt: '2023-02-01T00:00:00Z',
-    name: 'Shohei Ohtani',
     team: 'Los Angeles Angels',
     jersey: '17',
     year: '2023',
@@ -61,7 +60,6 @@ export const sampleCards: Card[] = [
     effects: ['gold-foil'],
     createdAt: '2023-03-01T00:00:00Z',
     updatedAt: '2023-03-01T00:00:00Z',
-    name: 'Ronald Acuña Jr.',
     team: 'Atlanta Braves',
     jersey: '13',
     year: '2023',
@@ -85,7 +83,6 @@ export const sampleCards: Card[] = [
     effects: ['metallic'],
     createdAt: '2023-04-01T00:00:00Z',
     updatedAt: '2023-04-01T00:00:00Z',
-    name: 'Mookie Betts',
     team: 'Los Angeles Dodgers',
     jersey: '50',
     year: '2023',
@@ -109,7 +106,6 @@ export const sampleCards: Card[] = [
     effects: ['refractor'],
     createdAt: '2023-05-01T00:00:00Z',
     updatedAt: '2023-05-01T00:00:00Z',
-    name: 'Francisco Lindor',
     team: 'New York Mets',
     jersey: '12',
     year: '2023',
@@ -133,7 +129,6 @@ export const sampleCards: Card[] = [
     effects: ['vintage'],
     createdAt: '2023-06-01T00:00:00Z',
     updatedAt: '2023-06-01T00:00:00Z',
-    name: 'Juan Soto',
     team: 'San Diego Padres',
     jersey: '22',
     year: '2023',

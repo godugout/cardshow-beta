@@ -10,7 +10,7 @@ import { CrdButton } from '@/components/ui/crd-button';
 import { Camera, Smartphone, Scan, Info } from 'lucide-react';
 import CardMedia from '@/components/gallery/CardMedia';
 import { toast } from 'sonner';
-import { useArCardViewer } from '@/hooks/useArCardViewer';
+import { useArCards } from '@/hooks/useArCards';
 import ArModeView from '@/components/ar/ArModeView';
 
 const ArCardViewer = () => {
@@ -19,8 +19,13 @@ const ArCardViewer = () => {
   const navigate = useNavigate();
   
   const {
+    cards: arCards,
+    currentCard,
+    loading,
+    error,
+    nextCard,
+    previousCard,
     activeCard,
-    arCards,
     availableCards,
     isArMode,
     isFlipped,
@@ -36,7 +41,7 @@ const ArCardViewer = () => {
     handleRotate,
     handleAddCard,
     handleRemoveCard
-  } = useArCardViewer(id);
+  } = useArCards();
 
   if (isArMode) {
     return (

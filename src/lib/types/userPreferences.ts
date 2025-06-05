@@ -131,4 +131,5 @@ export interface RecommendationItem<T> {
   item: T;
   score: number;
   reason: string;
+  category?: string;
 }
