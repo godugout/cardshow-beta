@@ -17,6 +17,7 @@ export interface CardData {
   updatedAt: string;
   // Additional properties used in home components
   backgroundColor?: string;
+  textColor?: string;  // Added for backward compatibility
   name?: string;
   team?: string;
   jersey?: string;
@@ -96,6 +97,7 @@ export function adaptCardToCardData(card: Card): CardData {
     artist: card.artist,
     cardNumber: card.cardNumber,
     backgroundColor: card.backgroundColor,
+    textColor: card.textColor,
     specialEffect: card.specialEffect,
     designMetadata: card.designMetadata || {
       cardStyle: {

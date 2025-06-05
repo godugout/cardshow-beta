@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { UGCAsset } from '@/lib/types/ugcTypes';
 import { ElementCategory, ElementType } from '@/lib/types/cardElements';
@@ -126,8 +125,8 @@ const AssetMarketplace: React.FC<AssetMarketplaceProps> = ({ onAssetSelect }) =>
             <div>
               <h4 className="mb-2 text-sm font-medium">Asset Type</h4>
               <Select 
-                value={assetType} 
-                onValueChange={(value) => setAssetType(value as ElementType || undefined)}
+                value={assetType || ""} 
+                onValueChange={(value) => setAssetType((value as ElementType) || undefined)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All types" />
@@ -146,8 +145,8 @@ const AssetMarketplace: React.FC<AssetMarketplaceProps> = ({ onAssetSelect }) =>
             <div>
               <h4 className="mb-2 text-sm font-medium">Category</h4>
               <Select 
-                value={category} 
-                onValueChange={(value) => setCategory(value as ElementCategory || undefined)}
+                value={category || ""} 
+                onValueChange={(value) => setCategory((value as ElementCategory) || undefined)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All categories" />
