@@ -6,7 +6,7 @@
 
 export type ElementType = 'sticker' | 'logo' | 'frame' | 'badge' | 'overlay' | 'decoration';
 
-export type ElementCategory = 'sports' | 'entertainment' | 'decorative' | 'seasonal' | 'teams';
+export type ElementCategory = 'sports' | 'entertainment' | 'decorative' | 'seasonal' | 'teams' | 'custom';
 
 export interface ElementPosition {
   x: number;
@@ -108,6 +108,14 @@ export interface ElementUploadMetadata {
   tags: string[];
   isPublic: boolean;
   fileSize?: number; // Added for backward compatibility
+  fileName?: string;
+  mimeType?: string;
+  isAnimated?: boolean;
+  dimensions?: {
+    width: number;
+    height: number;
+  };
+  hasTransparency?: boolean;
 }
 
 export interface ElementTransform {

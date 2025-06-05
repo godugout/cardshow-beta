@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { useUGCSystem } from '@/hooks/useUGCSystem';
 import { UGCModerationStatus, UGCReport } from '@/lib/types/ugcTypes';
+import { ModerationReport } from '@/lib/ugc/ModerationService';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -73,6 +73,14 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
     // In a real implementation, this would call an API
     // For now, we'll just close the dialog
     setSelectedReport(null);
+  };
+
+  // Convert ModerationReport to UGCReport
+  const convertToUGCReport = (report: ModerationReport): UGCReport => {
+    return {
+      ...report,
+      status: report.status === 'reviewed' ? 'approved' : report.status as UGCModerationStatus
+    };
   };
 
   // Not an admin view
@@ -227,7 +235,7 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({ isAdmin }) =>
                       <div 
                         key={i} 
                         className="py-3 border-b last:border-0 flex items-center justify-between cursor-pointer hover:bg-muted/30 p-2 rounded-md"
-                        onClick={() => setSelectedReport(report)}
+                        onClick={() => setSelectedReport(convertToUGCReport(report))}
                       >
                         <div className="flex items-center gap-3">
                           <div className="bg-muted rounded-md h-12 w-12 flex-shrink-0"></div>

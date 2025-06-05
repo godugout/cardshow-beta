@@ -23,7 +23,14 @@ export const cardData: CardData[] = [
     artist: "Jason T.",
     set: "Music Legends Series",
     cardNumber: "ML-001",
-    specialEffect: "Purple Rain Holographic"
+    specialEffect: "Purple Rain Holographic",
+    designMetadata: {
+      cardStyle: {
+        backgroundColor: "#5B23A9",
+        borderColor: "#000000",
+        borderWidth: 2
+      }
+    }
   },
   {
     id: "2",
@@ -46,7 +53,14 @@ export const cardData: CardData[] = [
     artist: "Jules A.",
     set: "Basketball Legends",
     cardNumber: "BL-023",
-    specialEffect: "Ruby Shimmer"
+    specialEffect: "Ruby Shimmer",
+    designMetadata: {
+      cardStyle: {
+        backgroundColor: "#CE1141",
+        borderColor: "#000000",
+        borderWidth: 2
+      }
+    }
   },
   {
     id: "3",
@@ -69,7 +83,14 @@ export const cardData: CardData[] = [
     artist: "Marcel G.",
     set: "Music Legends Series",
     cardNumber: "ML-002",
-    specialEffect: "Blue Suede Shimmer"
+    specialEffect: "Blue Suede Shimmer",
+    designMetadata: {
+      cardStyle: {
+        backgroundColor: "#5D9AD3",
+        borderColor: "#000000",
+        borderWidth: 2
+      }
+    }
   },
   {
     id: "4",
@@ -92,7 +113,14 @@ export const cardData: CardData[] = [
     artist: "Jessica P.",
     set: "Music Legends Series",
     cardNumber: "ML-003",
-    specialEffect: "Rasta Gold Effect"
+    specialEffect: "Rasta Gold Effect",
+    designMetadata: {
+      cardStyle: {
+        backgroundColor: "#FDB927",
+        borderColor: "#000000",
+        borderWidth: 2
+      }
+    }
   },
   {
     id: "5",
@@ -115,7 +143,14 @@ export const cardData: CardData[] = [
     artist: "Tyrone J.",
     set: "Music Legends Series",
     cardNumber: "ML-004",
-    specialEffect: "Bandana Pattern"
+    specialEffect: "Bandana Pattern",
+    designMetadata: {
+      cardStyle: {
+        backgroundColor: "#001A57",
+        borderColor: "#000000",
+        borderWidth: 2
+      }
+    }
   },
   {
     id: "6",
@@ -138,6 +173,13 @@ export const cardData: CardData[] = [
     artist: "Marcus L.",
     set: "Music Legends Series",
     cardNumber: "ML-005",
-    specialEffect: "Brooklyn Metal"
+    specialEffect: "Brooklyn Metal",
+    designMetadata: {
+      cardStyle: {
+        backgroundColor: "#FF0063",
+        borderColor: "#000000",
+        borderWidth: 2
+      }
+    }
   }
 ];

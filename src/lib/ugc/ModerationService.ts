@@ -15,8 +15,12 @@ export interface ModerationReport {
 export interface ModerationStats {
   totalReports: number;
   pendingReports: number;
+  pendingCount: number;
+  openReports: number;
   approvedAssets: number;
+  approvedCount: number;
   rejectedAssets: number;
+  rejectedCount: number;
   flaggedAssets: number;
 }
 
@@ -46,8 +50,12 @@ export class ModerationService {
     return {
       totalReports: 42,
       pendingReports: 12,
+      pendingCount: 12,
+      openReports: 15,
       approvedAssets: 1205,
+      approvedCount: 1205,
       rejectedAssets: 89,
+      rejectedCount: 89,
       flaggedAssets: 15
     };
   }

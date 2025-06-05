@@ -65,3 +65,29 @@ export interface UGCModerationQueue {
   flagged: UGCAsset[];
   reports: UGCReport[];
 }
+
+// Add missing metadata interfaces
+export interface ModerationMetadata {
+  status: UGCModerationStatus;
+  moderatedBy?: string;
+  moderatedAt?: string;
+  moderationNotes?: string;
+  violationReason?: string;
+}
+
+export interface MarketplaceMetadata {
+  isForSale: boolean;
+  price?: number;
+  currency?: string;
+  featured?: boolean;
+  salesCount?: number;
+  revenue?: number;
+}
+
+// Add performance metrics interface
+export interface PerformanceMetrics {
+  renderTime: number;
+  memoryUsage: number;
+  downloadSpeed: number;
+  qualityScore: number;
+}
