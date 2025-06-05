@@ -9,44 +9,23 @@ import { Reaction, Comment } from './interaction';
 import { User } from './user';
 
 /**
- * Fabric Swatch definition for card memorabilia
+ * Card rarity types
  */
-export interface FabricSwatch {
-  type: string;
-  team: string;
-  year: string;
-  manufacturer: string;
-  position: string;
-  size: string;
-}
-
-/**
- * Card statistics for sports cards
- */
-export interface CardStats {
-  battingAverage?: string;
-  homeRuns?: string;
-  rbis?: string;
-  era?: string;
-  wins?: string;
-  strikeouts?: string;
-  careerYears?: string;
-  ranking?: string;
-}
+export type CardRarity = 'common' | 'uncommon' | 'rare' | 'ultra-rare' | 'legendary' | 'one-of-one';
 
 /**
  * Card style definition for visual appearance
  */
 export interface CardStyle {
-  template: string;      // Required
-  effect: string;        // Required
-  borderRadius: string;  // Required
+  template: string;      
+  effect: string;        
+  borderRadius: string;  
   borderWidth?: number;
-  borderColor: string;   // Required
+  borderColor: string;   
   backgroundColor?: string;
-  shadowColor: string;   // Required
-  frameWidth: number;    // Required
-  frameColor: string;    // Required
+  shadowColor: string;   
+  frameWidth: number;    
+  frameColor: string;    
   [key: string]: JsonValue | undefined;
 }
 
@@ -58,72 +37,11 @@ export interface TextStyle {
   fontSize?: string;
   fontWeight?: string;
   color?: string;
-  titleColor: string;      // Required
-  titleAlignment: string;  // Required
-  titleWeight: string;     // Required
-  descriptionColor: string; // Required
+  titleColor: string;      
+  titleAlignment: string;  
+  titleWeight: string;     
+  descriptionColor: string; 
   [key: string]: JsonValue | undefined;
-}
-
-/**
- * Card effect definition for visual effects
- */
-export interface CardEffect {
-  id: string;
-  name: string;
-  enabled: boolean;
-  settings: CardEffectSettings;
-  className?: string;
-  category?: string;
-  description?: string;
-}
-
-/**
- * Settings for card effects
- */
-export interface CardEffectSettings {
-  intensity?: number;
-  speed?: number;
-  pattern?: string;
-  color?: string;
-  animationEnabled?: boolean;
-  [key: string]: JsonValue | undefined;
-}
-
-/**
- * Card layer for the card creation canvas
- */
-export interface CardLayer {
-  id: string;
-  type: 'image' | 'text' | 'shape' | 'effect';
-  content: string | any;
-  position: {
-    x: number;
-    y: number;
-    z: number;
-  };
-  size: {
-    width: number | 'auto';
-    height: number | 'auto';
-  };
-  rotation: number;
-  opacity: number;
-  zIndex: number;
-  visible?: boolean;
-  style?: Record<string, any>;
-  locked?: boolean;
-  effectIds?: string[];
-  textStyle?: {
-    fontFamily?: string;
-    fontSize?: number;
-    fontWeight?: string;
-    color?: string;
-    textAlign?: string;
-  };
-  imageUrl?: string;
-  shapeType?: string;
-  color?: string;
-  [key: string]: any;
 }
 
 /**
@@ -155,32 +73,6 @@ export interface CardMetadata {
   category?: string;      
   series?: string;        
   cardType?: string;      
-  cardStyle?: CardStyle;
-  textStyle?: TextStyle;
-  effects?: string[];
-  layers?: CardLayer[];
-  effectClasses?: string;
-  [key: string]: JsonValue | undefined;
-}
-
-/**
- * Oakland Memory Data definition
- */
-export interface OaklandMemoryData {
-  title: string;
-  description: string;
-  date?: string;
-  opponent?: string;
-  score?: string;
-  location?: string;
-  section?: string;
-  memoryType?: string;
-  attendees?: string[];
-  tags?: string[];
-  imageUrl?: string;
-  historicalContext?: string;
-  personalSignificance?: string;
-  template?: string;
   [key: string]: JsonValue | undefined;
 }
 
@@ -192,41 +84,32 @@ export interface DesignMetadata {
   textStyle: TextStyle;
   cardMetadata: CardMetadata;
   marketMetadata: MarketMetadata;
-  oaklandMemory?: OaklandMemoryData;
   effects?: string[];
-  layers?: CardLayer[];
   effectClasses?: string;
   [key: string]: JsonValue | undefined;
 }
 
 /**
- * Hotspot data for interactive cards
+ * Card effect definition for visual effects
  */
-export interface HotspotData {
+export interface CardEffect {
   id: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  content: string;
-  type: 'text' | 'link' | 'image' | 'video';
-  visible: boolean;
+  name: string;
+  enabled: boolean;
+  settings: Record<string, any>;
+  className?: string;
+  category?: string;
+  description?: string;
 }
-
-/**
- * Card rarity types
- */
-export type CardRarity = 'common' | 'uncommon' | 'rare' | 'ultra-rare' | 'legendary' | 'one-of-one';
 
 /**
  * Base Card interface containing common properties
  */
 export interface BaseCard extends BaseEntity {
   title: string;
-  description: string; // Making description required for consistency
+  description: string; 
   imageUrl: string;
-  thumbnailUrl: string; // Making thumbnailUrl required for consistency
-  image?: string; // Legacy support for older components
+  thumbnailUrl: string; 
   tags: string[];
   collectionId?: string;
   userId: string;
@@ -246,15 +129,13 @@ export interface BaseCard extends BaseEntity {
   set?: string;
   cardNumber?: string;
   cardType?: string;
-  artist?: string; // For backward compatibility
+  artist?: string; 
   backgroundColor?: string;
-  textColor?: string; // Added for backward compatibility
+  textColor?: string; 
   specialEffect?: string;
-  fabricSwatches?: FabricSwatch[];
-  stats?: CardStats;
   
   // Design related
-  name?: string; // Legacy support
+  name?: string; 
   cardStyle?: string;
   backTemplate?: string;
   designMetadata: DesignMetadata;
@@ -265,14 +146,14 @@ export interface BaseCard extends BaseEntity {
   condition?: string;
   rarity?: CardRarity;
   
-  // Additional fields needed by some components
+  // Additional fields
   creatorId?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 /**
- * Main Card interface that can be extended for specific use cases
+ * Main Card interface
  */
 export interface Card extends BaseCard {}
 
@@ -284,10 +165,10 @@ export interface CardTemplate {
   name: string;
   description?: string;
   thumbnail: string;
-  thumbnailUrl?: string; // Added for backward compatibility
+  thumbnailUrl?: string; 
   category: string;
-  isOfficial?: boolean; // Added for filtering
-  popularity?: number; // Added for sorting
+  isOfficial?: boolean; 
+  popularity?: number; 
   designDefaults: {
     cardStyle: Partial<CardStyle>;
     textStyle?: Partial<TextStyle>;
@@ -295,8 +176,36 @@ export interface CardTemplate {
   };
 }
 
-// Export types from enhancedCardTypes using export type for isolatedModules compatibility
-export type { EnhancedCard, Series, Deck } from './enhancedCardTypes';
+export const DEFAULT_CARD_STYLE: CardStyle = {
+  template: 'classic',
+  effect: 'none',
+  borderRadius: '8px',
+  borderWidth: 2,
+  borderColor: '#000000',
+  backgroundColor: '#FFFFFF',
+  shadowColor: 'rgba(0,0,0,0.2)',
+  frameWidth: 2,
+  frameColor: '#000000',
+};
 
-// Export renamed Reaction type to avoid conflicts
-export type { Reaction as CardReaction } from './interaction';
+export const DEFAULT_TEXT_STYLE: TextStyle = {
+  fontFamily: 'Inter',
+  fontSize: '16px',
+  fontWeight: 'normal',
+  color: '#000000',
+  titleColor: '#000000',
+  titleAlignment: 'center',
+  titleWeight: 'bold',
+  descriptionColor: '#333333',
+};
+
+export const DEFAULT_MARKET_METADATA: MarketMetadata = {
+  isPrintable: false,
+  isForSale: false,
+  includeInCatalog: false,
+  price: 0,
+  currency: 'USD',
+  availableForSale: false,
+  editionSize: 1,
+  editionNumber: 1
+};

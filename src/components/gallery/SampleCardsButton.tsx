@@ -3,25 +3,14 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useCards } from '@/context/CardContext';
-import { Card } from '@/lib/types';
+import { Card } from '@/lib/types/cardTypes';
 import { toast } from 'sonner';
-import { DEFAULT_CARD_STYLE, DEFAULT_TEXT_STYLE, MarketMetadata } from '@/components/card-templates/TemplateTypes';
+import { DEFAULT_CARD_STYLE, DEFAULT_TEXT_STYLE, DEFAULT_MARKET_METADATA } from '@/lib/types/cardTypes';
 
 const SampleCardsButton: React.FC = () => {
   const { addCard } = useCards();
 
   const createSampleCards = async () => {
-    const defaultMarketMetadata: MarketMetadata = {
-      isPrintable: false,
-      isForSale: false,
-      includeInCatalog: false,
-      price: 0,
-      currency: 'USD',
-      availableForSale: false,
-      editionSize: 1,
-      editionNumber: 1
-    };
-
     const sampleCards: Partial<Card>[] = [
       {
         id: `sample-card-${Date.now()}-1`,
@@ -41,7 +30,7 @@ const SampleCardsButton: React.FC = () => {
             series: 'rookie',
             cardType: 'standard'
           },
-          marketMetadata: defaultMarketMetadata
+          marketMetadata: DEFAULT_MARKET_METADATA
         }
       },
       {
@@ -62,7 +51,7 @@ const SampleCardsButton: React.FC = () => {
             series: 'championship',
             cardType: 'special'
           },
-          marketMetadata: defaultMarketMetadata
+          marketMetadata: DEFAULT_MARKET_METADATA
         }
       },
       {
@@ -83,7 +72,7 @@ const SampleCardsButton: React.FC = () => {
             series: 'legends',
             cardType: 'limited'
           },
-          marketMetadata: defaultMarketMetadata
+          marketMetadata: DEFAULT_MARKET_METADATA
         }
       }
     ];

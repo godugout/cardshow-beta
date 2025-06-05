@@ -6,7 +6,7 @@ export interface CardEffectSettings {
   color?: string;
   colorScheme?: string[] | string;
   animationEnabled?: boolean;
-  [key: string]: any; // Allow for additional properties as needed
+  [key: string]: any;
 }
 
 export interface BaseCardEffect {
@@ -57,4 +57,17 @@ export interface UseCardEffectsResult {
   updateEffectSettings: (effectId: string, settings: Partial<CardEffectSettings>) => void;
   applyEffectsToElement: (element: HTMLElement) => void;
   effectsLoading: boolean;
+}
+
+export interface MaterialSimulation {
+  id: string;
+  name: string;
+  type: 'metal' | 'glass' | 'fabric' | 'holographic';
+  properties: {
+    roughness: number;
+    metalness: number;
+    reflectivity: number;
+    opacity: number;
+  };
+  enabled: boolean;
 }

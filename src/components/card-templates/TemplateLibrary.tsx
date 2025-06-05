@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { CardTemplate } from './TemplateTypes';
+import { CardTemplate } from '@/lib/types/cardTypes';
+import { DEFAULT_CARD_STYLE, DEFAULT_TEXT_STYLE } from '@/lib/types/cardTypes';
 
 // This is a placeholder - in a real app this would come from an API
 const defaultTemplates: CardTemplate[] = [
@@ -8,31 +9,13 @@ const defaultTemplates: CardTemplate[] = [
     id: 'template-1',
     name: 'Classic Sports Card',
     description: 'Traditional sports card layout',
-    imageUrl: '/placeholder-template.png',
-    cardStyle: {
-      template: 'classic',
-      effect: 'none',
-      borderRadius: '8px',
-      borderWidth: 2,
-      borderColor: '#000000',
-      backgroundColor: '#FFFFFF',
-      shadowColor: 'rgba(0,0,0,0.2)',
-      frameWidth: 2,
-      frameColor: '#000000',
-    },
-    textStyle: {
-      fontFamily: 'Inter',
-      fontSize: '16px',
-      fontWeight: 'normal',
-      color: '#000000',
-      titleColor: '#000000',
-      titleAlignment: 'center',
-      titleWeight: 'bold',
-      descriptionColor: '#333333',
-    },
-    backgroundColor: '#FFFFFF',
+    thumbnail: '/placeholder-template.png',
     category: 'sports',
-    tags: ['classic', 'sports']
+    designDefaults: {
+      cardStyle: DEFAULT_CARD_STYLE,
+      textStyle: DEFAULT_TEXT_STYLE,
+      effects: []
+    }
   }
 ];
 
@@ -51,7 +34,7 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ onSelectTemplate }) =
         >
           <div className="aspect-[2.5/3.5] bg-gray-100 rounded mb-2">
             <img 
-              src={template.imageUrl} 
+              src={template.thumbnail} 
               alt={template.name}
               className="w-full h-full object-cover rounded"
             />

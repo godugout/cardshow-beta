@@ -1,17 +1,18 @@
 
 import React from 'react';
-import { CardDesignState } from '../types/cardTypes';
-import { DEFAULT_CARD_STYLE, DEFAULT_TEXT_STYLE } from '@/components/card-templates/TemplateTypes';
+import { Card } from '@/lib/types/cardTypes';
+import { DEFAULT_CARD_STYLE, DEFAULT_TEXT_STYLE } from '@/lib/types/cardTypes';
 
 interface CardPreviewProps {
-  cardData: CardDesignState;
+  cardData: Card;
   className?: string;
+  effectClasses?: string;
 }
 
-const CardPreview: React.FC<CardPreviewProps> = ({ cardData, className = '' }) => {
+const CardPreview: React.FC<CardPreviewProps> = ({ cardData, className = '', effectClasses = '' }) => {
   // Use default values if designMetadata is not available
-  const cardStyle = DEFAULT_CARD_STYLE;
-  const textStyle = DEFAULT_TEXT_STYLE;
+  const cardStyle = cardData.designMetadata?.cardStyle || DEFAULT_CARD_STYLE;
+  const textStyle = cardData.designMetadata?.textStyle || DEFAULT_TEXT_STYLE;
 
   const cardStyles = {
     backgroundColor: cardData.backgroundColor || cardStyle.backgroundColor,
@@ -24,7 +25,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardData, className = '' }) =
   } as React.CSSProperties;
 
   return (
-    <div className={`card-preview ${className}`}>
+    <div className={`card-preview ${className} ${effectClasses}`}>
       <div 
         className="w-64 h-96 rounded-lg border-2 shadow-lg p-4 flex flex-col"
         style={cardStyles}

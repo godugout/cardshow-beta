@@ -2,458 +2,238 @@
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { ElementType, ElementCategory } from '@/lib/types/cardElements';
-import { useUGCSystem } from '@/hooks/useUGCSystem';
-import { cn } from '@/lib/utils';
-import { X, Upload, Image, ChevronDown, ChevronUp, Tag, Info } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import {
-  Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Upload, X, FileImage, FileVideo, FileText } from 'lucide-react';
+import { toast } from 'sonner';
+
+type ElementType = 'sticker' | 'logo' | 'frame' | 'badge' | 'overlay' | 'decoration';
 
 interface AssetUploaderProps {
-  onUploadComplete?: (assetId: string) => void;
-  className?: string;
+  onUpload: (asset: any) => void;
+  onCancel: () => void;
 }
 
-const AssetUploader: React.FC<AssetUploaderProps> = ({ onUploadComplete, className }) => {
-  // State for form values
+const AssetUploader: React.FC<AssetUploaderProps> = ({ onUpload, onCancel }) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [elementType, setElementType] = useState<ElementType>('sticker');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [assetType, setAssetType] = useState<ElementType>('sticker');
-  const [category, setCategory] = useState<ElementCategory>('sports');
-  const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
-  const [isPublic, setIsPublic] = useState(true);
-  const [forSale, setForSale] = useState(false);
-  const [price, setPrice] = useState(5);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  
-  // File handling
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // Advanced options
-  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
-  
-  // Use the UGC hook for upload functionality
-  const { uploadAsset, uploadProgress } = useUGCSystem();
-  
-  // Handle file selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      
-      // Clear any file-related errors
-      const newErrors = { ...errors };
-      delete newErrors.file;
-      setErrors(newErrors);
-    }
+
+  const allowedTypes: Record<ElementType, string[]> = {
+    sticker: ['image/png', 'image/jpeg', 'image/gif', 'image/svg+xml'],
+    logo: ['image/png', 'image/jpeg', 'image/svg+xml'],
+    frame: ['image/png', 'image/svg+xml'],
+    badge: ['image/png', 'image/jpeg', 'image/svg+xml'],
+    overlay: ['image/png', 'image/svg+xml'],
+    decoration: ['image/png', 'image/jpeg', 'image/svg+xml']
   };
-  
-  // Handle tag addition
-  const handleAddTag = () => {
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
-      setTagInput('');
-    }
-  };
-  
-  // Handle tag input keypress
-  const handleTagKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddTag();
-    }
-  };
-  
-  // Handle tag removal
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
-  };
-  
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validate form
-    const newErrors: Record<string, string> = {};
-    
-    if (!title.trim()) newErrors.title = 'Title is required';
-    if (!selectedFile) newErrors.file = 'Please select a file to upload';
-    
-    // Asset type validation
-    if (selectedFile) {
-      const fileExt = selectedFile.name.split('.').pop()?.toLowerCase() || '';
-      
-      // Check file formats based on asset type
-      const allowedFormats: Record<ElementType, string[]> = {
-        'sticker': ['png', 'gif', 'webp', 'svg'],
-        'logo': ['png', 'svg', 'webp'],
-        'frame': ['png', 'svg'],
-        'badge': ['png', 'svg'],
-        'overlay': ['png', 'webp', 'svg']
-      };
-      
-      if (!allowedFormats[assetType].includes(fileExt)) {
-        newErrors.file = `Invalid file format for ${assetType}. Allowed formats: ${allowedFormats[assetType].join(', ')}`;
-      }
-      
-      // Check file size (5MB limit for most, 10MB for frames and overlays)
-      const maxSize = (assetType === 'frame' || assetType === 'overlay') ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
-      if (selectedFile.size > maxSize) {
-        newErrors.file = `File size exceeds the maximum allowed (${maxSize / (1024 * 1024)}MB)`;
-      }
-    }
-    
-    // Check if there are validation errors
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    if (!allowedTypes[elementType].includes(file.type)) {
+      toast.error(`Invalid file type for ${elementType}. Please select a valid image file.`);
       return;
     }
-    
-    // Submit the form
-    if (selectedFile) {
-      try {
-        const result = await uploadAsset.mutateAsync({
-          file: selectedFile,
-          metadata: {
-            title,
-            description,
-            assetType,
-            category,
-            tags,
-            isPublic,
-            forSale,
-            price: forSale ? price : undefined
-          }
-        });
-        
-        if (result && onUploadComplete) {
-          onUploadComplete(result.id);
-        }
-        
-        // Reset form
-        setTitle('');
-        setDescription('');
-        setAssetType('sticker');
-        setCategory('sports');
-        setTags([]);
-        setSelectedFile(null);
-        setPreview(null);
-        setIsPublic(true);
-        setForSale(false);
-        setPrice(5);
-        setErrors({});
-      } catch (error) {
-        console.error('Upload error:', error);
-        setErrors({ submit: 'Failed to upload asset. Please try again.' });
-      }
+
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File size must be less than 10MB');
+      return;
+    }
+
+    setSelectedFile(file);
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile || !title.trim()) {
+      toast.error('Please select a file and enter a title');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      // Create asset object
+      const asset = {
+        id: `asset-${Date.now()}`,
+        file: selectedFile,
+        type: elementType,
+        title: title.trim(),
+        description: description.trim(),
+        tags,
+        createdAt: new Date().toISOString(),
+        fileSize: selectedFile.size,
+        mimeType: selectedFile.type
+      };
+
+      await onUpload(asset);
+      toast.success('Asset uploaded successfully!');
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Failed to upload asset');
+    } finally {
+      setUploading(false);
     }
   };
-  
+
+  const addTag = (tag: string) => {
+    const trimmedTag = tag.trim().toLowerCase();
+    if (trimmedTag && !tags.includes(trimmedTag)) {
+      setTags([...tags, trimmedTag]);
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
   return (
-    <div className={cn("space-y-6", className)}>
-      {uploadProgress > 0 && uploadProgress < 100 ? (
-        <div className="space-y-2">
-          <Progress value={uploadProgress} className="w-full" />
-          <p className="text-center text-sm text-muted-foreground">
-            Uploading... {Math.round(uploadProgress)}%
-          </p>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* File Upload Section */}
-          <div className="space-y-2">
-            <Label htmlFor="asset-file">Asset File</Label>
-            <div 
-              className={cn(
-                "border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-colors",
-                preview ? "border-primary/20 bg-primary/5" : "border-gray-300 hover:border-primary/40 hover:bg-primary/5",
-                errors.file && "border-destructive/50 bg-destructive/5"
-              )}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {preview ? (
-                <div className="relative w-full aspect-square flex items-center justify-center">
-                  <img 
-                    src={preview} 
-                    alt="Preview" 
-                    className="max-w-full max-h-full object-contain"
-                  />
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute bottom-2 right-2 opacity-80 hover:opacity-100"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedFile(null);
-                      setPreview(null);
-                      if (fileInputRef.current) fileInputRef.current.value = '';
-                    }}
-                  >
-                    <X className="h-4 w-4 mr-1" /> Remove
-                  </Button>
-                </div>
-              ) : (
-                <div className="text-center">
-                  <Upload className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
-                  <p className="text-sm font-medium mb-1">
-                    Drag and drop or click to upload
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    SVG, PNG, GIF up to {assetType === 'frame' || assetType === 'overlay' ? '10MB' : '5MB'}
-                  </p>
-                </div>
-              )}
-              <input
-                ref={fileInputRef}
-                id="asset-file"
-                type="file"
-                accept=".png,.svg,.gif,.webp"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-            </div>
-            {errors.file && (
-              <p className="text-sm text-destructive">{errors.file}</p>
-            )}
-          </div>
-          
-          {/* Basic Information */}
+    <div className="max-w-2xl mx-auto p-6 space-y-6">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold">Upload New Asset</h2>
+        <p className="text-gray-600 mt-2">Share your creative elements with the community</p>
+      </div>
+
+      {/* File Upload Area */}
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+        {selectedFile ? (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Give your asset a name"
-                className={errors.title ? "border-destructive" : ""}
-              />
-              {errors.title && (
-                <p className="text-sm text-destructive">{errors.title}</p>
-              )}
+            <div className="flex items-center justify-center text-green-600">
+              <FileImage className="h-12 w-12" />
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="description">Description (optional)</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe your asset..."
-                rows={3}
-              />
+            <div>
+              <p className="font-medium">{selectedFile.name}</p>
+              <p className="text-sm text-gray-500">
+                {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+              </p>
             </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="asset-type">Asset Type</Label>
-                <Select 
-                  value={assetType} 
-                  onValueChange={(value) => setAssetType(value as ElementType)}
-                >
-                  <SelectTrigger id="asset-type">
-                    <SelectValue placeholder="Select asset type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sticker">Sticker</SelectItem>
-                    <SelectItem value="logo">Logo</SelectItem>
-                    <SelectItem value="frame">Frame</SelectItem>
-                    <SelectItem value="badge">Badge</SelectItem>
-                    <SelectItem value="overlay">Overlay</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Select 
-                  value={category} 
-                  onValueChange={(value) => setCategory(value as ElementCategory)}
-                >
-                  <SelectTrigger id="category">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sports">Sports</SelectItem>
-                    <SelectItem value="entertainment">Entertainment</SelectItem>
-                    <SelectItem value="decorative">Decorative</SelectItem>
-                    <SelectItem value="seasonal">Seasonal</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="tags">Tags</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="tags"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={handleTagKeyPress}
-                  placeholder="Add tags (press Enter)"
-                />
-                <Button 
-                  type="button" 
-                  onClick={handleAddTag}
-                  variant="outline"
-                >
-                  <Tag className="h-4 w-4 mr-2" />
-                  Add
-                </Button>
-              </div>
-              
-              {tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {tags.map((tag) => (
-                    <Badge 
-                      key={tag} 
-                      variant="secondary"
-                      className="flex items-center gap-1"
-                    >
-                      {tag}
-                      <X 
-                        className="h-3 w-3 cursor-pointer hover:text-destructive" 
-                        onClick={() => handleRemoveTag(tag)}
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* Advanced Options */}
-          <Collapsible
-            open={isAdvancedOpen}
-            onOpenChange={setIsAdvancedOpen}
-            className="border rounded-md p-4"
-          >
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium">Advanced Options</h3>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  {isAdvancedOpen ? (
-                    <ChevronUp className="h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4" />
-                  )}
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            
-            <CollapsibleContent className="pt-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="is-public">Make Public</Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="h-3 w-3 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Public assets are visible to everyone in the marketplace</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch 
-                  id="is-public" 
-                  checked={isPublic}
-                  onCheckedChange={setIsPublic}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="for-sale">Sell this asset</Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="h-3 w-3 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Set a price in credits for others to purchase your asset</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch 
-                  id="for-sale" 
-                  checked={forSale}
-                  onCheckedChange={setForSale}
-                />
-              </div>
-              
-              {forSale && (
-                <div className="space-y-2">
-                  <Label htmlFor="price">Price (credits)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    min={1}
-                    value={price}
-                    onChange={(e) => setPrice(parseInt(e.target.value) || 1)}
-                  />
-                </div>
-              )}
-              
-              <div className="pt-2 text-xs text-muted-foreground">
-                <p>
-                  Your asset will be reviewed before appearing in the marketplace. 
-                  This helps ensure quality and appropriate content.
-                </p>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-          
-          {/* Error Message */}
-          {errors.submit && (
-            <div className="bg-destructive/10 p-3 rounded-md text-sm text-destructive">
-              {errors.submit}
-            </div>
-          )}
-          
-          {/* Submit Button */}
-          <div className="flex justify-end">
-            <Button type="submit" disabled={uploadAsset.isPending}>
-              <Upload className="mr-2 h-4 w-4" />
-              Upload Asset
+            <Button
+              variant="outline"
+              onClick={() => setSelectedFile(null)}
+              className="text-red-600 hover:text-red-700"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Remove
             </Button>
           </div>
-        </form>
-      )}
+        ) : (
+          <div className="space-y-4">
+            <Upload className="h-12 w-12 text-gray-400 mx-auto" />
+            <div>
+              <p className="text-lg font-medium">Drop files here or click to browse</p>
+              <p className="text-sm text-gray-500">
+                Supports PNG, JPG, GIF, SVG up to 10MB
+              </p>
+            </div>
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              className="mx-auto"
+            >
+              Choose File
+            </Button>
+          </div>
+        )}
+        
+        <input
+          ref={fileInputRef}
+          type="file"
+          onChange={handleFileSelect}
+          accept={allowedTypes[elementType].join(',')}
+          className="hidden"
+        />
+      </div>
+
+      {/* Asset Details Form */}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label>Element Type</Label>
+          <Select value={elementType} onValueChange={(value: ElementType) => setElementType(value)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sticker">Sticker</SelectItem>
+              <SelectItem value="logo">Logo</SelectItem>
+              <SelectItem value="frame">Frame</SelectItem>
+              <SelectItem value="badge">Badge</SelectItem>
+              <SelectItem value="overlay">Overlay</SelectItem>
+              <SelectItem value="decoration">Decoration</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="title">Title *</Label>
+          <Input
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter a descriptive title"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Describe your asset (optional)"
+            rows={3}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Tags</Label>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {tags.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800"
+              >
+                {tag}
+                <button
+                  onClick={() => removeTag(tag)}
+                  className="ml-1 text-blue-600 hover:text-blue-800"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            ))}
+          </div>
+          <Input
+            placeholder="Add tags (press Enter)"
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addTag(e.currentTarget.value);
+                e.currentTarget.value = '';
+              }
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-between pt-6 border-t">
+        <Button variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button
+          onClick={handleUpload}
+          disabled={!selectedFile || !title.trim() || uploading}
+        >
+          {uploading ? 'Uploading...' : 'Upload Asset'}
+        </Button>
+      </div>
     </div>
   );
 };

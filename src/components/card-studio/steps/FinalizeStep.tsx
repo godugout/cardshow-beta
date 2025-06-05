@@ -1,212 +1,132 @@
-
 import React from 'react';
-import { Card } from '@/lib/types/cardTypes';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardRarity } from '@/lib/types/cardTypes';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
-import { MarketMetadata, CardMetadata, DEFAULT_CARD_STYLE, DEFAULT_TEXT_STYLE } from '@/components/card-templates/TemplateTypes';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import CardPreview from '@/components/card-creation/components/CardPreview';
 
 interface FinalizeStepProps {
   cardData: Partial<Card>;
   onUpdate: (updates: Partial<Card>) => void;
+  onComplete: (card: Card) => void;
+  onCancel: () => void;
 }
 
-const FinalizeStep: React.FC<FinalizeStepProps> = ({ cardData, onUpdate }) => {
-  const [newTag, setNewTag] = React.useState('');
-  
-  const currentMarketMetadata: MarketMetadata = cardData.designMetadata?.marketMetadata || {
-    isPrintable: false,
-    isForSale: false,
-    includeInCatalog: false,
-    price: 0,
-    currency: 'USD',
-    availableForSale: false,
-    editionSize: 1,
-    editionNumber: 1,
+const FinalizeStep: React.FC<FinalizeStepProps> = ({ 
+  cardData, 
+  onUpdate, 
+  onComplete, 
+  onCancel 
+}) => {
+  const handleComplete = () => {
+    // Create the final card object
+    const finalCard: Card = {
+      id: cardData.id || `card-${Date.now()}`,
+      title: cardData.title || 'Untitled Card',
+      description: cardData.description || '',
+      imageUrl: cardData.imageUrl || '',
+      thumbnailUrl: cardData.thumbnailUrl || cardData.imageUrl || '',
+      tags: cardData.tags || [],
+      userId: cardData.userId || 'user-1',
+      effects: cardData.effects || [],
+      designMetadata: cardData.designMetadata || {
+        cardStyle: { template: 'classic', effect: 'none', borderRadius: '8px', borderColor: '#000000', shadowColor: 'rgba(0,0,0,0.2)', frameWidth: 2, frameColor: '#000000' },
+        textStyle: { titleColor: '#000000', titleAlignment: 'center', titleWeight: 'bold', descriptionColor: '#333333' },
+        cardMetadata: { category: 'general' },
+        marketMetadata: { isPrintable: false, isForSale: false, includeInCatalog: false }
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      rarity: (cardData.rarity as CardRarity) || 'common',
+    };
+
+    onComplete(finalCard);
   };
 
-  const currentCardMetadata: CardMetadata = cardData.designMetadata?.cardMetadata || {
-    category: 'general',
-    series: 'base',
-    cardType: 'standard',
-  };
-
-  const updateMarketMetadata = (updates: Partial<MarketMetadata>) => {
-    const newMarketMetadata = { ...currentMarketMetadata, ...updates };
-    onUpdate({
-      designMetadata: {
-        cardStyle: cardData.designMetadata?.cardStyle || DEFAULT_CARD_STYLE,
-        textStyle: cardData.designMetadata?.textStyle || DEFAULT_TEXT_STYLE,
-        marketMetadata: newMarketMetadata,
-        cardMetadata: currentCardMetadata,
-        ...cardData.designMetadata
-      }
-    });
-  };
-
-  const updateCardMetadata = (updates: Partial<CardMetadata>) => {
-    const newCardMetadata = { ...currentCardMetadata, ...updates };
-    onUpdate({
-      designMetadata: {
-        cardStyle: cardData.designMetadata?.cardStyle || DEFAULT_CARD_STYLE,
-        textStyle: cardData.designMetadata?.textStyle || DEFAULT_TEXT_STYLE,
-        marketMetadata: currentMarketMetadata,
-        cardMetadata: newCardMetadata,
-        ...cardData.designMetadata
-      }
-    });
-  };
-
-  const addTag = () => {
-    if (newTag.trim() && !cardData.tags?.includes(newTag.trim())) {
-      onUpdate({ 
-        tags: [...(cardData.tags || []), newTag.trim()] 
-      });
-      setNewTag('');
-    }
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    onUpdate({ 
-      tags: cardData.tags?.filter(tag => tag !== tagToRemove) || [] 
-    });
-  };
+  const rarityOptions: { value: CardRarity; label: string }[] = [
+    { value: 'common', label: 'Common' },
+    { value: 'uncommon', label: 'Uncommon' },
+    { value: 'rare', label: 'Rare' },
+    { value: 'ultra-rare', label: 'Ultra Rare' },
+    { value: 'legendary', label: 'Legendary' },
+    { value: 'one-of-one', label: 'One of One' }
+  ];
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Card Metadata */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Card Metadata</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Card Settings */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold">Final Details</h3>
           
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
-            <Input
-              id="category"
-              value={currentCardMetadata.category || ''}
-              onChange={(e) => updateCardMetadata({ category: e.target.value })}
-              placeholder="sports, entertainment, etc."
-            />
+            <Label htmlFor="rarity">Card Rarity</Label>
+            <Select
+              value={cardData.rarity || 'common'}
+              onValueChange={(value: CardRarity) => onUpdate({ rarity: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select rarity" />
+              </SelectTrigger>
+              <SelectContent>
+                {rarityOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="series">Series</Label>
+            <Label htmlFor="price">Price (Optional)</Label>
             <Input
-              id="series"
-              value={currentCardMetadata.series || ''}
-              onChange={(e) => updateCardMetadata({ series: e.target.value })}
-              placeholder="Series name"
+              id="price"
+              type="number"
+              step="0.01"
+              value={cardData.price || ''}
+              onChange={(e) => onUpdate({ price: parseFloat(e.target.value) || 0 })}
+              placeholder="0.00"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="cardType">Card Type</Label>
-            <Input
-              id="cardType"
-              value={currentCardMetadata.cardType || ''}
-              onChange={(e) => updateCardMetadata({ cardType: e.target.value })}
-              placeholder="standard, special, limited, etc."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="rarity">Rarity</Label>
-            <Input
-              id="rarity"
-              value={cardData.rarity || ''}
-              onChange={(e) => onUpdate({ rarity: e.target.value })}
-              placeholder="common, rare, epic, legendary"
-            />
+          <div className="space-y-4">
+            <h4 className="font-medium">Publishing Options</h4>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="isPublic"
+                checked={cardData.isPublic !== false}
+                onCheckedChange={(checked) => onUpdate({ isPublic: checked === true })}
+              />
+              <Label htmlFor="isPublic">Make card public</Label>
+            </div>
           </div>
         </div>
 
-        {/* Market Settings */}
+        {/* Preview */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Market Settings</h3>
-          
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="isPrintable"
-              checked={currentMarketMetadata.isPrintable}
-              onCheckedChange={(checked) => updateMarketMetadata({ isPrintable: checked })}
-            />
-            <Label htmlFor="isPrintable">Enable Physical Printing</Label>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="isForSale"
-              checked={currentMarketMetadata.isForSale}
-              onCheckedChange={(checked) => updateMarketMetadata({ isForSale: checked })}
-            />
-            <Label htmlFor="isForSale">List for Sale</Label>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="includeInCatalog"
-              checked={currentMarketMetadata.includeInCatalog}
-              onCheckedChange={(checked) => updateMarketMetadata({ includeInCatalog: checked })}
-            />
-            <Label htmlFor="includeInCatalog">Include in Public Catalog</Label>
-          </div>
-
-          {currentMarketMetadata.isForSale && (
-            <div className="space-y-2">
-              <Label htmlFor="price">Price ({currentMarketMetadata.currency})</Label>
-              <Input
-                id="price"
-                type="number"
-                value={currentMarketMetadata.price || ''}
-                onChange={(e) => updateMarketMetadata({ price: parseFloat(e.target.value) || 0 })}
-                placeholder="0.00"
-                step="0.01"
-              />
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="editionSize">Edition Size</Label>
-            <Input
-              id="editionSize"
-              type="number"
-              value={currentMarketMetadata.editionSize || 1}
-              onChange={(e) => updateMarketMetadata({ editionSize: parseInt(e.target.value) || 1 })}
-              min="1"
+          <h3 className="text-lg font-semibold">Preview</h3>
+          <div className="flex justify-center">
+            <CardPreview 
+              cardData={cardData as Card} 
+              className="transform scale-90" 
             />
           </div>
         </div>
       </div>
 
-      {/* Tags */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Tags</h3>
-        
-        <div className="flex gap-2">
-          <Input
-            value={newTag}
-            onChange={(e) => setNewTag(e.target.value)}
-            placeholder="Add a tag"
-            onKeyPress={(e) => e.key === 'Enter' && addTag()}
-          />
-          <Button onClick={addTag} variant="outline">Add</Button>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          {cardData.tags?.map((tag) => (
-            <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-              {tag}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => removeTag(tag)}
-              />
-            </Badge>
-          ))}
-        </div>
+      {/* Action Buttons */}
+      <div className="flex justify-between pt-6 border-t">
+        <Button variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button onClick={handleComplete}>
+          Create Card
+        </Button>
       </div>
     </div>
   );
