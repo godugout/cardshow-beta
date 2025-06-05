@@ -71,8 +71,8 @@ export const TEMPLATE_LIBRARY: CardTemplate[] = [
   }
 ];
 
-// Export the CardTemplate type
-export { CardTemplate };
+// Export the CardTemplate type explicitly
+export type { CardTemplate };
 
 // Default export for compatibility
 export default TEMPLATE_LIBRARY;
@@ -112,3 +112,4 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
     </div>
   );
 };
+

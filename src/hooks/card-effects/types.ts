@@ -76,3 +76,4 @@ export interface MaterialSimulation {
   roughness?: number;
   metalness?: number;
 }
+

@@ -77,21 +77,7 @@ export interface CardMetadata {
 }
 
 /**
- * Design metadata for card design information
- */
-export interface DesignMetadata {
-  cardStyle: CardStyle;
-  textStyle: TextStyle;
-  cardMetadata: CardMetadata;
-  marketMetadata: MarketMetadata;
-  effects?: string[];
-  effectClasses?: string;
-  oaklandMemory?: OaklandMemoryData;
-  [key: string]: JsonValue | undefined;
-}
-
-/**
- * Oakland memory data
+ * Oakland memory data - now extends JsonValue compatibility
  */
 export interface OaklandMemoryData {
   title: string;
@@ -108,6 +94,21 @@ export interface OaklandMemoryData {
   historicalContext?: string;
   personalSignificance?: string;
   template?: string;
+  [key: string]: JsonValue | undefined;
+}
+
+/**
+ * Design metadata for card design information
+ */
+export interface DesignMetadata {
+  cardStyle: CardStyle;
+  textStyle: TextStyle;
+  cardMetadata: CardMetadata;
+  marketMetadata: MarketMetadata;
+  effects?: string[];
+  effectClasses?: string;
+  oaklandMemory?: OaklandMemoryData;
+  [key: string]: JsonValue | undefined;
 }
 
 /**
@@ -161,7 +162,7 @@ export interface CardLayer {
 }
 
 /**
- * Hotspot data for interactive elements
+ * Hotspot data for interactive elements - with required action property
  */
 export interface HotspotData {
   id: string;
@@ -177,7 +178,7 @@ export interface HotspotData {
 }
 
 /**
- * Fabric swatch definition
+ * Fabric swatch definition - with additional properties
  */
 export interface FabricSwatch {
   id: string;
@@ -305,3 +306,4 @@ export const DEFAULT_MARKET_METADATA: MarketMetadata = {
   editionSize: 1,
   editionNumber: 1
 };
+
