@@ -1,108 +1,76 @@
 
 import React from 'react';
-import { cn } from '@/lib/utils';
-import { Card } from '@/lib/types/cardTypes';
+import { CardDesignState } from '../types/cardTypes';
+import { DEFAULT_CARD_STYLE, DEFAULT_TEXT_STYLE } from '@/components/card-templates/TemplateTypes';
 
 interface CardPreviewProps {
-  card?: Partial<Card>;
+  cardData: CardDesignState;
   className?: string;
-  effectClasses?: string;
 }
 
-const CardPreview = React.forwardRef<HTMLDivElement, CardPreviewProps>(({
-  card,
-  className,
-  effectClasses = ''
-}, ref) => {
-  if (!card || !card.imageUrl) {
-    return (
-      <div 
-        ref={ref}
-        className={cn(
-          "aspect-[2.5/3.5] bg-gray-100 rounded-lg border flex flex-col items-center justify-center text-gray-400",
-          className
-        )}
-      >
-        <p className="text-center px-4">
-          Upload an image to see your card preview
-        </p>
-      </div>
-    );
-  }
-  
-  // Ensure we have default values for required properties with proper type safety
-  const designMetadata = card.designMetadata || {
-    cardStyle: {},
-    textStyle: {},
-    cardMetadata: {},
-    marketMetadata: {}
-  };
-  const cardStyle = designMetadata.cardStyle || {}; 
-  const textStyle = designMetadata.textStyle || {};
-  
-  // Extract properties with defaults
-  const backgroundColor = cardStyle.backgroundColor || '#FFFFFF';
-  const borderRadius = cardStyle.borderRadius || '8px';
-  const borderColor = cardStyle.borderColor || '#000000';
-  const titleColor = textStyle.titleColor || '#FFFFFF';
-  const titleWeight = textStyle.titleWeight || 'bold';
-  const titleAlignment = (textStyle.titleAlignment || 'center') as any;
-  const descriptionColor = textStyle.descriptionColor || '#DDDDDD';
-  
+const CardPreview: React.FC<CardPreviewProps> = ({ cardData, className = '' }) => {
+  // Use default values if designMetadata is not available
+  const cardStyle = DEFAULT_CARD_STYLE;
+  const textStyle = DEFAULT_TEXT_STYLE;
+
+  const cardStyles = {
+    backgroundColor: cardData.backgroundColor || cardStyle.backgroundColor,
+    borderRadius: cardData.borderRadius || cardStyle.borderRadius,
+    borderColor: cardData.borderColor || cardStyle.borderColor,
+    color: textStyle.titleColor,
+    fontWeight: textStyle.titleWeight,
+    textAlign: textStyle.titleAlignment as 'left' | 'center' | 'right',
+    '--description-color': textStyle.descriptionColor,
+  } as React.CSSProperties;
+
   return (
-    <div className="relative" ref={ref}>
+    <div className={`card-preview ${className}`}>
       <div 
-        className={cn(
-          "aspect-[2.5/3.5] rounded-lg overflow-hidden shadow-xl transition-all duration-300",
-          effectClasses,
-          className
-        )}
-        style={{
-          backgroundColor,
-          borderRadius,
-          borderWidth: '2px',
-          borderStyle: 'solid',
-          borderColor,
-        }}
+        className="w-64 h-96 rounded-lg border-2 shadow-lg p-4 flex flex-col"
+        style={cardStyles}
       >
-        <div className="relative w-full h-full">
-          <img 
-            src={card.imageUrl} 
-            alt={card.title || "Card preview"} 
-            className="w-full h-full object-cover"
-          />
+        {cardData.imageUrl && (
+          <div className="flex-1 mb-4">
+            <img 
+              src={cardData.imageUrl} 
+              alt="Card preview"
+              className="w-full h-full object-cover rounded"
+            />
+          </div>
+        )}
+        
+        <div className="space-y-2">
+          {cardData.title && (
+            <h3 className="text-lg font-bold truncate">
+              {cardData.title}
+            </h3>
+          )}
           
-          {card.title && (
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-              <h3 
-                className="text-white text-sm font-bold truncate"
-                style={{ 
-                  color: titleColor,
-                  fontWeight: titleWeight,
-                  textAlign: titleAlignment
-                }}
-              >
-                {card.title}
-              </h3>
-              {card.player && (
-                <p 
-                  className="text-white/80 text-xs truncate"
-                  style={{ 
-                    color: descriptionColor,
-                  }}
+          {cardData.description && (
+            <p 
+              className="text-sm opacity-90 line-clamp-3"
+              style={{ color: textStyle.descriptionColor }}
+            >
+              {cardData.description}
+            </p>
+          )}
+          
+          {cardData.tags && cardData.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {cardData.tags.slice(0, 3).map((tag, index) => (
+                <span 
+                  key={index}
+                  className="text-xs px-2 py-1 bg-black/10 rounded-full"
                 >
-                  {card.player}
-                  {card.team && ` • ${card.team}`}
-                </p>
-              )}
+                  {tag}
+                </span>
+              ))}
             </div>
           )}
         </div>
       </div>
     </div>
   );
-});
-
-CardPreview.displayName = 'CardPreview';
+};
 
 export default CardPreview;

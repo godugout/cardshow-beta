@@ -57,3 +57,39 @@ export interface CardTemplate {
   category: string;
   tags: string[];
 }
+
+export interface MarketMetadata {
+  isPrintable: boolean;
+  isForSale: boolean;
+  includeInCatalog: boolean;
+  price?: number;
+  currency?: string;
+  availableForSale?: boolean;
+  editionSize?: number;
+  editionNumber?: number;
+  lastSoldPrice?: number;
+  currentAskingPrice?: number;
+  estimatedMarketValue?: number;
+}
+
+export interface CardMetadata {
+  category?: string;
+  series?: string;
+  cardType?: string;
+  rarity?: string;
+  condition?: string;
+  year?: string;
+  manufacturer?: string;
+  setName?: string;
+  cardNumber?: string;
+}
+
+export interface DesignMetadata {
+  cardStyle: CardStyle;
+  textStyle: TextStyle;
+  marketMetadata: MarketMetadata;
+  cardMetadata: CardMetadata;
+  effects?: string[];
+  effectSettings?: Record<string, any>;
+  effectClasses?: string;
+}

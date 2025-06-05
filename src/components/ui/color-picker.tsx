@@ -7,16 +7,21 @@ interface ColorPickerProps {
   onChange: (color: string) => void;
   className?: string;
   colors?: string[];
+  id?: string;
+  label?: string;
 }
 
 export const ColorPicker: React.FC<ColorPickerProps> = ({ 
   color, 
   onChange, 
   className,
-  colors = ['#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff', '#888888']
+  colors = ['#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff', '#888888'],
+  id,
+  label
 }) => {
   return (
     <div className={cn("flex flex-wrap gap-2", className)}>
+      {label && <label htmlFor={id} className="text-sm font-medium">{label}</label>}
       {/* Predefined color palette */}
       <div className="flex gap-1 flex-wrap">
         {colors.map((presetColor) => (
@@ -33,6 +38,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       
       {/* Custom color input */}
       <input
+        id={id}
         type="color"
         value={color}
         onChange={(e) => onChange(e.target.value)}
