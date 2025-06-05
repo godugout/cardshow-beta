@@ -86,7 +86,7 @@ export interface UserPreferences {
   brandProfiles: BrandProfile[];
   activeBrandProfileId?: string;
   workflowConfig: WorkflowConfig;
-  workflow?: WorkflowConfig;
+  workflow?: WorkflowConfig; // Keep as fallback
   recommendationsEnabled?: boolean;
   recommendationPreferences?: {
     showTemplateRecommendations: boolean;
@@ -115,4 +115,3 @@ export interface RecommendationItem<T> {
   reason: string;
   category?: string;
 }
-

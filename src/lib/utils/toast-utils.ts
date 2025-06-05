@@ -1,33 +1,20 @@
 
-import { toast } from '@/hooks/use-toast';
-import { ToastVariant } from '@/types/toast';
+import { toast } from 'sonner';
 
 export const toastUtils = {
-  show: (title: string, description?: string, variant: ToastVariant = 'default', duration?: number) => {
-    return toast({
-      id: Math.random().toString(36).substring(2, 9),
-      title,
-      description,
-      variant,
-      duration
-    });
+  success: (title: string, description?: string) => {
+    toast.success(title, { description });
   },
   
-  success: (title: string, description?: string, duration?: number) => {
-    return toastUtils.show(title, description, 'success', duration);
+  error: (title: string, description?: string) => {
+    toast.error(title, { description });
   },
   
-  error: (title: string, description?: string, duration?: number) => {
-    return toastUtils.show(title, description, 'destructive', duration);
+  info: (title: string, description?: string) => {
+    toast.info(title, { description });
   },
   
-  warning: (title: string, description?: string, duration?: number) => {
-    return toastUtils.show(title, description, 'warning', duration);
-  },
-  
-  info: (title: string, description?: string, duration?: number) => {
-    return toastUtils.show(title, description, 'info', duration);
+  warning: (title: string, description?: string) => {
+    toast.warning(title, { description });
   }
 };
-
-export default toastUtils;

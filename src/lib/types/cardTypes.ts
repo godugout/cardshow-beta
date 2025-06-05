@@ -152,21 +152,45 @@ export interface CardTemplate {
 }
 
 /**
- * Card layer data structure for layer panel
+ * Card layer data structure for layer panel - CONSOLIDATED DEFINITION
  */
 export interface CardLayer {
   id: string;
   type: 'image' | 'text' | 'shape' | 'effect' | 'sticker';
-  name: string;
+  name: string; // Add required name property
+  content: string | any;
   visible: boolean;
   locked: boolean;
   opacity: number;
   zIndex: number;
+  position: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  size: {
+    width: number | 'auto';
+    height: number | 'auto';
+  };
+  rotation: number;
   data?: Record<string, any>;
+  style?: Record<string, any>;
+  effectIds?: string[];
+  textStyle?: {
+    fontFamily?: string;
+    fontSize?: number;
+    fontWeight?: string;
+    color?: string;
+    textAlign?: string;
+  };
+  imageUrl?: string;
+  shapeType?: string;
+  color?: string;
+  [key: string]: any;
 }
 
 /**
- * Hotspot data for interactive card elements
+ * Hotspot data for interactive card elements - UPDATED WITH ALL TYPES
  */
 export interface HotspotData {
   id: string;
@@ -174,13 +198,16 @@ export interface HotspotData {
   y: number;
   width: number;
   height: number;
-  type: 'link' | 'video' | 'audio' | 'popup' | 'animation';
+  type: 'link' | 'video' | 'audio' | 'popup' | 'animation' | 'text' | 'image';
+  visible: boolean; // Add missing visible property
   content: {
     title?: string;
     description?: string;
     url?: string;
     mediaId?: string;
     action?: string;
+    text?: string; // Add for text type
+    imageUrl?: string; // Add for image type
   };
   style?: {
     borderColor?: string;
@@ -314,4 +341,3 @@ export const DEFAULT_DESIGN_METADATA: DesignMetadata = {
   cardMetadata: DEFAULT_CARD_METADATA,
   marketMetadata: DEFAULT_MARKET_METADATA,
 };
-

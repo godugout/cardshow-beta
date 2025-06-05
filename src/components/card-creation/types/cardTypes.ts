@@ -4,6 +4,8 @@
  */
 
 import { JsonValue } from '@/lib/types';
+// Import the consolidated CardLayer from main types
+export { CardLayer, CardEffect } from '@/lib/types/cardTypes';
 
 export interface CardDesignState {
   title: string;
@@ -17,48 +19,6 @@ export interface CardDesignState {
   team?: string;
   year?: string;
   [key: string]: any;
-}
-
-export interface CardLayer {
-  id: string;
-  type: 'image' | 'text' | 'shape' | 'effect';
-  content: string | any; // Allow content to be more flexible
-  position: {
-    x: number;
-    y: number;
-    z: number;
-  };
-  size: {
-    width: number | 'auto';
-    height: number | 'auto';
-  };
-  rotation: number;
-  opacity: number;
-  zIndex: number;
-  visible?: boolean;
-  style?: Record<string, any>;
-  locked?: boolean;
-  effectIds?: string[];
-  textStyle?: {
-    fontFamily?: string;
-    fontSize?: number;
-    fontWeight?: string;
-    color?: string;
-    textAlign?: string;
-  };
-  imageUrl?: string;
-  shapeType?: string;
-  color?: string;
-  [key: string]: any; // Add index signature for flexibility
-}
-
-// Define CardEffect here as the canonical source
-export interface CardEffect {
-  id: string;
-  name: string;
-  enabled: boolean;
-  settings: Record<string, any>;
-  className?: string;
 }
 
 export interface CardEffectSettings {
