@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Card, Collection } from '@/lib/types';
@@ -87,12 +88,7 @@ export function useCards() {
         }
       }
       
-      // Successfully loaded cards one way or another
-      toast({
-        title: "Cards loaded",
-        description: `Your card collection is ready to view`,
-        variant: "default",
-      });
+      // Cards loaded successfully - no toast notification needed
       
     } catch (err) {
       const error = err as Error;
