@@ -6,8 +6,11 @@ export interface Reaction {
   userId: string;
   type: 'like' | 'dislike' | 'love' | 'haha' | 'wow' | 'sad' | 'angry';
   createdAt: string;
-  targetType: 'card' | 'comment';
+  targetType: 'card' | 'comment' | 'collection';
   targetId: string;
+  cardId?: string;
+  collectionId?: string;
+  commentId?: string;
 }
 
 export interface CardStats {
@@ -58,8 +61,28 @@ export interface CardLayer {
     scaleX: number;
     scaleY: number;
   };
+  position: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  size: {
+    width: number | 'auto';
+    height: number | 'auto';
+  };
+  rotation: number;
   content?: any;
   style?: any;
+  textStyle?: {
+    fontFamily: string;
+    fontSize: number;
+    fontWeight: string;
+    color: string;
+    textAlign: string;
+  };
+  color?: string;
+  shapeType?: string;
+  zIndex?: number;
 }
 
 export interface CardEffect {
@@ -153,7 +176,7 @@ export interface Card {
   id: string;
   title: string;
   name?: string;
-  description: string;
+  description?: string;
   imageUrl: string;
   thumbnailUrl?: string;
   tags: string[];
@@ -203,6 +226,8 @@ export interface CardTemplate {
   thumbnail?: string;
   category: string;
   tags?: string[];
+  isOfficial?: boolean;
+  popularity?: number;
   designDefaults: {
     cardStyle: Partial<CardStyle>;
     textStyle?: Partial<TextStyle>;

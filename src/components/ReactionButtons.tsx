@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -55,7 +56,19 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
       let data: Reaction[] = [];
       
       if (cardId) {
-        data = await reactionRepository.getAllByCardId(cardId);
+        const rawData = await reactionRepository.getAllByCardId(cardId);
+        // Convert the raw data to match our Reaction interface
+        data = rawData.map(reaction => ({
+          id: reaction.id,
+          userId: reaction.userId,
+          type: reaction.type,
+          createdAt: reaction.createdAt,
+          targetType: (cardId ? 'card' : collectionId ? 'collection' : 'comment') as 'card' | 'comment' | 'collection',
+          targetId: cardId || collectionId || commentId || '',
+          cardId: reaction.cardId,
+          collectionId: reaction.collectionId,
+          commentId: reaction.commentId
+        }));
       }
       
       setReactions(data);
@@ -110,10 +123,10 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
         setReactions(prev => prev.filter(r => r.userId !== user.id));
       } else {
         // Add or update reaction
-        const targetType = cardId ? 'card' : 'comment';
+        const targetType = cardId ? 'card' : collectionId ? 'collection' : 'comment';
         const targetId = cardId || collectionId || commentId || '';
         
-        const data = await reactionRepository.create({
+        const rawData = await reactionRepository.create({
           userId: user.id,
           cardId,
           collectionId,
@@ -122,6 +135,19 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
           targetType,
           targetId
         });
+        
+        // Convert to our Reaction interface
+        const data: Reaction = {
+          id: rawData.id,
+          userId: rawData.userId,
+          type: rawData.type,
+          createdAt: rawData.createdAt,
+          targetType: targetType as 'card' | 'comment' | 'collection',
+          targetId,
+          cardId: rawData.cardId,
+          collectionId: rawData.collectionId,
+          commentId: rawData.commentId
+        };
         
         if (userReaction) {
           // Update existing reaction
