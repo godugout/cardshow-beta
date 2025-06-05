@@ -11,7 +11,11 @@ interface ElementUploadFormProps {
   onElementCreated?: () => void;
 }
 
-const ElementUploadForm: React.FC<ElementUploadFormProps> = ({ onUpload, onCancel, onElementCreated }) => {
+const ElementUploadForm: React.FC<ElementUploadFormProps> = ({ 
+  onUpload, 
+  onCancel, 
+  onElementCreated 
+}) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);

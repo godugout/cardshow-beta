@@ -18,6 +18,36 @@ const initialCards: Card[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     effects: [],
+    designMetadata: {
+      cardStyle: {
+        template: 'classic',
+        effect: 'none',
+        borderRadius: '8px',
+        borderColor: '#000000',
+        shadowColor: 'rgba(0,0,0,0.2)',
+        frameWidth: 2,
+        frameColor: '#000000'
+      },
+      textStyle: {
+        titleColor: '#000000',
+        titleAlignment: 'center',
+        titleWeight: 'bold',
+        descriptionColor: '#333333'
+      },
+      cardMetadata: {
+        category: 'general'
+      },
+      marketMetadata: {
+        isPrintable: false,
+        isForSale: false,
+        includeInCatalog: false,
+        price: 0,
+        currency: 'USD',
+        availableForSale: false,
+        editionSize: 1,
+        editionNumber: 1
+      }
+    }
   }),
 ];
 
@@ -59,6 +89,20 @@ export const useCardOperations = () => {
       id: uuidv4(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      designMetadata: {
+        ...card.designMetadata,
+        marketMetadata: {
+          isPrintable: false,
+          isForSale: false,
+          includeInCatalog: false,
+          price: 0,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1,
+          editionNumber: 1,
+          ...card.designMetadata?.marketMetadata
+        }
+      }
     });
 
     setCards(prevCards => [...prevCards, newCard]);
@@ -69,7 +113,22 @@ export const useCardOperations = () => {
     setCards(prevCards =>
       prevCards.map(card =>
         card.id === id
-          ? adaptToLegacyCard({ ...card, ...updates, updatedAt: new Date().toISOString() })
+          ? adaptToLegacyCard({ 
+              ...card, 
+              ...updates, 
+              updatedAt: new Date().toISOString(),
+              designMetadata: {
+                ...card.designMetadata,
+                ...updates.designMetadata,
+                marketMetadata: {
+                  isPrintable: false,
+                  isForSale: false,
+                  includeInCatalog: false,
+                  ...card.designMetadata?.marketMetadata,
+                  ...updates.designMetadata?.marketMetadata
+                }
+              }
+            })
           : card
       )
     );

@@ -86,6 +86,19 @@ export interface DesignMetadata {
   marketMetadata: MarketMetadata;
   effects?: string[];
   effectClasses?: string;
+  oaklandMemory?: {
+    date?: string;
+    opponent?: string;
+    score?: string;
+    location?: string;
+    section?: string;
+    memoryType?: string;
+    attendees?: string[];
+    imageUrl?: string;
+    historicalContext?: string;
+    personalSignificance?: string;
+    template?: string;
+  };
   [key: string]: JsonValue | undefined;
 }
 
@@ -100,6 +113,7 @@ export interface CardEffect {
   className?: string;
   category?: string;
   description?: string;
+  iconUrl?: string;
 }
 
 /**
@@ -149,6 +163,9 @@ export interface HotspotData {
   height: number;
   action: string;
   metadata?: Record<string, any>;
+  type?: string;
+  content?: string;
+  visible?: boolean;
 }
 
 /**
@@ -161,6 +178,10 @@ export interface FabricSwatch {
   texture?: string;
   material?: string;
   imageUrl?: string;
+  type?: string;
+  year?: string;
+  team?: string;
+  position?: string;
 }
 
 /**

@@ -1,6 +1,6 @@
 
 import { useState, useMemo } from 'react';
-import { Card } from '@/lib/types';
+import { Card, OaklandMemoryData } from '@/lib/types';
 import { format, isValid, parse } from 'date-fns';
 
 export const useOaklandMemoryFilters = (cards: Card[]) => {
@@ -18,18 +18,24 @@ export const useOaklandMemoryFilters = (cards: Card[]) => {
   
   const allOpponents = useMemo(() => Array.from(new Set(
     oaklandCards
-      .map(card => card.designMetadata?.oaklandMemory?.opponent)
+      .map(card => {
+        const memory = card.designMetadata?.oaklandMemory as OaklandMemoryData;
+        return memory?.opponent;
+      })
       .filter(Boolean) as string[]
   )).sort(), [oaklandCards]);
   
   const allLocations = useMemo(() => Array.from(new Set(
     oaklandCards
-      .map(card => card.designMetadata?.oaklandMemory?.location)
+      .map(card => {
+        const memory = card.designMetadata?.oaklandMemory as OaklandMemoryData;
+        return memory?.location;
+      })
       .filter(Boolean) as string[]
   )).sort(), [oaklandCards]);
   
   const filteredCards = useMemo(() => oaklandCards.filter(card => {
-    const oaklandMemory = card.designMetadata?.oaklandMemory;
+    const oaklandMemory = card.designMetadata?.oaklandMemory as OaklandMemoryData;
     if (!oaklandMemory) return false;
     
     if (filterType && oaklandMemory.memoryType !== filterType) {

@@ -50,7 +50,7 @@ export const useGalleryCards = () => {
       const imageUrl = card.imageUrl || card.thumbnailUrl || '/placeholder.svg';
       
       // Create a properly structured card object
-      return {
+      const processedCard: Card = {
         ...card,
         imageUrl: imageUrl,
         // Process other card data
@@ -62,7 +62,9 @@ export const useGalleryCards = () => {
             description: card.description || ''
           } : undefined
         }
-      } as Card;
+      };
+      
+      return processedCard;
     });
     
     // Debug info

@@ -33,3 +33,32 @@ export interface PaginatedResponse<T = any> extends ApiResponse<T[]> {
     totalPages: number;
   };
 }
+
+// Instagram types
+export interface InstagramPost {
+  id: string;
+  imageUrl: string;
+  caption: string;
+  likes: number;
+  comments: number;
+  timestamp: string;
+  userId: string;
+}
+
+// Oakland Memory Data with proper typing
+export interface OaklandMemoryData {
+  title: string;
+  description: string;
+  date?: string;
+  opponent?: string;
+  score?: string;
+  location?: string;
+  section?: string;
+  memoryType?: string;
+  attendees?: string[];
+  tags?: string[];
+  imageUrl?: string;
+  historicalContext?: string;
+  personalSignificance?: string;
+  template?: string;
+}

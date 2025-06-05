@@ -62,7 +62,7 @@ export interface UseCardEffectsResult {
 export interface MaterialSimulation {
   id: string;
   name: string;
-  type: 'metal' | 'glass' | 'fabric' | 'holographic';
+  type: 'metal' | 'glass' | 'fabric' | 'holographic' | 'mesh' | 'synthetic' | 'canvas';
   properties: {
     roughness: number;
     metalness: number;
@@ -72,4 +72,7 @@ export interface MaterialSimulation {
   enabled: boolean;
   textureUrl?: string;
   baseColor?: string;
+  weathering?: number;
+  roughness?: number;
+  metalness?: number;
 }
