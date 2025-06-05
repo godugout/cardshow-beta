@@ -31,32 +31,123 @@ const PersonalizationContext = createContext<PersonalizationContextType | undefi
 export function PersonalizationProvider({ children }: { children: ReactNode }) {
   const personalization = usePersonalization();
   
-  // Create mock implementations for missing properties
+  // Create mock preferences
+  const mockPreferences: UserPreferences = {
+    userId: 'mock-user',
+    styleProfile: personalization.styleProfile || {
+      userId: 'mock-user',
+      preferredColors: [],
+      preferredEffects: [],
+      favoriteEffects: [],
+      favoriteTemplates: [],
+      favoriteElements: [],
+      styleCategories: [],
+      stylePreferences: {
+        classicVsModern: 0.5,
+        colorfulVsMinimal: 0.5,
+        boldVsSubtle: 0.5,
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    brandProfiles: [],
+    activeBrandId: undefined,
+    activeBrandProfileId: undefined,
+    colorPalettes: [
+      {
+        id: 'default-palette',
+        name: 'Default Colors',
+        colors: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'],
+        isSystem: true,
+        isDefault: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+    ],
+    workflowConfig: {
+      id: 'default-workflow',
+      name: 'Default Workflow',
+      steps: [],
+      shortcuts: {},
+      autoSave: true,
+      defaultSettings: {},
+      defaultView: 'simple',
+      quickAccessTools: ['upload', 'effects', 'text', 'download'],
+      layoutPreferences: {
+        sidebarPosition: 'right',
+        visiblePanels: ['tools', 'properties'],
+        collapsedPanels: [],
+        panelSizes: {
+          main: 70,
+          sidebar: 30,
+        },
+      },
+    },
+    workflow: {
+      id: 'default-workflow',
+      name: 'Default Workflow',
+      steps: [],
+      shortcuts: {},
+      autoSave: true,
+      defaultSettings: {},
+      defaultView: 'simple',
+      quickAccessTools: ['upload', 'effects', 'text', 'download'],
+      layoutPreferences: {
+        sidebarPosition: 'right',
+        visiblePanels: ['tools', 'properties'],
+        collapsedPanels: [],
+        panelSizes: {
+          main: 70,
+          sidebar: 30,
+        },
+      },
+    },
+    favoriteTemplates: [],
+    favoriteEffects: [],
+    favoriteElements: [],
+    recommendationsEnabled: true,
+    recommendationPreferences: {
+      showTemplateRecommendations: true,
+      showEffectRecommendations: true,
+      showColorRecommendations: true,
+      showElementRecommendations: true,
+    },
+    creationHistory: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  
   const contextValue: PersonalizationContextType = {
     loading: personalization.isLoading,
-    preferences: null,
+    preferences: mockPreferences,
     activeBrandProfile: null,
     styleProfile: personalization.styleProfile,
     toggleFavorite: async () => true,
-    createColorPalette: async () => ({
+    createColorPalette: async (palette) => ({
       id: 'new-palette',
-      name: 'New Palette',
-      colors: [],
+      name: palette.name,
+      colors: palette.colors,
       isSystem: false,
+      isDefault: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }),
-    createBrandProfile: async () => ({
+    createBrandProfile: async (profile) => ({
       id: 'new-brand',
-      name: 'New Brand',
-      primaryColor: '#000000',
-      secondaryColor: '#ffffff',
-      fontFamily: 'Inter',
-      colorPalettes: [],
-      templateIds: [],
-      effectIds: [],
-      elementIds: [],
-      isActive: true,
+      name: profile.name,
+      description: profile.description,
+      primaryColor: profile.primaryColor,
+      secondaryColor: profile.secondaryColor,
+      fontFamily: profile.fontFamily,
+      colorPalettes: profile.colorPalettes,
+      templateIds: profile.templateIds,
+      effectIds: profile.effectIds,
+      elementIds: profile.elementIds,
+      isActive: profile.isActive,
+      colors: profile.colors,
+      typography: profile.typography,
+      assets: profile.assets,
+      templates: profile.templates,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }),
@@ -66,13 +157,9 @@ export function PersonalizationProvider({ children }: { children: ReactNode }) {
     getEffectRecommendations: async () => [],
     getElementRecommendations: async () => [],
     getColorRecommendations: async () => [],
-    updateWorkflow: async () => ({
-      id: 'workflow',
-      name: 'Default',
-      steps: [],
-      shortcuts: {},
-      autoSave: true,
-      defaultSettings: {}
+    updateWorkflow: async (updates) => ({
+      ...mockPreferences.workflowConfig,
+      ...updates,
     }),
   };
   
