@@ -111,14 +111,17 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
         setReactions(prev => prev.filter(r => r.userId !== user.id));
       } else {
         // Add or update reaction
+        const targetType = cardId ? 'card' : collectionId ? 'collection' : 'comment';
+        const targetId = cardId || collectionId || commentId || '';
+        
         const data = await reactionRepository.create({
           userId: user.id,
           cardId,
           collectionId,
           commentId,
           type,
-          targetType: cardId ? 'card' : collectionId ? 'collection' : 'comment',
-          targetId: cardId || collectionId || commentId || ''
+          targetType,
+          targetId
         });
         
         if (userReaction) {

@@ -152,6 +152,45 @@ export interface CardTemplate {
 }
 
 /**
+ * Card layer data structure for layer panel
+ */
+export interface CardLayer {
+  id: string;
+  type: 'image' | 'text' | 'shape' | 'effect' | 'sticker';
+  name: string;
+  visible: boolean;
+  locked: boolean;
+  opacity: number;
+  zIndex: number;
+  data?: Record<string, any>;
+}
+
+/**
+ * Hotspot data for interactive card elements
+ */
+export interface HotspotData {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  type: 'link' | 'video' | 'audio' | 'popup' | 'animation';
+  content: {
+    title?: string;
+    description?: string;
+    url?: string;
+    mediaId?: string;
+    action?: string;
+  };
+  style?: {
+    borderColor?: string;
+    backgroundColor?: string;
+    borderRadius?: number;
+    opacity?: number;
+  };
+}
+
+/**
  * Base Card interface containing common properties
  */
 export interface BaseCard extends BaseEntity {
@@ -262,3 +301,17 @@ export const DEFAULT_MARKET_METADATA: MarketMetadata = {
   editionSize: 1,
   editionNumber: 1
 };
+
+export const DEFAULT_CARD_METADATA: CardMetadata = {
+  category: 'general',
+  series: 'base',
+  cardType: 'standard',
+};
+
+export const DEFAULT_DESIGN_METADATA: DesignMetadata = {
+  cardStyle: DEFAULT_CARD_STYLE,
+  textStyle: DEFAULT_TEXT_STYLE,
+  cardMetadata: DEFAULT_CARD_METADATA,
+  marketMetadata: DEFAULT_MARKET_METADATA,
+};
+

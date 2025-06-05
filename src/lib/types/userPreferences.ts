@@ -24,6 +24,7 @@ export interface ColorPalette {
   name: string;
   colors: string[];
   isSystem: boolean;
+  isDefault?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -31,10 +32,28 @@ export interface ColorPalette {
 export interface BrandProfile {
   id: string;
   name: string;
+  description?: string;
   primaryColor: string;
   secondaryColor: string;
   logoUrl?: string;
   fontFamily: string;
+  colors?: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    text: string;
+    background: string;
+  };
+  typography?: {
+    fontFamily: string;
+    headingFont?: string;
+  };
+  assets?: {
+    logos: string[];
+    backgrounds: string[];
+    elements: string[];
+  };
+  templates?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -44,6 +63,17 @@ export interface WorkflowConfig {
   defaultTemplate: string;
   showTutorials: boolean;
   shortcuts: Record<string, string>;
+  defaultView?: 'simple' | 'advanced' | 'expert';
+  layoutPreferences?: {
+    visiblePanels: string[];
+    collapsedPanels: string[];
+    sidebarPosition: 'left' | 'right';
+    panelSizes: {
+      main: number;
+      sidebar: number;
+    };
+  };
+  quickAccessTools?: string[];
 }
 
 export interface UserPreferences {
@@ -56,6 +86,14 @@ export interface UserPreferences {
   brandProfiles: BrandProfile[];
   activeBrandProfileId?: string;
   workflowConfig: WorkflowConfig;
+  workflow?: WorkflowConfig;
+  recommendationsEnabled?: boolean;
+  recommendationPreferences?: {
+    showTemplateRecommendations: boolean;
+    showEffectRecommendations: boolean;
+    showColorRecommendations: boolean;
+    showElementRecommendations: boolean;
+  };
   creationHistory: CreationHistoryItem[];
   createdAt: string;
   updatedAt: string;
@@ -77,3 +115,4 @@ export interface RecommendationItem<T> {
   reason: string;
   category?: string;
 }
+

@@ -1,8 +1,7 @@
 
-import { Card, CardTemplate } from '@/lib/types/cardTypes';
+import { Card, CardTemplate, CardEffect } from '@/lib/types/cardTypes';
 import { CardElement } from '@/lib/types/cardElements';
 import { UserStyleProfile, RecommendationItem } from '@/lib/types/userPreferences';
-import { CardEffect } from '@/lib/types/cardTypes';
 
 /**
  * Service that provides personalized recommendations
@@ -90,8 +89,8 @@ export class RecommendationService {
       }
       
       // Adjust based on user preferences if available
-      if (this.styleProfile) {
-        if (this.styleProfile.preferredEffects.includes(effect.id)) {
+      if (this.styleProfile && this.styleProfile.favoriteEffects) {
+        if (this.styleProfile.favoriteEffects.includes(effect.id)) {
           score += 0.2;
           reason = 'Based on your favorite effects';
         }
@@ -198,7 +197,7 @@ export class RecommendationService {
     }
     
     // Adjust based on user profile if available
-    if (this.styleProfile) {
+    if (this.styleProfile && this.styleProfile.favoriteElements) {
       recommendations.forEach(rec => {
         if (this.styleProfile?.favoriteElements.includes(rec.item.id)) {
           rec.score += 0.2;
@@ -236,15 +235,15 @@ export class RecommendationService {
     let score = 0.5; // Base score
     
     // Adjust based on favorites
-    if (this.styleProfile.favoriteTemplates.includes(template.id)) {
+    if (this.styleProfile.favoriteTemplates && this.styleProfile.favoriteTemplates.includes(template.id)) {
       score += 0.3;
     }
     
     // Adjust based on style preferences (simplified example)
-    if (template.category === 'modern' && 
+    if (this.styleProfile.stylePreferences && template.category === 'modern' && 
         this.styleProfile.stylePreferences.classicVsModern > 60) {
       score += 0.2;
-    } else if (template.category === 'classic' && 
+    } else if (this.styleProfile.stylePreferences && template.category === 'classic' && 
         this.styleProfile.stylePreferences.classicVsModern < 40) {
       score += 0.2;
     }
@@ -262,7 +261,7 @@ export class RecommendationService {
    */
   private getTemplateRecommendationReason(template: CardTemplate, score: number): string {
     if (score > 0.8) {
-      if (this.styleProfile?.favoriteTemplates.includes(template.id)) {
+      if (this.styleProfile?.favoriteTemplates && this.styleProfile.favoriteTemplates.includes(template.id)) {
         return 'One of your favorite templates';
       }
       return 'Perfectly matches your style preferences';

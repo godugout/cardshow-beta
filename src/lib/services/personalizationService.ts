@@ -52,7 +52,25 @@ export class PersonalizationService {
           autoSave: true,
           defaultTemplate: 'classic',
           showTutorials: true,
-          shortcuts: {}
+          shortcuts: {},
+          defaultView: 'simple',
+          layoutPreferences: {
+            visiblePanels: ['tools', 'properties', 'layers'],
+            collapsedPanels: [],
+            sidebarPosition: 'right',
+            panelSizes: {
+              main: 70,
+              sidebar: 30
+            }
+          },
+          quickAccessTools: ['upload', 'effects', 'text', 'elements']
+        },
+        recommendationsEnabled: true,
+        recommendationPreferences: {
+          showTemplateRecommendations: true,
+          showEffectRecommendations: true,
+          showColorRecommendations: true,
+          showElementRecommendations: true
         },
         creationHistory: [],
         createdAt: new Date().toISOString(),
