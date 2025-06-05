@@ -1,49 +1,146 @@
+
 import { Card } from '@/lib/types/cardTypes';
-import { CreationHistoryItem, UserStyleProfile } from '@/lib/types/ugcTypes';
+import { CreationHistoryItem, UserStyleProfile, UserPreferences, ColorPalette, BrandProfile, WorkflowConfig } from '@/lib/types/userPreferences';
 import { v4 as uuidv4 } from 'uuid';
 
 export class PersonalizationService {
+  private userId: string;
   private userProfiles: Map<string, UserStyleProfile> = new Map();
   private creationHistory: Map<string, CreationHistoryItem[]> = new Map();
+  private userPreferences: Map<string, UserPreferences> = new Map();
 
-  async getUserStyleProfile(userId: string): Promise<UserStyleProfile | undefined> {
-    return this.userProfiles.get(userId);
+  constructor(userId: string = 'guest') {
+    this.userId = userId;
   }
 
-  async createUserStyleProfile(userId: string): Promise<UserStyleProfile> {
+  async getUserStyleProfile(): Promise<UserStyleProfile | undefined> {
+    return this.userProfiles.get(this.userId);
+  }
+
+  async createUserStyleProfile(): Promise<UserStyleProfile> {
     const newProfile: UserStyleProfile = {
-      userId,
+      userId: this.userId,
       preferredColors: [],
       preferredEffects: [],
       favoriteTemplates: [],
+      favoriteElements: [],
       styleCategories: [],
+      stylePreferences: {
+        classicVsModern: 50,
+        colorfulVsMinimal: 50,
+        boldVsSubtle: 50
+      },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
-    this.userProfiles.set(userId, newProfile);
+    this.userProfiles.set(this.userId, newProfile);
     return newProfile;
   }
 
-  async updateUserStyleProfile(userId: string, updates: Partial<UserStyleProfile>): Promise<UserStyleProfile | undefined> {
-    const existingProfile = this.userProfiles.get(userId);
-    if (!existingProfile) {
-      return undefined;
+  async loadUserPreferences(): Promise<UserPreferences> {
+    let prefs = this.userPreferences.get(this.userId);
+    if (!prefs) {
+      prefs = {
+        id: uuidv4(),
+        userId: this.userId,
+        favoriteTemplates: [],
+        favoriteEffects: [],
+        favoriteElements: [],
+        colorPalettes: [],
+        brandProfiles: [],
+        workflowConfig: {
+          autoSave: true,
+          defaultTemplate: 'classic',
+          showTutorials: true,
+          shortcuts: {}
+        },
+        creationHistory: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      this.userPreferences.set(this.userId, prefs);
     }
-
-    const updatedProfile: UserStyleProfile = {
-      ...existingProfile,
-      ...updates,
-      updatedAt: new Date().toISOString()
-    };
-    this.userProfiles.set(userId, updatedProfile);
-    return updatedProfile;
+    return prefs;
   }
 
-  async recordColorPreference(userId: string, color: string): Promise<void> {
-    const profile = this.userProfiles.get(userId) || await this.createUserStyleProfile(userId);
+  async getActiveBrandProfile(): Promise<BrandProfile | null> {
+    const prefs = await this.loadUserPreferences();
+    if (prefs.activeBrandProfileId) {
+      return prefs.brandProfiles.find(p => p.id === prefs.activeBrandProfileId) || null;
+    }
+    return null;
+  }
+
+  async toggleFavorite(type: 'template' | 'effect' | 'element', itemId: string): Promise<boolean> {
+    const prefs = await this.loadUserPreferences();
+    const key = `favorite${type.charAt(0).toUpperCase() + type.slice(1)}s` as keyof Pick<UserPreferences, 'favoriteTemplates' | 'favoriteEffects' | 'favoriteElements'>;
+    const favorites = prefs[key] as string[];
+    
+    const index = favorites.indexOf(itemId);
+    if (index > -1) {
+      favorites.splice(index, 1);
+      return false;
+    } else {
+      favorites.push(itemId);
+      return true;
+    }
+  }
+
+  async createColorPalette(palette: Omit<ColorPalette, 'id' | 'isSystem' | 'createdAt' | 'updatedAt'>): Promise<ColorPalette> {
+    const newPalette: ColorPalette = {
+      ...palette,
+      id: uuidv4(),
+      isSystem: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    const prefs = await this.loadUserPreferences();
+    prefs.colorPalettes.push(newPalette);
+    return newPalette;
+  }
+
+  async createBrandProfile(profile: Omit<BrandProfile, 'id' | 'createdAt' | 'updatedAt'>): Promise<BrandProfile> {
+    const newProfile: BrandProfile = {
+      ...profile,
+      id: uuidv4(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    const prefs = await this.loadUserPreferences();
+    prefs.brandProfiles.push(newProfile);
+    return newProfile;
+  }
+
+  async setActiveBrandProfile(profileId: string): Promise<void> {
+    const prefs = await this.loadUserPreferences();
+    prefs.activeBrandProfileId = profileId;
+  }
+
+  async addToHistory(item: Omit<CreationHistoryItem, 'id' | 'createdAt'>): Promise<void> {
+    const historyItem: CreationHistoryItem = {
+      ...item,
+      id: uuidv4(),
+      createdAt: new Date().toISOString()
+    };
+
+    const userHistory = this.creationHistory.get(this.userId) || [];
+    userHistory.push(historyItem);
+    this.creationHistory.set(this.userId, userHistory);
+  }
+
+  async updateWorkflowConfig(updates: Partial<WorkflowConfig>): Promise<WorkflowConfig> {
+    const prefs = await this.loadUserPreferences();
+    prefs.workflowConfig = { ...prefs.workflowConfig, ...updates };
+    return prefs.workflowConfig;
+  }
+
+  async recordColorPreference(color: string): Promise<void> {
+    const profile = this.userProfiles.get(this.userId) || await this.createUserStyleProfile();
     if (!profile.preferredColors.includes(color)) {
       profile.preferredColors.push(color);
-      this.userProfiles.set(userId, profile);
+      this.userProfiles.set(this.userId, profile);
     }
   }
 
@@ -62,7 +159,6 @@ export class PersonalizationService {
   }
 
   async recordCreationHistory(
-    userId: string,
     cardId: string,
     effectsUsed: string[],
     elementsUsed: string[],
@@ -77,17 +173,17 @@ export class PersonalizationService {
       createdAt: new Date().toISOString()
     };
 
-    const userHistory = this.creationHistory.get(userId) || [];
+    const userHistory = this.creationHistory.get(this.userId) || [];
     userHistory.push(historyItem);
-    this.creationHistory.set(userId, userHistory);
+    this.creationHistory.set(this.userId, userHistory);
   }
 
-  async getCreationHistory(userId: string): Promise<CreationHistoryItem[]> {
-    return this.creationHistory.get(userId) || [];
+  async getCreationHistory(): Promise<CreationHistoryItem[]> {
+    return this.creationHistory.get(this.userId) || [];
   }
 
-  async clearCreationHistory(userId: string): Promise<void> {
-    this.creationHistory.delete(userId);
+  async clearCreationHistory(): Promise<void> {
+    this.creationHistory.delete(this.userId);
   }
 }
 

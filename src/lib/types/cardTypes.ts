@@ -22,7 +22,7 @@ export interface CardStyle {
   borderRadius: string;  
   borderWidth?: number;
   borderColor: string;   
-  backgroundColor?: string; // Added backgroundColor as optional
+  backgroundColor?: string;
   shadowColor: string;   
   frameWidth: number;    
   frameColor: string;    
@@ -37,9 +37,13 @@ export interface TextStyle {
   fontSize?: string;
   fontWeight?: string;
   color?: string;
+  titleFont?: string;      
+  titleSize?: string;      
   titleColor: string;      
   titleAlignment: string;  
   titleWeight: string;     
+  descriptionFont?: string;
+  descriptionSize?: string;
   descriptionColor: string; 
   [key: string]: JsonValue | undefined;
 }
@@ -126,71 +130,25 @@ export interface CardEffect {
 }
 
 /**
- * Card layer definition for design elements
+ * Card template definition for template system
  */
-export interface CardLayer {
-  id: string;
-  type: 'image' | 'text' | 'shape' | 'effect';
-  content: string | any;
-  position: {
-    x: number;
-    y: number;
-    z: number;
-  };
-  size: {
-    width: number | 'auto';
-    height: number | 'auto';
-  };
-  rotation: number;
-  opacity: number;
-  zIndex: number;
-  visible?: boolean;
-  style?: Record<string, any>;
-  locked?: boolean;
-  effectIds?: string[];
-  textStyle?: {
-    fontFamily?: string;
-    fontSize?: number;
-    fontWeight?: string;
-    color?: string;
-    textAlign?: string;
-  };
-  imageUrl?: string;
-  shapeType?: string;
-  color?: string;
-  [key: string]: any;
-}
-
-/**
- * Hotspot data for interactive elements - with action now optional
- */
-export interface HotspotData {
-  id: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  action?: string; // Made optional
-  metadata?: Record<string, any>;
-  type?: string;
-  content?: string;
-  visible?: boolean;
-}
-
-/**
- * Fabric swatch definition - with additional properties
- */
-export interface FabricSwatch {
+export interface CardTemplate {
   id: string;
   name: string;
-  color: string;
-  texture?: string;
-  material?: string;
-  imageUrl?: string;
-  type?: string;
-  year?: string;
-  team?: string;
-  position?: string;
+  description?: string;
+  thumbnail?: string;
+  thumbnailUrl?: string; 
+  category: string;
+  isOfficial?: boolean; 
+  popularity?: number; 
+  designDefaults: {
+    cardStyle: Partial<CardStyle>;
+    textStyle?: Partial<TextStyle>;
+    effects?: string[];
+  };
+  previewUrl?: string;
+  sport?: string;
+  style?: string;
 }
 
 /**
@@ -252,67 +210,19 @@ export interface BaseCard extends BaseEntity {
 export interface Card extends BaseCard {}
 
 /**
- * Card template definition for template system
+ * Fabric swatch definition
  */
-export interface CardTemplate {
+export interface FabricSwatch {
   id: string;
   name: string;
-  description?: string;
-  thumbnail: string;
-  thumbnailUrl?: string; 
-  category: string;
-  isOfficial?: boolean; 
-  popularity?: number; 
-  designDefaults: {
-    cardStyle: Partial<CardStyle>;
-    textStyle?: Partial<TextStyle>;
-    effects?: string[];
-  };
-  previewUrl?: string;
-  sport?: string;
-  style?: string;
-}
-
-// Card data interface for compatibility with existing code
-export interface CardData {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  thumbnailUrl?: string;
-  tags: string[];
-  userId: string;
-  teamId?: string;
-  collectionId?: string;
-  isPublic?: boolean;
-  effects: string[];
-  rarity?: CardRarity;
-  createdAt: string;
-  updatedAt: string;
-  
-  // Baseball card properties
-  player?: string;
-  team?: string;
+  color: string;
+  texture?: string;
+  material?: string;
+  imageUrl?: string;
+  type?: string;
   year?: string;
-  jersey?: string;
-  set?: string;
-  cardNumber?: string;
-  cardType?: string;
-  artist?: string;
-  backgroundColor?: string;
-  borderColor?: string;
-  borderRadius?: string;
-  textColor?: string;
-  specialEffect?: string;
-  
-  // Design properties
-  designMetadata?: DesignMetadata;
-  fabricSwatches?: FabricSwatch[];
-  
-  // Market data
-  price?: number;
-  estimatedValue?: string;
-  condition?: string;
+  team?: string;
+  position?: string;
 }
 
 export const DEFAULT_CARD_STYLE: CardStyle = {
@@ -321,7 +231,7 @@ export const DEFAULT_CARD_STYLE: CardStyle = {
   borderRadius: '8px',
   borderWidth: 2,
   borderColor: '#000000',
-  backgroundColor: '#FFFFFF', // Added backgroundColor to default
+  backgroundColor: '#FFFFFF',
   shadowColor: 'rgba(0,0,0,0.2)',
   frameWidth: 2,
   frameColor: '#000000',
@@ -332,9 +242,13 @@ export const DEFAULT_TEXT_STYLE: TextStyle = {
   fontSize: '16px',
   fontWeight: 'normal',
   color: '#000000',
+  titleFont: 'Inter',
+  titleSize: '24px',
   titleColor: '#000000',
   titleAlignment: 'center',
-  titleWeight: 'bold', // Added titleWeight
+  titleWeight: 'bold',
+  descriptionFont: 'Inter',
+  descriptionSize: '14px',
   descriptionColor: '#333333',
 };
 

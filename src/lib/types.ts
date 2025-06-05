@@ -48,21 +48,5 @@ export function serializeMetadata(metadata: DesignMetadata | undefined): Record<
     serialized.oaklandMemory = JSON.parse(JSON.stringify(metadata.oaklandMemory));
   }
   
-  // Handle layers which might contain functions or complex objects
-  if (metadata.layers && Array.isArray(metadata.layers)) {
-    serialized.layers = metadata.layers.map(layer => {
-      const layerCopy = { ...layer } as Record<string, any>;
-      
-      // Convert any non-serializable values
-      Object.keys(layerCopy).forEach(key => {
-        if (typeof layerCopy[key] === 'function') {
-          delete layerCopy[key];
-        }
-      });
-      
-      return layerCopy;
-    });
-  }
-  
   return serialized;
 }

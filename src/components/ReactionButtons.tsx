@@ -53,25 +53,13 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
     
     setIsLoading(true);
     try {
-      let data: Reaction[] | null = null;
-      let error: any = null;
+      let data: Reaction[] = [];
       
       if (cardId) {
-        const result = await reactionRepository.getAllByCardId(cardId);
-        data = result;
-        // If the API returns an error property, handle it here
+        data = await reactionRepository.getAllByCardId(cardId);
       }
       
-      // Additional endpoints for collection and comment reactions could be added here
-      
-      if (error) {
-        console.error('Error fetching reactions:', error);
-        return;
-      }
-      
-      if (data) {
-        setReactions(data);
-      }
+      setReactions(data);
     } catch (err) {
       console.error('Unexpected error fetching reactions:', err);
     } finally {
@@ -119,28 +107,19 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
       
       if (userReaction && isSameType) {
         // Remove reaction if clicking the same type again
-        const success = await reactionRepository.remove(userReaction.id);
-        
-        if (!success) {
-          toast.error('Failed to update reaction');
-          return;
-        }
-        
+        await reactionRepository.remove(userReaction.id);
         setReactions(prev => prev.filter(r => r.userId !== user.id));
       } else {
         // Add or update reaction
-        const data = await reactionRepository.add(
-          user.id,
+        const data = await reactionRepository.create({
+          userId: user.id,
           cardId,
           collectionId,
           commentId,
-          type
-        );
-        
-        if (!data) {
-          toast.error('Failed to update reaction');
-          return;
-        }
+          type,
+          targetType: cardId ? 'card' : collectionId ? 'collection' : 'comment',
+          targetId: cardId || collectionId || commentId || ''
+        });
         
         if (userReaction) {
           // Update existing reaction
@@ -280,7 +259,7 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
         </Tooltip>
       </TooltipProvider>
       
-      {/* Reactions summary (can be expanded with user icons for who reacted) */}
+      {/* Reactions summary */}
       {totalReactions > 0 && (
         <div className="text-sm text-muted-foreground ml-1">
           {totalReactions} reaction{totalReactions !== 1 ? 's' : ''}

@@ -1,6 +1,8 @@
+
 import { Card, CardTemplate } from '@/lib/types/cardTypes';
 import { CardElement } from '@/lib/types/cardElements';
-import { UserStyleProfile } from '@/lib/types/ugcTypes';
+import { UserStyleProfile, RecommendationItem } from '@/lib/types/userPreferences';
+import { CardEffect } from '@/lib/types/cardTypes';
 
 /**
  * Service that provides personalized recommendations
@@ -89,7 +91,7 @@ export class RecommendationService {
       
       // Adjust based on user preferences if available
       if (this.styleProfile) {
-        if (this.styleProfile.favoriteEffects.includes(effect.id)) {
+        if (this.styleProfile.preferredEffects.includes(effect.id)) {
           score += 0.2;
           reason = 'Based on your favorite effects';
         }

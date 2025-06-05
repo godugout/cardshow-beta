@@ -202,3 +202,6 @@ export const sampleCards: CardData[] = [
     }
   }
 ];
+
+// Export cardData for backward compatibility
+export const cardData = sampleCards;
