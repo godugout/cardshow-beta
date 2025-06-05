@@ -13,12 +13,10 @@ export const fetchCards = async (): Promise<Card[]> => {
       imageUrl: '/sample-card-1.jpg',
       thumbnailUrl: '/sample-card-1-thumb.jpg',
       tags: ['sample', 'card'],
-      team: 'Team A',
-      year: '2023',
-      userId: 'user1', // Add required userId
+      userId: 'user1',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      effects: [] // Add required effects property
+      effects: []
     }),
     adaptToCard({
       id: '2',
@@ -27,12 +25,10 @@ export const fetchCards = async (): Promise<Card[]> => {
       imageUrl: '/sample-card-2.jpg',
       thumbnailUrl: '/sample-card-2-thumb.jpg',
       tags: ['sample', 'card'],
-      team: 'Team B',
-      year: '2022',
-      userId: 'user2', // Add required userId
+      userId: 'user2',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      effects: ['Holographic'] // Add required effects property
+      effects: ['Holographic']
     }),
   ];
 };

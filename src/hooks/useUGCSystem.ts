@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { UGCAsset } from '@/lib/types/ugcTypes';
 import { ElementType, ElementCategory } from '@/lib/types/cardElements';
+import { ModerationStats, ModerationReport } from '@/lib/ugc/ModerationService';
 
 interface UsePublicAssetsOptions {
   assetType?: ElementType;
@@ -10,21 +11,9 @@ interface UsePublicAssetsOptions {
   sortBy?: 'latest' | 'popular' | 'rating';
 }
 
-interface ModerationStats {
-  pending: number;
-  approved: number;
-  rejected: number;
-  flagged: number;
-}
-
-interface ModerationReport {
-  id: string;
-  assetId: string;
-  reporterId: string;
-  reason: string;
-  details: string;
-  status: 'pending' | 'reviewed' | 'resolved';
-  createdAt: string;
+interface ModerationMutation {
+  mutateAsync: (params: { assetId: string; status: string; moderatorId: string; reason?: string; notes?: string }) => Promise<void>;
+  isPending: boolean;
 }
 
 export function useUGCSystem() {
@@ -70,10 +59,15 @@ export function useUGCSystem() {
 
   const useModerationStats = () => {
     const [stats, setStats] = useState<ModerationStats>({
-      pending: 5,
-      approved: 150,
-      rejected: 10,
-      flagged: 2
+      totalReports: 42,
+      pendingReports: 12,
+      pendingCount: 12,
+      openReports: 15,
+      approvedAssets: 1205,
+      approvedCount: 1205,
+      rejectedAssets: 89,
+      rejectedCount: 89,
+      flaggedAssets: 15
     });
     const [isLoading, setIsLoading] = useState(false);
 
@@ -87,10 +81,12 @@ export function useUGCSystem() {
     return { data: reports, isLoading };
   };
 
-  const moderateAsset = async (assetId: string, action: 'approve' | 'reject', reason?: string) => {
-    // Mock moderation function
-    console.log(`Moderating asset ${assetId} with action: ${action}`, reason);
-    return Promise.resolve();
+  const moderateAsset: ModerationMutation = {
+    mutateAsync: async (params: { assetId: string; status: string; moderatorId: string; reason?: string; notes?: string }) => {
+      console.log('Moderating asset:', params);
+      return Promise.resolve();
+    },
+    isPending: false
   };
 
   return { 

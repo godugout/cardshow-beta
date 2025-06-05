@@ -35,6 +35,9 @@ export function useArCards(initialCards: Card[] = []) {
   const handleFlip = () => setIsFlipped(!isFlipped);
   const handleZoomIn = () => console.log('Zooming in');
   const handleZoomOut = () => console.log('Zooming out');
+  const handleRotate = () => console.log('Rotating');
+  const handleAddCard = () => console.log('Adding card');
+  const handleRemoveCard = () => console.log('Removing card');
 
   return {
     // Basic card navigation
@@ -62,5 +65,8 @@ export function useArCards(initialCards: Card[] = []) {
     handleFlip,
     handleZoomIn,
     handleZoomOut,
+    handleRotate,
+    handleAddCard,
+    handleRemoveCard,
   };
 }

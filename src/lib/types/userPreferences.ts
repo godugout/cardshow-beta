@@ -1,14 +1,58 @@
-import { CardTemplate } from './cardTypes';
+
+import { CardTemplate } from './templateTypes';
 import { CardEffect } from './cardTypes';
 import { CardElement } from './cardElements';
+
+// Base preference data interface
+export interface PreferenceData {
+  type: 'template' | 'effect' | 'element' | 'color';
+  itemId: string;
+  action: 'like' | 'dislike' | 'favorite' | 'use';
+  context?: string;
+  timestamp: string;
+}
+
+export interface ColorPalette {
+  id: string;
+  name: string;
+  colors: string[];
+  isSystem: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkflowConfig {
+  id: string;
+  name: string;
+  steps: string[];
+  shortcuts: Record<string, string>;
+  autoSave: boolean;
+  defaultSettings: Record<string, any>;
+}
+
+export interface BrandProfile {
+  id: string;
+  name: string;
+  logoUrl?: string;
+  primaryColor: string;
+  secondaryColor: string;
+  fontFamily: string;
+  colorPalettes: ColorPalette[];
+  templateIds: string[];
+  effectIds: string[];
+  elementIds: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface UserStyleProfile {
   userId: string;
   preferredColors: string[];
   preferredEffects: string[];
+  favoriteEffects: string[];
   favoriteTemplates: string[];
   favoriteElements: string[];
-  favoriteEffects: string[];
   styleCategories: string[];
   stylePreferences: {
     classicVsModern: number;
@@ -19,99 +63,19 @@ export interface UserStyleProfile {
   updatedAt: string;
 }
 
-export interface ColorPalette {
-  id: string;
-  name: string;
-  colors: string[];
-  isSystem: boolean;
-  isDefault?: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface BrandProfile {
-  id: string;
-  name: string;
-  description?: string;
-  primaryColor: string;
-  secondaryColor: string;
-  logoUrl?: string;
-  fontFamily: string;
-  colors?: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    text: string;
-    background: string;
-  };
-  typography?: {
-    fontFamily: string;
-    headingFont?: string;
-  };
-  assets?: {
-    logos: string[];
-    backgrounds: string[];
-    elements: string[];
-  };
-  templates?: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface WorkflowConfig {
-  autoSave: boolean;
-  defaultTemplate: string;
-  showTutorials: boolean;
-  shortcuts: Record<string, string>;
-  defaultView?: 'simple' | 'advanced' | 'expert';
-  layoutPreferences?: {
-    visiblePanels: string[];
-    collapsedPanels: string[];
-    sidebarPosition: 'left' | 'right';
-    panelSizes: {
-      main: number;
-      sidebar: number;
-    };
-  };
-  quickAccessTools?: string[];
-}
-
 export interface UserPreferences {
-  id: string;
   userId: string;
-  favoriteTemplates: string[];
-  favoriteEffects: string[];
-  favoriteElements: string[];
-  colorPalettes: ColorPalette[];
+  styleProfile: UserStyleProfile;
   brandProfiles: BrandProfile[];
-  activeBrandProfileId?: string;
+  activeBrandId?: string;
+  colorPalettes: ColorPalette[];
   workflowConfig: WorkflowConfig;
-  workflow?: WorkflowConfig; // Keep as fallback
-  recommendationsEnabled?: boolean;
-  recommendationPreferences?: {
-    showTemplateRecommendations: boolean;
-    showEffectRecommendations: boolean;
-    showColorRecommendations: boolean;
-    showElementRecommendations: boolean;
-  };
-  creationHistory: CreationHistoryItem[];
   createdAt: string;
   updatedAt: string;
-}
-
-export interface CreationHistoryItem {
-  id: string;
-  cardId: string;
-  templateId?: string;
-  effectsUsed: string[];
-  elementsUsed: string[];
-  timeSpent: number;
-  createdAt: string;
 }
 
 export interface RecommendationItem<T> {
   item: T;
   score: number;
   reason: string;
-  category?: string;
 }

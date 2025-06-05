@@ -24,7 +24,7 @@ const OaklandMemoryGrid: React.FC<OaklandMemoryGridProps> = ({ cards }) => {
         const typedMemory = oaklandMemory as OaklandMemoryData;
         
         const memoryData: OaklandMemoryData = {
-          title: card.title || card.name || '',
+          title: card.title || '',
           description: card.description,
           date: typedMemory.date,
           opponent: typedMemory.opponent,

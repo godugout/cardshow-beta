@@ -31,8 +31,53 @@ const PersonalizationContext = createContext<PersonalizationContextType | undefi
 export function PersonalizationProvider({ children }: { children: ReactNode }) {
   const personalization = usePersonalization();
   
+  // Create mock implementations for missing properties
+  const contextValue: PersonalizationContextType = {
+    loading: personalization.isLoading,
+    preferences: null,
+    activeBrandProfile: null,
+    styleProfile: personalization.styleProfile,
+    toggleFavorite: async () => true,
+    createColorPalette: async () => ({
+      id: 'new-palette',
+      name: 'New Palette',
+      colors: [],
+      isSystem: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }),
+    createBrandProfile: async () => ({
+      id: 'new-brand',
+      name: 'New Brand',
+      primaryColor: '#000000',
+      secondaryColor: '#ffffff',
+      fontFamily: 'Inter',
+      colorPalettes: [],
+      templateIds: [],
+      effectIds: [],
+      elementIds: [],
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }),
+    setActiveBrand: async () => {},
+    recordCardCreation: async () => {},
+    getTemplateRecommendations: async () => [],
+    getEffectRecommendations: async () => [],
+    getElementRecommendations: async () => [],
+    getColorRecommendations: async () => [],
+    updateWorkflow: async () => ({
+      id: 'workflow',
+      name: 'Default',
+      steps: [],
+      shortcuts: {},
+      autoSave: true,
+      defaultSettings: {}
+    }),
+  };
+  
   return (
-    <PersonalizationContext.Provider value={personalization}>
+    <PersonalizationContext.Provider value={contextValue}>
       {children}
     </PersonalizationContext.Provider>
   );

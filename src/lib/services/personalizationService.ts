@@ -8,7 +8,7 @@ export class PersonalizationService {
       userId,
       preferredColors: [],
       preferredEffects: [],
-      favoriteEffects: [], // Add missing property
+      favoriteEffects: [],
       favoriteTemplates: [],
       favoriteElements: [],
       styleCategories: [],
