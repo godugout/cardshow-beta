@@ -20,7 +20,7 @@ export function Toaster() {
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, variant = "default", ...props }) {
         const IconName = toastIconConfig[variant]
-        const Icon = IconName ? ToastIcons[IconName] : null
+        const Icon = IconName && ToastIcons[IconName] ? ToastIcons[IconName] : null
 
         return (
           <Toast key={id} variant={variant} {...props}>

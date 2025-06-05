@@ -23,3 +23,12 @@ export const toastStyles = cva(
     },
   }
 );
+
+export const toastIconConfig: Record<ToastVariant, string> = {
+  default: "Info",
+  success: "CheckCircle",
+  warning: "AlertTriangle", 
+  info: "Info",
+  destructive: "XCircle",
+  error: "XCircle"
+};
