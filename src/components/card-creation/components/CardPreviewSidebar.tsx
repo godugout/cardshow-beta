@@ -57,8 +57,8 @@ const CardPreviewSidebar: React.FC<CardPreviewSidebarProps> = ({
                   key={layer.id}
                   className="absolute text-white text-shadow-sm"
                   style={{
-                    top: `${layer.position?.y ?? layer.y}%`,
-                    left: `${layer.position?.x ?? layer.x}%`,
+                    top: `${layer.position?.y ?? layer.y ?? 0}%`,
+                    left: `${layer.position?.x ?? layer.x ?? 0}%`,
                     transform: `translate(-50%, -50%) rotate(${layer.rotation}deg)`,
                     opacity: layer.opacity,
                     zIndex: layer.position?.z ?? 1,
@@ -74,10 +74,10 @@ const CardPreviewSidebar: React.FC<CardPreviewSidebarProps> = ({
                   key={layer.id}
                   className="absolute"
                   style={{
-                    top: `${layer.position?.y ?? layer.y}%`,
-                    left: `${layer.position?.x ?? layer.x}%`,
-                    width: layer.size?.width ?? layer.width,
-                    height: layer.size?.height ?? layer.height,
+                    top: `${layer.position?.y ?? layer.y ?? 0}%`,
+                    left: `${layer.position?.x ?? layer.x ?? 0}%`,
+                    width: layer.size?.width ?? layer.width ?? 'auto',
+                    height: layer.size?.height ?? layer.height ?? 'auto',
                     transform: `translate(-50%, -50%) rotate(${layer.rotation}deg)`,
                     opacity: layer.opacity,
                     zIndex: layer.position?.z ?? 1,
@@ -85,7 +85,7 @@ const CardPreviewSidebar: React.FC<CardPreviewSidebarProps> = ({
                 >
                   {layer.content && (
                     <img 
-                      src={typeof layer.content === 'string' ? layer.content : layer.imageUrl} 
+                      src={typeof layer.content === 'string' ? layer.content : layer.imageUrl || ''} 
                       alt="Layer" 
                       className="w-full h-full object-contain"
                     />
@@ -99,10 +99,10 @@ const CardPreviewSidebar: React.FC<CardPreviewSidebarProps> = ({
                   key={layer.id}
                   className="absolute bg-white"
                   style={{
-                    top: `${layer.position?.y ?? layer.y}%`,
-                    left: `${layer.position?.x ?? layer.x}%`,
-                    width: layer.size?.width ?? layer.width,
-                    height: layer.size?.height ?? layer.height,
+                    top: `${layer.position?.y ?? layer.y ?? 0}%`,
+                    left: `${layer.position?.x ?? layer.x ?? 0}%`,
+                    width: layer.size?.width ?? layer.width ?? 'auto',
+                    height: layer.size?.height ?? layer.height ?? 'auto',
                     transform: `translate(-50%, -50%) rotate(${layer.rotation}deg)`,
                     opacity: layer.opacity,
                     zIndex: layer.position?.z ?? 1,

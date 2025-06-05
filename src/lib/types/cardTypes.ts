@@ -44,6 +44,10 @@ export interface FabricSwatch {
   color: string;
   texture?: string;
   pattern?: string;
+  type?: string;
+  year?: string;
+  team?: string;
+  position?: string;
 }
 
 export interface CardLayer {
@@ -83,6 +87,12 @@ export interface CardLayer {
   color?: string;
   shapeType?: string;
   zIndex?: number;
+  // Legacy properties for backward compatibility
+  x?: number;
+  y?: number;
+  width?: number | 'auto';
+  height?: number | 'auto';
+  imageUrl?: string;
 }
 
 export interface CardEffect {
@@ -99,11 +109,24 @@ export interface HotspotData {
   y: number;
   width: number;
   height: number;
-  content: string;
-  type: 'text' | 'image' | 'video';
+  content: {
+    title?: string;
+    description?: string;
+    text?: string;
+    url?: string;
+    imageUrl?: string;
+  } | string;
+  type: 'text' | 'image' | 'video' | 'link';
+  visible?: boolean;
+  style?: {
+    borderColor?: string;
+    backgroundColor?: string;
+    borderRadius?: number;
+    opacity?: number;
+  };
 }
 
-export type CardRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+export type CardRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'ultra-rare' | 'one-of-one';
 
 export interface CardStyle {
   template?: string;
@@ -224,10 +247,13 @@ export interface CardTemplate {
   imageUrl?: string;
   thumbnailUrl?: string;
   thumbnail?: string;
+  previewUrl?: string;
   category: string;
   tags?: string[];
   isOfficial?: boolean;
   popularity?: number;
+  style?: string;
+  sport?: string;
   designDefaults: {
     cardStyle: Partial<CardStyle>;
     textStyle?: Partial<TextStyle>;
