@@ -10,6 +10,21 @@ interface UsePublicAssetsOptions {
   sortBy?: 'latest' | 'popular' | 'rating';
 }
 
+interface ModerationStats {
+  pending: number;
+  approved: number;
+  rejected: number;
+  flagged: number;
+}
+
+interface PendingReport {
+  id: string;
+  assetId: string;
+  reporterId: string;
+  reason: string;
+  createdAt: string;
+}
+
 export function useUGCSystem() {
   const usePublicAssets = (options: UsePublicAssetsOptions = {}) => {
     const [data, setData] = useState<UGCAsset[]>([]);
@@ -51,5 +66,35 @@ export function useUGCSystem() {
     return { data, isLoading, error };
   };
 
-  return { usePublicAssets };
+  const useModerationStats = () => {
+    const [stats, setStats] = useState<ModerationStats>({
+      pending: 5,
+      approved: 150,
+      rejected: 10,
+      flagged: 2
+    });
+    const [isLoading, setIsLoading] = useState(false);
+
+    return { data: stats, isLoading };
+  };
+
+  const usePendingReports = () => {
+    const [reports, setReports] = useState<PendingReport[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    return { data: reports, isLoading };
+  };
+
+  const moderateAsset = async (assetId: string, action: 'approve' | 'reject', reason?: string) => {
+    // Mock moderation function
+    console.log(`Moderating asset ${assetId} with action: ${action}`, reason);
+    return Promise.resolve();
+  };
+
+  return { 
+    usePublicAssets, 
+    useModerationStats, 
+    usePendingReports, 
+    moderateAsset 
+  };
 }

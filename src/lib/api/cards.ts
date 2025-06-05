@@ -13,7 +13,7 @@ export const fetchCards = async (): Promise<Card[]> => {
       imageUrl: '/sample-card-1.jpg',
       thumbnailUrl: '/sample-card-1-thumb.jpg',
       tags: ['sample', 'card'],
-      name: 'John Doe',
+      player: 'John Doe',
       team: 'Team A',
       year: '2023',
       userId: 'user1', // Add required userId
@@ -28,7 +28,7 @@ export const fetchCards = async (): Promise<Card[]> => {
       imageUrl: '/sample-card-2.jpg',
       thumbnailUrl: '/sample-card-2-thumb.jpg',
       tags: ['sample', 'card'],
-      name: 'Jane Smith',
+      player: 'Jane Smith',
       team: 'Team B',
       year: '2022',
       userId: 'user2', // Add required userId

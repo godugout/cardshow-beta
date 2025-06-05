@@ -1,3 +1,4 @@
+
 import { CardElement, ElementType, ElementCategory, ElementUploadMetadata } from '../types/cardElements';
 
 export class ElementUploader {
@@ -13,7 +14,7 @@ export class ElementUploader {
       category: metadata.category,
       title: metadata.title,
       name: metadata.fileName || metadata.title,
-      description: metadata.description,
+      description: metadata.title, // Use title as description fallback
       thumbnailUrl: assetUrl,
       assetUrl: assetUrl,
       tags: metadata.tags,
@@ -25,8 +26,15 @@ export class ElementUploader {
       downloadCount: 0,
       rating: 0,
       ratingCount: 0,
-      position: { x: 0, y: 0 },
-      size: { width: 100, height: 100 }
+      position: { x: 0, y: 0, z: 0 },
+      size: { 
+        width: 100, 
+        height: 100, 
+        scale: 1, 
+        aspectRatio: 1, 
+        preserveAspectRatio: true 
+      },
+      style: { opacity: 1 }
     };
 
     return element;

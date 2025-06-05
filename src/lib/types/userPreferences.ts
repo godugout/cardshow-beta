@@ -1,4 +1,3 @@
-
 import { CardTemplate } from './cardTypes';
 import { CardEffect } from './cardTypes';
 import { CardElement } from './cardElements';
@@ -9,6 +8,7 @@ export interface UserStyleProfile {
   preferredEffects: string[];
   favoriteTemplates: string[];
   favoriteElements: string[];
+  favoriteEffects: string[];
   styleCategories: string[];
   stylePreferences: {
     classicVsModern: number;
