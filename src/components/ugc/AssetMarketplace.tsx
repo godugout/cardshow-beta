@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { UGCAsset } from '@/lib/types/ugcTypes';
 import { ElementCategory, ElementType } from '@/lib/types/cardElements';
@@ -126,7 +127,7 @@ const AssetMarketplace: React.FC<AssetMarketplaceProps> = ({ onAssetSelect }) =>
               <h4 className="mb-2 text-sm font-medium">Asset Type</h4>
               <Select 
                 value={assetType || ""} 
-                onValueChange={(value) => setAssetType((value as ElementType) || undefined)}
+                onValueChange={(value) => setAssetType(value ? (value as ElementType) : undefined)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All types" />
@@ -146,7 +147,7 @@ const AssetMarketplace: React.FC<AssetMarketplaceProps> = ({ onAssetSelect }) =>
               <h4 className="mb-2 text-sm font-medium">Category</h4>
               <Select 
                 value={category || ""} 
-                onValueChange={(value) => setCategory((value as ElementCategory) || undefined)}
+                onValueChange={(value) => setCategory(value ? (value as ElementCategory) : undefined)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All categories" />
@@ -333,7 +334,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset, onClick }) => {
         <div className="flex justify-between items-center mt-1">
           <div className="flex items-center text-xs text-muted-foreground">
             <Tag className="h-3 w-3 mr-1" />
-            {asset.category || asset.assetType}
+            <span>{String(asset.category || asset.assetType)}</span>
           </div>
           
           {asset.marketplace?.isForSale ? (

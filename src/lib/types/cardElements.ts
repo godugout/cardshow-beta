@@ -1,135 +1,56 @@
 
 /**
- * Definition for card elements like stickers, logos, etc.
+ * Card Elements System Types
+ * Defines types for all card elements including stickers, logos, frames, etc.
  */
+
 export type ElementType = 'sticker' | 'logo' | 'frame' | 'badge' | 'overlay' | 'decoration';
-export type ElementCategoryType = string;
+
+export type ElementCategory = 'sports' | 'entertainment' | 'decorative' | 'seasonal';
 
 export interface CardElement {
   id: string;
-  name: string;
-  description?: string;
   type: ElementType;
-  category: ElementCategoryType;
-  url: string;
-  thumbnailUrl?: string;
-  assetUrl?: string;
-  tags: string[];
-  isOfficial?: boolean;
-  isPremium?: boolean;
-  price?: number;
-  userId?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  width?: number;
-  height?: number;
-  scale?: number;
-  position: { 
-    x: number; 
-    y: number;
-    z?: number; 
-    rotation?: number;
-  };
-  size: {
-    width: number;
-    height: number;
-    scale?: number;
-    aspectRatio?: number;
-    preserveAspectRatio?: boolean;
-  };
-  style?: Record<string, any>;
-  metadata?: Record<string, any>;
-}
-
-export interface ElementCategory {
-  id: string;
-  name: string;
+  category: ElementCategory;
+  title: string;
   description?: string;
-  count?: number;
-  tags?: string[];
-  thumbnailUrl?: string;
-}
-
-export interface ElementLibrary {
-  categories: ElementCategory[];
-  elements: Record<string, CardElement[]>;
-  featured: string[];
-  recentlyUsed: string[];
-}
-
-// Additional types for element system
-export interface StickerElement extends CardElement {
-  type: 'sticker';
-}
-
-export interface LogoElement extends CardElement {
-  type: 'logo';
-}
-
-export interface FrameElement extends CardElement {
-  type: 'frame';
-}
-
-export interface BadgeElement extends CardElement {
-  type: 'badge';
-}
-
-export interface OverlayElement extends CardElement {
-  type: 'overlay';
+  thumbnailUrl: string;
+  assetUrl: string;
+  tags: string[];
+  isOfficial: boolean;
+  isPremium: boolean;
+  createdAt: string;
+  updatedAt: string;
+  creatorId: string;
+  downloadCount: number;
+  rating: number;
+  ratingCount: number;
 }
 
 export interface ElementLibraryCollection {
   id: string;
   name: string;
+  description?: string;
+  category: ElementCategory;
   elements: CardElement[];
+  isOfficial: boolean;
+  createdAt: string;
 }
 
 export interface ElementUploadMetadata {
-  originalName: string;
-  size: number;
-  mimeType: string;
-  uploadedBy: string;
-  uploadedAt: string;
-  fileName?: string;
-  dimensions?: {
-    width: number;
-    height: number;
-  };
-  hasTransparency?: boolean;
-  isAnimated?: boolean;
-}
-
-export interface ElementPosition {
-  x: number;
-  y: number;
-  z?: number;
-  rotation?: number;
-}
-
-export interface ElementSize {
-  width: number;
-  height: number;
-  scale?: number;
+  title: string;
+  description?: string;
+  category: ElementCategory;
+  tags: string[];
+  isPublic: boolean;
 }
 
 export interface ElementTransform {
-  position: ElementPosition;
-  size: ElementSize;
-  rotation?: number;
-  opacity?: number;
-  translateX?: number;
-  translateY?: number;
-  rotate?: number;
-  scaleX?: number;
-  scaleY?: number;
-}
-
-export interface ElementPlacementOptions {
-  snapToGrid?: boolean;
-  gridSize?: number;
-  constrainToBounds?: boolean;
-  allowOverlap?: boolean;
-  position?: ElementPosition;
-  size?: ElementSize;
-  style?: Record<string, any>;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+  translateX: number;
+  translateY: number;
+  rotate: number;
+  scaleX: number;
+  scaleY: number;
 }
