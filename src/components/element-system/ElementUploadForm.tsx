@@ -81,7 +81,7 @@ const ElementUploadForm: React.FC<ElementUploadFormProps> = ({ onUpload, onCance
           Upload
         </Button>
       </div>
-    </div>
+    </form>
   );
 };
 
