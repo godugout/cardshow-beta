@@ -122,8 +122,7 @@ export class ElementLibrary {
 
     this.collections.set(id, { 
       ...collection, 
-      ...updates, 
-      updatedAt: new Date().toISOString() 
+      ...updates
     });
     return true;
   }
@@ -147,8 +146,7 @@ export class ElementLibrary {
     if (!collection.elementIds.includes(elementId)) {
       collection.elementIds.push(elementId);
       this.collections.set(collectionId, {
-        ...collection,
-        updatedAt: new Date().toISOString()
+        ...collection
       });
     }
     
@@ -167,8 +165,7 @@ export class ElementLibrary {
     
     collection.elementIds.splice(index, 1);
     this.collections.set(collectionId, {
-      ...collection,
-      updatedAt: new Date().toISOString()
+      ...collection
     });
     
     return true;
@@ -188,19 +185,25 @@ export class ElementLibrary {
       id,
       type,
       name: data.name,
+      title: data.title,
       assetUrl: data.assetUrl,
       thumbnailUrl: data.thumbnailUrl,
       description: data.description,
       tags: data.tags || [],
       category: data.category,
       isOfficial: data.isOfficial || false,
+      isPremium: data.isPremium || false,
       position: data.position,
       size: data.size,
       style: data.style,
       metadata: data.metadata,
       createdAt: now,
       updatedAt: now,
-      creatorId: data.creatorId
+      creatorId: data.creatorId,
+      downloadCount: data.downloadCount || 0,
+      rating: data.rating || 0,
+      ratingCount: data.ratingCount || 0,
+      url: data.url
     };
     
     let element: CardElement;

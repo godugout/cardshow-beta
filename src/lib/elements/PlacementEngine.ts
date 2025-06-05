@@ -1,4 +1,3 @@
-
 import { 
   CardElement, 
   ElementPosition, 
@@ -115,7 +114,7 @@ export class PlacementEngine {
     };
     
     // Preserve aspect ratio if enabled
-    if (preserveAspectRatio && element.size.aspectRatio > 0) {
+    if (preserveAspectRatio && element.size.aspectRatio && element.size.aspectRatio > 0) {
       if (newSize.width && !newSize.height) {
         size.height = newSize.width / element.size.aspectRatio;
       } else if (newSize.height && !newSize.width) {
@@ -134,11 +133,13 @@ export class PlacementEngine {
    */
   getElementTransform(element: CardElement): ElementTransform {
     return {
+      position: { x: element.position.x, y: element.position.y },
+      size: { width: element.size.width, height: element.size.height },
       translateX: element.position.x,
       translateY: element.position.y,
-      rotate: element.position.rotation,
-      scaleX: element.size.scale,
-      scaleY: element.size.scale
+      rotate: element.position.rotation || 0,
+      scaleX: element.size.scale || 1,
+      scaleY: element.size.scale || 1
     };
   }
   

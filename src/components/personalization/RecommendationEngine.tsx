@@ -27,7 +27,7 @@ interface RecommendationProps<T> {
   emptyMessage?: string;
 }
 
-function Recommendation<T extends { id: string; name: string }>({
+function Recommendation<T extends { id: string; title?: string; name?: string }>({
   title,
   description,
   items,
@@ -322,13 +322,13 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({
               <div className="flex items-center space-x-3">
                 <div className="h-10 w-10 rounded bg-accent flex items-center justify-center">
                   <img 
-                    src={element.thumbnailUrl || element.url} 
-                    alt={element.name}
+                    src={element.thumbnailUrl || element.assetUrl} 
+                    alt={element.title}
                     className="h-8 w-8 object-contain" 
                   />
                 </div>
                 <div>
-                  <h4 className="font-medium">{element.name}</h4>
+                  <h4 className="font-medium">{element.title}</h4>
                   <p className="text-xs text-muted-foreground">{element.category}</p>
                 </div>
               </div>

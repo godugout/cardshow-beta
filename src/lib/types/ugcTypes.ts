@@ -43,3 +43,25 @@ export interface CreatorProfile {
   createdAt: string;
   updatedAt: string;
 }
+
+// Add missing exports for moderation
+export type UGCModerationStatus = 'pending' | 'approved' | 'rejected' | 'flagged';
+
+export interface UGCReport {
+  id: string;
+  assetId: string;
+  reporterId: string;
+  reason: string;
+  details: string;
+  status: UGCModerationStatus;
+  createdAt: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  notes?: string;
+}
+
+export interface UGCModerationQueue {
+  pending: UGCAsset[];
+  flagged: UGCAsset[];
+  reports: UGCReport[];
+}

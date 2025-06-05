@@ -28,14 +28,9 @@ const ELEMENT_CATEGORIES = [
   'all', 
   'sports', 
   'entertainment', 
-  'achievement', 
   'decorative', 
   'seasonal', 
-  'holiday', 
-  'teams', 
-  'brands', 
-  'custom', 
-  'other'
+  'teams'
 ] as const;
 
 type ElementCategoryType = typeof ELEMENT_CATEGORIES[number];
@@ -91,7 +86,7 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
       const query = searchQuery.toLowerCase();
       filteredElements = filteredElements.filter(
         element => 
-          element.name.toLowerCase().includes(query) ||
+          element.title.toLowerCase().includes(query) ||
           element.tags.some(tag => tag.toLowerCase().includes(query)) ||
           (element.description && element.description.toLowerCase().includes(query))
       );
@@ -122,14 +117,9 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
     { value: 'all', label: 'All Categories' },
     { value: 'sports', label: 'Sports' },
     { value: 'entertainment', label: 'Entertainment' },
-    { value: 'achievement', label: 'Achievement' },
     { value: 'decorative', label: 'Decorative' },
     { value: 'seasonal', label: 'Seasonal' },
-    { value: 'holiday', label: 'Holiday' },
-    { value: 'teams', label: 'Teams' },
-    { value: 'brands', label: 'Brands' },
-    { value: 'custom', label: 'Custom' },
-    { value: 'other', label: 'Other' }
+    { value: 'teams', label: 'Teams' }
   ];
 
   return (
@@ -209,7 +199,7 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
                     {element.thumbnailUrl ? (
                       <img 
                         src={element.thumbnailUrl} 
-                        alt={element.name}
+                        alt={element.title}
                         className="max-w-full max-h-full object-contain"
                       />
                     ) : (
@@ -219,7 +209,7 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
                     )}
                   </div>
                   <div>
-                    <h3 className="font-medium text-sm truncate">{element.name}</h3>
+                    <h3 className="font-medium text-sm truncate">{element.title}</h3>
                     <div className="flex items-center gap-1 mt-1 flex-wrap">
                       <Badge 
                         variant={element.isOfficial ? "default" : "outline"}
@@ -253,45 +243,60 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
             onClick={() => {
               // Add some demo elements
               const demoSticker = elementLibrary.createElement('sticker', {
+                title: 'Star Sticker',
                 name: 'Star Sticker',
-                url: '/placeholder.svg',  // Add URL property to fix TypeScript error
                 assetUrl: '/placeholder.svg',
                 thumbnailUrl: '/placeholder.svg',
                 description: 'A sample star sticker',
                 tags: ['star', 'sample', 'decoration'],
                 category: 'decorative',
                 isOfficial: true,
+                isPremium: false,
                 position: { x: 0, y: 0 },
                 size: { width: 100, height: 100, scale: 1, aspectRatio: 1, preserveAspectRatio: true },
-                style: { opacity: 1 }
+                style: { opacity: 1 },
+                creatorId: 'demo',
+                downloadCount: 0,
+                rating: 0,
+                ratingCount: 0
               });
               
               const demoLogo = elementLibrary.createElement('logo', {
+                title: 'Sample Team Logo',
                 name: 'Sample Team Logo',
-                url: '/placeholder.svg',  // Add URL property to fix TypeScript error
                 assetUrl: '/placeholder.svg',
                 thumbnailUrl: '/placeholder.svg',
                 description: 'A sample team logo',
                 tags: ['team', 'logo', 'sports'],
                 category: 'teams',
                 isOfficial: true,
+                isPremium: false,
                 position: { x: 0, y: 0 },
                 size: { width: 120, height: 120, scale: 1, aspectRatio: 1, preserveAspectRatio: true },
-                style: { opacity: 1 }
+                style: { opacity: 1 },
+                creatorId: 'demo',
+                downloadCount: 0,
+                rating: 0,
+                ratingCount: 0
               });
               
               const demoFrame = elementLibrary.createElement('frame', {
+                title: 'Gold Frame',
                 name: 'Gold Frame',
-                url: '/placeholder.svg',  // Add URL property to fix TypeScript error
                 assetUrl: '/placeholder.svg',
                 thumbnailUrl: '/placeholder.svg',
                 description: 'A decorative gold frame',
                 tags: ['frame', 'gold', 'decoration'],
                 category: 'decorative',
                 isOfficial: true,
+                isPremium: false,
                 position: { x: 0, y: 0 },
                 size: { width: 300, height: 400, scale: 1, aspectRatio: 0.75, preserveAspectRatio: true },
-                style: { opacity: 1 }
+                style: { opacity: 1 },
+                creatorId: 'demo',
+                downloadCount: 0,
+                rating: 0,
+                ratingCount: 0
               });
               
               loadElements();
