@@ -1,8 +1,6 @@
-
-import { RecommendationItem, RecommendationType, UserStyleProfile } from '../types/userPreferences';
-import { CardTemplate } from '../types/templateTypes';
-import { CardElement } from '../types/cardElements';
-import { CardEffect } from '../types/cardTypes';
+import { Card, CardTemplate } from '@/lib/types/cardTypes';
+import { CardElement } from '@/lib/types/cardElements';
+import { UserStyleProfile } from '@/lib/types/ugcTypes';
 
 /**
  * Service that provides personalized recommendations
@@ -297,4 +295,39 @@ export class RecommendationService {
     
     return result.sort((a, b) => b.score - a.score);
   }
+
+  private analyzeUserTemplatePreferences(profile: UserStyleProfile): string[] {
+    // Use favoriteTemplates if available, otherwise infer from other preferences
+    if (profile.favoriteTemplates && profile.favoriteTemplates.length > 0) {
+      return profile.favoriteTemplates;
+    }
+
+    // Fallback: infer templates from style categories
+    const inferredTemplates: string[] = [];
+    
+    if (profile.styleCategories.includes('vintage')) {
+      inferredTemplates.push('vintage-baseball', 'classic-card');
+    }
+    
+    if (profile.styleCategories.includes('modern')) {
+      inferredTemplates.push('modern-sleek', 'chrome-finish');
+    }
+    
+    return inferredTemplates;
+  }
+
+  private calculateTemplateCompatibility(template: CardTemplate, preferences: string[]): number {
+    if (preferences.includes(template.id)) {
+      return 1.0;
+    }
+    
+    // Check category compatibility
+    if (preferences.some(pref => template.category.includes(pref))) {
+      return 0.7;
+    }
+    
+    return 0.3;
+  }
 }
+
+export const recommendationService = new RecommendationService();

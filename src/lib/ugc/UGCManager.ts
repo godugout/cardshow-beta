@@ -1,3 +1,4 @@
+
 import { UGCAsset, CreatorProfile, UGCModerationStatus } from '../types/ugcTypes';
 import { ModerationMetadata, MarketplaceMetadata, PerformanceMetrics } from '../types/ugcTypes';
 import { ElementType, ElementCategory } from '../types/cardElements';
@@ -73,7 +74,8 @@ export class UGCManager {
       isVerified: true,
       socialLinks: {
         twitter: '@johndoe',
-        instagram: '@johndoeart'
+        instagram: '@johndoeart',
+        website: 'https://johndoe.art'
       },
       createdAt: now,
       updatedAt: now
@@ -91,7 +93,8 @@ export class UGCManager {
       isVerified: false,
       socialLinks: {
         twitter: '@janesmithdesign',
-        instagram: '@janesmithdesign'
+        instagram: '@janesmithdesign',
+        website: 'https://janesmith.design'
       },
       createdAt: now,
       updatedAt: now
@@ -137,6 +140,38 @@ export class UGCManager {
     this.moderationQueue.push(newAsset);
 
     return newAsset;
+  }
+
+  async uploadAsset(
+    title: string,
+    description: string,
+    assetType: ElementType,
+    category: ElementCategory,
+    file: File,
+    creatorId: string
+  ): Promise<UGCAsset> {
+    // Mock file upload
+    const assetUrl = URL.createObjectURL(file);
+    const thumbnailUrl = assetUrl; // In real implementation, would generate thumbnail
+    
+    return this.submitAssetForReview(
+      title,
+      description,
+      assetType,
+      category,
+      assetUrl,
+      thumbnailUrl,
+      [],
+      creatorId
+    );
+  }
+
+  async getPublicAssets(category?: ElementCategory): Promise<UGCAsset[]> {
+    const assets = Array.from(this.assets.values());
+    if (category) {
+      return assets.filter(asset => asset.category === category && asset.isOfficial);
+    }
+    return assets.filter(asset => asset.isOfficial);
   }
 
   private async moderateAsset(assetId: string): Promise<void> {
@@ -231,7 +266,7 @@ export class UGCManager {
       frame: ['decorative', 'geometric', 'artistic'],
       badge: ['achievements', 'ranks', 'awards'],
       overlay: ['textures', 'patterns', 'effects'],
-      decoration: ['borders', 'corners', 'accents'] // Added decoration
+      decoration: ['borders', 'corners', 'accents']
     };
   }
 

@@ -1,3 +1,4 @@
+
 import { Reaction } from '@/lib/types/interaction';
 import { User, UserRole } from '@/lib/types/user';
 
@@ -23,9 +24,9 @@ export const reactionRepository = {
       cardId: data.cardId,
       collectionId: data.collectionId,
       commentId: data.commentId,
-      type: data.type!,
+      type: data.type as "like" | "love" | "wow" | "haha" | "sad" | "angry" || 'like',
       createdAt: data.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(), // Added updatedAt
+      updatedAt: new Date().toISOString(),
       user: data.user || {
         id: data.userId!,
         email: 'user@example.com',
@@ -41,7 +42,18 @@ export const reactionRepository = {
       targetId: data.targetId!
     };
 
-    mockReactions.push(reaction);
+    mockReactions.push({
+      id: reaction.id,
+      userId: reaction.userId,
+      cardId: reaction.cardId,
+      collectionId: reaction.collectionId,
+      commentId: reaction.commentId,
+      type: reaction.type,
+      createdAt: reaction.createdAt,
+      user: reaction.user!,
+      targetType: reaction.targetType,
+      targetId: reaction.targetId
+    });
     return reaction;
   },
 
@@ -52,9 +64,9 @@ export const reactionRepository = {
         id: r.id,
         userId: r.userId,
         cardId: r.cardId,
-        type: r.type,
+        type: r.type as "like" | "love" | "wow" | "haha" | "sad" | "angry",
         createdAt: r.createdAt,
-        updatedAt: new Date().toISOString(), // Added updatedAt
+        updatedAt: new Date().toISOString(),
         targetType: 'card',
         targetId: r.cardId!,
         user: {
@@ -71,6 +83,10 @@ export const reactionRepository = {
       }));
   },
 
+  async getAllByCardId(cardId: string): Promise<Reaction[]> {
+    return this.findByCardId(cardId);
+  },
+
   async findByCollectionId(collectionId: string): Promise<Reaction[]> {
     return mockReactions
       .filter(r => r.collectionId === collectionId)
@@ -78,7 +94,7 @@ export const reactionRepository = {
         id: r.id,
         userId: r.userId,
         collectionId: r.collectionId,
-        type: r.type,
+        type: r.type as "like" | "love" | "wow" | "haha" | "sad" | "angry",
         createdAt: r.createdAt,
         updatedAt: new Date().toISOString(),
         targetType: 'collection',
@@ -104,7 +120,7 @@ export const reactionRepository = {
         id: r.id,
         userId: r.userId,
         commentId: r.commentId,
-        type: r.type,
+        type: r.type as "like" | "love" | "wow" | "haha" | "sad" | "angry",
         createdAt: r.createdAt,
         updatedAt: new Date().toISOString(),
         targetType: 'comment',
@@ -130,6 +146,14 @@ export const reactionRepository = {
     }
   },
 
+  async remove(id: string): Promise<void> {
+    return this.delete(id);
+  },
+
+  async add(data: Partial<Reaction>): Promise<Reaction> {
+    return this.create(data);
+  },
+
   async findOne(id: string): Promise<Reaction | undefined> {
     const reaction = mockReactions.find(r => r.id === id);
     if (!reaction) return undefined;
@@ -140,7 +164,7 @@ export const reactionRepository = {
       cardId: reaction.cardId,
       collectionId: reaction.collectionId,
       commentId: reaction.commentId,
-      type: reaction.type,
+      type: reaction.type as "like" | "love" | "wow" | "haha" | "sad" | "angry",
       createdAt: reaction.createdAt,
       updatedAt: new Date().toISOString(),
       targetType: reaction.targetType,
