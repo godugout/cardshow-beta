@@ -8,7 +8,7 @@ export const useToast = () => {
   const showToast = (
     title: string, 
     description: string, 
-    variant: "success" | "error" | "warning" | "info" | "destructive" = "info", 
+    variant: ToastVariant = "info", 
     duration?: number
   ) => {
     toast({
@@ -24,7 +24,7 @@ export const useToast = () => {
     success: (title: string, description: string, duration?: number) => 
       showToast(title, description, "success", duration),
     error: (title: string, description: string, duration?: number) => 
-      showToast(title, description, "error", duration),
+      showToast(title, description, "destructive", duration),
     warning: (title: string, description: string, duration?: number) => 
       showToast(title, description, "warning", duration),
     info: (title: string, description: string, duration?: number) => 

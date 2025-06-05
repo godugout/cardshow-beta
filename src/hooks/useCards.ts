@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Card, Collection } from '@/lib/types';
@@ -95,6 +96,7 @@ export function useCards() {
       setError(error);
       
       toast({
+        id: Math.random().toString(36).substring(2, 9),
         title: 'Error loading cards',
         description: error.message || 'Failed to load your card collection',
         variant: 'destructive',
@@ -151,6 +153,7 @@ export function useCards() {
       const error = err as Error;
       console.error('Error creating card:', error);
       toast({
+        id: Math.random().toString(36).substring(2, 9),
         title: 'Error creating card',
         description: error.message,
         variant: 'destructive',
@@ -174,6 +177,7 @@ export function useCards() {
       const error = err as Error;
       console.error('Error updating card:', error);
       toast({
+        id: Math.random().toString(36).substring(2, 9),
         title: 'Error updating card',
         description: error.message,
         variant: 'destructive',
@@ -190,6 +194,7 @@ export function useCards() {
       const error = err as Error;
       console.error('Error deleting card:', error);
       toast({
+        id: Math.random().toString(36).substring(2, 9),
         title: 'Error deleting card',
         description: error.message,
         variant: 'destructive',
@@ -224,6 +229,7 @@ export function useCards() {
       const error = err as Error;
       console.error('Error creating collection:', error);
       toast({
+        id: Math.random().toString(36).substring(2, 9),
         title: 'Error creating collection',
         description: error.message,
         variant: 'destructive',

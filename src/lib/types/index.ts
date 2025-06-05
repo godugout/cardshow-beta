@@ -5,6 +5,7 @@
 
 // Base types
 export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+export type JsonObject = { [key: string]: JsonValue };
 
 export interface BaseEntity {
   id: string;
@@ -17,6 +18,7 @@ export * from './cardTypes';
 export * from './user';
 export * from './interaction';
 export * from './collection';
+export * from './cardElements';
 
 // Additional utility types
 export interface ApiResponse<T = any> {
@@ -32,6 +34,16 @@ export interface PaginatedResponse<T = any> extends ApiResponse<T[]> {
     total: number;
     totalPages: number;
   };
+}
+
+// Team Member interface
+export interface TeamMember {
+  id: string;
+  teamId: string;
+  userId: string;
+  role: 'owner' | 'admin' | 'member' | 'viewer';
+  joinedAt: string;
+  user?: any; // User type
 }
 
 // Instagram types

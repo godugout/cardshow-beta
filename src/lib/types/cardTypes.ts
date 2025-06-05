@@ -306,4 +306,3 @@ export const DEFAULT_MARKET_METADATA: MarketMetadata = {
   editionSize: 1,
   editionNumber: 1
 };
-

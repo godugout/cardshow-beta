@@ -30,7 +30,8 @@ export interface ToasterToastWithId extends ToasterToast {
   open: boolean;
 }
 
-// Create toast function
-export function createToast(props: ToastProps) {
+// Create toast function that returns proper ToastProps
+export function createToast(props: ToastProps): ToastProps {
   console.log('Toast:', props);
+  return props;
 }

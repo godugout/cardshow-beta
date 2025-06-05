@@ -56,3 +56,64 @@ export interface ElementLibrary {
   featured: string[];
   recentlyUsed: string[];
 }
+
+// Additional types for element system
+export interface StickerElement extends CardElement {
+  type: 'sticker';
+}
+
+export interface LogoElement extends CardElement {
+  type: 'logo';
+}
+
+export interface FrameElement extends CardElement {
+  type: 'frame';
+}
+
+export interface BadgeElement extends CardElement {
+  type: 'badge';
+}
+
+export interface OverlayElement extends CardElement {
+  type: 'overlay';
+}
+
+export interface ElementLibraryCollection {
+  id: string;
+  name: string;
+  elements: CardElement[];
+}
+
+export interface ElementUploadMetadata {
+  originalName: string;
+  size: number;
+  mimeType: string;
+  uploadedBy: string;
+  uploadedAt: string;
+}
+
+export interface ElementPosition {
+  x: number;
+  y: number;
+  z?: number;
+}
+
+export interface ElementSize {
+  width: number;
+  height: number;
+  scale?: number;
+}
+
+export interface ElementTransform {
+  position: ElementPosition;
+  size: ElementSize;
+  rotation?: number;
+  opacity?: number;
+}
+
+export interface ElementPlacementOptions {
+  snapToGrid?: boolean;
+  gridSize?: number;
+  constrainToBounds?: boolean;
+  allowOverlap?: boolean;
+}
