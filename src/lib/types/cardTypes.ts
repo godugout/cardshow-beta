@@ -1,4 +1,3 @@
-
 /**
  * Consolidated Card Types for Cardshow (CRD)
  * This file serves as the central source of truth for all card-related types
@@ -20,7 +19,7 @@ export interface CardStyle {
   template: string;      
   effect: string;        
   borderRadius: string;  
-  borderWidth?: number;
+  borderWidth?: number;  // Add borderWidth property
   borderColor: string;   
   backgroundColor?: string;
   shadowColor: string;   
@@ -130,7 +129,7 @@ export interface CardEffect {
 }
 
 /**
- * Card template definition for template system
+ * Card template definition for template system - CONSOLIDATED DEFINITION
  */
 export interface CardTemplate {
   id: string;
@@ -141,6 +140,7 @@ export interface CardTemplate {
   category: string;
   isOfficial?: boolean; 
   popularity?: number; 
+  tags?: string[]; // Add tags property
   designDefaults: {
     cardStyle: Partial<CardStyle>;
     textStyle?: Partial<TextStyle>;
@@ -252,7 +252,6 @@ export interface BaseCard extends BaseEntity {
   specialEffect?: string;
   
   // Design related
-  name?: string; 
   cardStyle?: string;
   backTemplate?: string;
   designMetadata: DesignMetadata;

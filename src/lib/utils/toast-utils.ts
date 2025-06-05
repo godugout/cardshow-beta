@@ -2,19 +2,19 @@
 import { toast } from 'sonner';
 
 export const toastUtils = {
-  success: (title: string, description?: string) => {
-    toast.success(title, { description });
+  success: (message: string) => {
+    toast.success(message);
   },
-  
-  error: (title: string, description?: string) => {
-    toast.error(title, { description });
+  error: (message: string) => {
+    toast.error(message);
   },
-  
-  info: (title: string, description?: string) => {
-    toast.info(title, { description });
+  info: (message: string) => {
+    toast.info(message);
   },
-  
-  warning: (title: string, description?: string) => {
-    toast.warning(title, { description });
+  warning: (message: string) => {
+    toast.warning(message);
   }
 };
+
+// Named export for compatibility
+export { toastUtils as default };

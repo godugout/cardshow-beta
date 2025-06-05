@@ -245,6 +245,7 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
               const demoSticker = elementLibrary.createElement('sticker', {
                 title: 'Star Sticker',
                 name: 'Star Sticker',
+                imageUrl: '/placeholder.svg', // Add required imageUrl
                 assetUrl: '/placeholder.svg',
                 thumbnailUrl: '/placeholder.svg',
                 description: 'A sample star sticker',
@@ -264,6 +265,7 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
               const demoLogo = elementLibrary.createElement('logo', {
                 title: 'Sample Team Logo',
                 name: 'Sample Team Logo',
+                imageUrl: '/placeholder.svg', // Add required imageUrl
                 assetUrl: '/placeholder.svg',
                 thumbnailUrl: '/placeholder.svg',
                 description: 'A sample team logo',
@@ -283,6 +285,7 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
               const demoFrame = elementLibrary.createElement('frame', {
                 title: 'Gold Frame',
                 name: 'Gold Frame',
+                imageUrl: '/placeholder.svg', // Add required imageUrl
                 assetUrl: '/placeholder.svg',
                 thumbnailUrl: '/placeholder.svg',
                 description: 'A decorative gold frame',

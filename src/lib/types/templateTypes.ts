@@ -10,6 +10,7 @@ export interface CardTemplate {
   category: string;
   isOfficial?: boolean;
   popularity?: number;
+  tags?: string[]; // Add tags property
   designDefaults?: { // Optional in this version
     cardStyle: Partial<CardStyle>;
     textStyle?: Partial<TextStyle>;

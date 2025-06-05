@@ -37,7 +37,7 @@ export interface CardElement {
   description?: string;
   type: ElementType;
   category: ElementCategory;
-  imageUrl: string;
+  imageUrl: string; // Required property
   thumbnailUrl: string;
   assetUrl: string; // Add primary asset URL
   url?: string; // Keep as fallback
@@ -76,6 +76,7 @@ export interface ElementCollection {
 
 export interface ElementUploadMetadata {
   title: string;
+  description?: string; // Add description property
   category: ElementCategory;
   tags: string[];
   isPublic: boolean;
