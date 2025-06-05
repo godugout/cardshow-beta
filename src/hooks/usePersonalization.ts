@@ -1,213 +1,84 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { PersonalizationService } from '@/lib/services/personalizationService';
-import { RecommendationService } from '@/lib/services/recommendationService';
-import { UserPreferences, ColorPalette, WorkflowConfig, BrandProfile, RecommendationItem, UserStyleProfile } from '@/lib/types/userPreferences';
+import { useState, useEffect } from 'react';
 import { CardTemplate } from '@/lib/types/templateTypes';
-import { CardEffect } from '@/lib/types/cardTypes';
 import { CardElement } from '@/lib/types/cardElements';
+import { UserStyleProfile, RecommendationItem } from '@/lib/types/userPreferences';
+import { personalizationService } from '@/lib/services/personalizationService';
+import { templateLibrary } from '@/components/card-templates/TemplateLibrary';
 
-/**
- * Hook to access and manage user personalization features
- */
-export function usePersonalization() {
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [preferences, setPreferences] = useState<UserPreferences | null>(null);
-  const [activeBrandProfile, setActiveBrandProfile] = useState<BrandProfile | null>(null);
+export function usePersonalization(userId?: string) {
   const [styleProfile, setStyleProfile] = useState<UserStyleProfile | null>(null);
-  
-  // Create services - use a dummy user ID if not authenticated
-  const userId = user?.id || 'guest-user';
-  const personalizationService = new PersonalizationService(userId);
-  const recommendationService = new RecommendationService(styleProfile);
-  
-  // Load personalization data
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    async function loadPersonalizationData() {
-      setLoading(true);
-      try {
-        const prefs = await personalizationService.loadUserPreferences();
-        setPreferences(prefs);
-        
-        // Load active brand profile if there is one
-        if (prefs.activeBrandProfileId) {
-          const profile = await personalizationService.getActiveBrandProfile();
-          setActiveBrandProfile(profile);
+    if (userId) {
+      loadStyleProfile();
+    }
+  }, [userId]);
+
+  const loadStyleProfile = async () => {
+    if (!userId) return;
+    
+    setIsLoading(true);
+    try {
+      const profile = await personalizationService.getUserStyleProfile(userId);
+      setStyleProfile(profile);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load style profile');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updatePreferences = async (updates: Partial<UserStyleProfile>) => {
+    if (!userId || !styleProfile) return;
+    
+    try {
+      const updatedProfile = await personalizationService.updateStyleProfile(userId, updates);
+      setStyleProfile(updatedProfile);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update preferences');
+    }
+  };
+
+  const getRecommendedTemplates = (limit: number = 5): RecommendationItem<CardTemplate>[] => {
+    const allTemplates = templateLibrary.getAllTemplates();
+    
+    // Convert to the expected type structure
+    return allTemplates.slice(0, limit).map(template => ({
+      item: {
+        ...template,
+        thumbnail: template.thumbnail || '/placeholder.jpg', // Ensure thumbnail is present
+        designDefaults: template.designDefaults || { // Ensure designDefaults is present
+          cardStyle: {
+            template: 'classic',
+            effect: 'none',
+            borderRadius: '8px',
+            borderColor: '#000000',
+            frameColor: '#000000',
+            frameWidth: 2,
+            shadowColor: 'rgba(0,0,0,0.2)'
+          }
         }
-      } catch (error) {
-        console.error('Failed to load personalization data:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    
-    loadPersonalizationData();
-  }, [user?.id]);
-  
-  /**
-   * Toggle favorite status for an item
-   */
-  const toggleFavorite = useCallback(async (
-    type: 'template' | 'effect' | 'element',
-    itemId: string
-  ): Promise<boolean> => {
-    const result = await personalizationService.toggleFavorite(type, itemId);
-    
-    // Update local preferences
-    const updatedPrefs = await personalizationService.loadUserPreferences();
-    setPreferences(updatedPrefs);
-    
-    return result;
-  }, [personalizationService]);
-  
-  /**
-   * Create a new color palette
-   */
-  const createColorPalette = useCallback(async (
-    palette: Omit<ColorPalette, 'id' | 'isSystem' | 'createdAt' | 'updatedAt'>
-  ): Promise<ColorPalette> => {
-    const result = await personalizationService.createColorPalette(palette);
-    
-    // Update local preferences
-    const updatedPrefs = await personalizationService.loadUserPreferences();
-    setPreferences(updatedPrefs);
-    
-    return result;
-  }, [personalizationService]);
-  
-  /**
-   * Create a new brand profile
-   */
-  const createBrandProfile = useCallback(async (
-    profile: Omit<BrandProfile, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<BrandProfile> => {
-    const result = await personalizationService.createBrandProfile(profile);
-    
-    // Update local preferences
-    const updatedPrefs = await personalizationService.loadUserPreferences();
-    setPreferences(updatedPrefs);
-    
-    // If this is the new active profile, update that too
-    if (updatedPrefs.activeBrandProfileId === result.id) {
-      setActiveBrandProfile(result);
-    }
-    
-    return result;
-  }, [personalizationService]);
-  
-  /**
-   * Set active brand profile
-   */
-  const setActiveBrand = useCallback(async (profileId: string): Promise<void> => {
-    await personalizationService.setActiveBrandProfile(profileId);
-    
-    // Update active profile
-    const profile = await personalizationService.getActiveBrandProfile();
-    setActiveBrandProfile(profile);
-    
-    // Update local preferences
-    const updatedPrefs = await personalizationService.loadUserPreferences();
-    setPreferences(updatedPrefs);
-  }, [personalizationService]);
-  
-  /**
-   * Record a card creation in history
-   */
-  const recordCardCreation = useCallback(async (
-    cardId: string,
-    templateId: string | undefined,
-    effectsUsed: string[],
-    elementsUsed: string[],
-    timeSpent: number
-  ): Promise<void> => {
-    await personalizationService.addToHistory({
-      cardId,
-      templateId,
-      effectsUsed,
-      elementsUsed,
-      timeSpent
-    });
-    
-    // Update local preferences
-    const updatedPrefs = await personalizationService.loadUserPreferences();
-    setPreferences(updatedPrefs);
-  }, [personalizationService]);
-  
-  /**
-   * Get template recommendations
-   */
-  const getTemplateRecommendations = useCallback(async (
-    imageUrl: string,
-    availableTemplates: CardTemplate[]
-  ): Promise<RecommendationItem<CardTemplate>[]> => {
-    return recommendationService.getTemplateRecommendations(imageUrl, availableTemplates);
-  }, [recommendationService]);
-  
-  /**
-   * Get effect recommendations
-   */
-  const getEffectRecommendations = useCallback(async (
-    imageUrl: string,
-    availableEffects: CardEffect[]
-  ): Promise<RecommendationItem<CardEffect>[]> => {
-    return recommendationService.getEffectRecommendations(imageUrl, availableEffects);
-  }, [recommendationService]);
-  
-  /**
-   * Get element recommendations
-   */
-  const getElementRecommendations = useCallback(async (
-    context: {
-      imageUrl: string;
-      templateId?: string;
-      cardTitle?: string;
-      tags?: string[];
-    },
-    availableElements: CardElement[]
-  ): Promise<RecommendationItem<CardElement>[]> => {
-    return recommendationService.getElementRecommendations(context, availableElements);
-  }, [recommendationService]);
-  
-  /**
-   * Get color recommendations based on image
-   */
-  const getColorRecommendations = useCallback(async (
-    imageUrl: string
-  ): Promise<string[][]> => {
-    return recommendationService.getColorRecommendations(imageUrl);
-  }, [recommendationService]);
-  
-  /**
-   * Update workflow configuration
-   */
-  const updateWorkflow = useCallback(async (
-    updates: Partial<WorkflowConfig>
-  ): Promise<WorkflowConfig> => {
-    const result = await personalizationService.updateWorkflowConfig(updates);
-    
-    // Update local preferences
-    const updatedPrefs = await personalizationService.loadUserPreferences();
-    setPreferences(updatedPrefs);
-    
-    return result;
-  }, [personalizationService]);
-  
+      },
+      score: Math.random(), // Mock scoring
+      reason: 'Based on your preferences'
+    }));
+  };
+
+  const getRecommendedElements = (limit: number = 5): RecommendationItem<CardElement>[] => {
+    // Mock implementation
+    return [];
+  };
+
   return {
-    loading,
-    preferences,
-    activeBrandProfile,
     styleProfile,
-    toggleFavorite,
-    createColorPalette,
-    createBrandProfile,
-    setActiveBrand,
-    recordCardCreation,
-    getTemplateRecommendations,
-    getEffectRecommendations,
-    getElementRecommendations,
-    getColorRecommendations,
-    updateWorkflow
+    isLoading,
+    error,
+    updatePreferences,
+    getRecommendedTemplates,
+    getRecommendedElements,
+    loadStyleProfile
   };
 }

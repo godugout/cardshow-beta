@@ -1,18 +1,5 @@
 
 import { CardTemplate } from "@/lib/types/templateTypes";
-import { MarketMetadata } from "@/lib/types/cardTypes";
-
-// Default market metadata object that matches the required interface
-const defaultMarketMetadata: MarketMetadata = {
-  isPrintable: false,
-  isForSale: false,
-  includeInCatalog: false,
-  price: 0,
-  currency: 'USD',
-  availableForSale: false,
-  editionSize: 1,
-  editionNumber: 1
-};
 
 // Sample templates for development
 const templates: CardTemplate[] = [
@@ -43,17 +30,7 @@ const templates: CardTemplate[] = [
         descriptionColor: "#333333"
       },
       effects: []
-    },
-    cardStyle: {
-      template: "classic",
-      effect: "none",
-      borderRadius: "8px",
-      borderColor: "#000000",
-      shadowColor: "rgba(0,0,0,0.2)",
-      frameWidth: 4,
-      frameColor: "#e0e0e0"
-    },
-    marketMetadata: defaultMarketMetadata
+    }
   },
   {
     id: "modern-premium",
@@ -82,17 +59,7 @@ const templates: CardTemplate[] = [
         descriptionColor: "#cccccc"
       },
       effects: ["holographic"]
-    },
-    cardStyle: {
-      template: "modern",
-      effect: "chrome",
-      borderRadius: "16px",
-      borderColor: "#1a1a1a",
-      shadowColor: "rgba(0,0,0,0.4)",
-      frameWidth: 2,
-      frameColor: "#888888"
-    },
-    marketMetadata: defaultMarketMetadata
+    }
   },
   {
     id: "vintage-throwback",
@@ -121,17 +88,7 @@ const templates: CardTemplate[] = [
         descriptionColor: "#6b5b4c"
       },
       effects: ["vintage"]
-    },
-    cardStyle: {
-      template: "vintage",
-      effect: "vintage",
-      borderRadius: "4px",
-      borderColor: "#d8c9a3",
-      shadowColor: "rgba(139,69,19,0.3)",
-      frameWidth: 6,
-      frameColor: "#d8c9a3"
-    },
-    marketMetadata: defaultMarketMetadata
+    }
   }
 ];
 

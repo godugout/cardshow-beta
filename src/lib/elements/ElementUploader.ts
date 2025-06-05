@@ -14,7 +14,8 @@ export class ElementUploader {
       category: metadata.category,
       title: metadata.title,
       name: metadata.fileName || metadata.title,
-      description: metadata.title, // Use title as description fallback
+      description: metadata.description || metadata.title, // Use description or title as fallback
+      imageUrl: assetUrl, // Required property
       thumbnailUrl: assetUrl,
       assetUrl: assetUrl,
       tags: metadata.tags,
@@ -43,6 +44,7 @@ export class ElementUploader {
   private async extractMetadata(file: File): Promise<Partial<ElementUploadMetadata>> {
     return {
       title: file.name.split('.')[0],
+      description: `Uploaded element: ${file.name}`,
       category: 'decorative',
       tags: [],
       isPublic: false,

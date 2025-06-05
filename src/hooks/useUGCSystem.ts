@@ -15,10 +15,6 @@ interface ModerationStats {
   approved: number;
   rejected: number;
   flagged: number;
-  pendingCount: number; // Add alias
-  openReports: number; // Add alias  
-  approvedCount: number; // Add alias
-  rejectedCount: number; // Add alias
 }
 
 interface ModerationReport {
@@ -26,16 +22,8 @@ interface ModerationReport {
   assetId: string;
   reporterId: string;
   reason: string;
-  details: string; // Add missing property
-  status: string; // Add missing property
-  createdAt: string;
-}
-
-interface PendingReport {
-  id: string;
-  assetId: string;
-  reporterId: string;
-  reason: string;
+  details: string;
+  status: 'pending' | 'reviewed' | 'resolved';
   createdAt: string;
 }
 
@@ -85,11 +73,7 @@ export function useUGCSystem() {
       pending: 5,
       approved: 150,
       rejected: 10,
-      flagged: 2,
-      pendingCount: 5,
-      openReports: 2,
-      approvedCount: 150,
-      rejectedCount: 10
+      flagged: 2
     });
     const [isLoading, setIsLoading] = useState(false);
 
@@ -108,10 +92,6 @@ export function useUGCSystem() {
     console.log(`Moderating asset ${assetId} with action: ${action}`, reason);
     return Promise.resolve();
   };
-
-  // Add mutation-like properties for compatibility
-  moderateAsset.mutateAsync = moderateAsset;
-  moderateAsset.isPending = false;
 
   return { 
     usePublicAssets, 

@@ -1,3 +1,4 @@
+
 import { Card } from '@/lib/types/cardTypes';
 
 // Sample cards for development
@@ -282,3 +283,9 @@ export const sampleCards: Card[] = [
     updatedAt: '2023-01-06T00:00:00Z'
   }
 ];
+
+// Export cardData for backward compatibility
+export const cardData = sampleCards;
+
+// Export default for backward compatibility
+export default sampleCards;
