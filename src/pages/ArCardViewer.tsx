@@ -49,14 +49,14 @@ const ArCardViewer = () => {
         activeCards={arCards}
         availableCards={availableCards}
         onExitAr={handleExitAr}
-        onCameraError={handleCameraError}
+        onCameraError={(errorMsg: string) => handleCameraError(errorMsg)}
         onTakeSnapshot={handleTakeSnapshot}
         onFlip={handleFlip}
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         onRotate={handleRotate}
-        onAddCard={handleAddCard}
-        onRemoveCard={handleRemoveCard}
+        onAddCard={(cardId: string) => handleAddCard(cardId)}
+        onRemoveCard={(cardId: string) => handleRemoveCard(cardId)}
       />
     );
   }

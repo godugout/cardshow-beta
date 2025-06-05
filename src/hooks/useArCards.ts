@@ -1,8 +1,9 @@
 
 import { useState } from 'react';
 import { Card } from '@/lib/types/cardTypes';
+import { sampleCards } from '@/lib/sampleCards';
 
-export function useArCards(initialCards: Card[] = []) {
+export function useArCards(initialCards: Card[] = sampleCards) {
   const [cards] = useState<Card[]>(initialCards);
   const [currentCard, setCurrentCard] = useState<Card | null>(initialCards[0] || null);
   const [loading, setLoading] = useState(false);
@@ -11,7 +12,9 @@ export function useArCards(initialCards: Card[] = []) {
   // AR-specific state
   const [isArMode, setIsArMode] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [cameraError, setCameraError] = useState<Error | null>(null);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [arCards, setArCards] = useState<Card[]>([]);
+  const [availableCards, setAvailableCards] = useState<Card[]>(initialCards);
 
   const nextCard = () => {
     if (!currentCard) return;
@@ -30,14 +33,26 @@ export function useArCards(initialCards: Card[] = []) {
   // AR-specific methods
   const handleLaunchAr = () => setIsArMode(true);
   const handleExitAr = () => setIsArMode(false);
-  const handleCameraError = (error: Error) => setCameraError(error);
+  const handleCameraError = (errorMsg: string) => setCameraError(errorMsg);
   const handleTakeSnapshot = () => console.log('Taking snapshot');
   const handleFlip = () => setIsFlipped(!isFlipped);
   const handleZoomIn = () => console.log('Zooming in');
   const handleZoomOut = () => console.log('Zooming out');
   const handleRotate = () => console.log('Rotating');
-  const handleAddCard = () => console.log('Adding card');
-  const handleRemoveCard = () => console.log('Removing card');
+  const handleAddCard = (cardId: string) => {
+    const card = availableCards.find(c => c.id === cardId);
+    if (card) {
+      setArCards(prev => [...prev, card]);
+      setAvailableCards(prev => prev.filter(c => c.id !== cardId));
+    }
+  };
+  const handleRemoveCard = (cardId: string) => {
+    const card = arCards.find(c => c.id === cardId);
+    if (card) {
+      setArCards(prev => prev.filter(c => c.id !== cardId));
+      setAvailableCards(prev => [...prev, card]);
+    }
+  };
 
   return {
     // Basic card navigation
@@ -50,8 +65,8 @@ export function useArCards(initialCards: Card[] = []) {
     
     // AR-specific properties
     activeCard: currentCard,
-    arCards: cards,
-    availableCards: cards,
+    arCards,
+    availableCards,
     isArMode,
     isFlipped,
     cameraError,
