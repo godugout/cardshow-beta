@@ -12,8 +12,8 @@ import FanDashboard from '@/components/dashboard/FanDashboard';
 const Dashboard: React.FC = () => {
   const auth = useAuth();
   const user = auth.user;
-  // Check for loading in either auth context format
-  const isLoading = auth.loading || auth.isLoading || false;
+  // Fixed property name
+  const isLoading = auth.isLoading || false;
   
   const [dashboardUser, setDashboardUser] = useState<User | null>(null);
   const [dashboardLoaded, setDashboardLoaded] = useState(false);
@@ -34,11 +34,11 @@ const Dashboard: React.FC = () => {
           email: user.email,
           name: user.name,
           displayName: user.displayName,
-          role: user.role,
-          permissions: user.permissions as UserPermission[],
+          role: user.role || UserRole.USER, // Fixed with fallback
+          permissions: (user.permissions || []) as UserPermission[],
           avatarUrl: user.avatarUrl,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
+          createdAt: user.createdAt || new Date().toISOString(), // Fixed with fallback
+          updatedAt: user.updatedAt || new Date().toISOString(), // Fixed with fallback
         };
         setDashboardUser(compatibleUser);
       } else {

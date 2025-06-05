@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useTransition } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/navigation/PageLayout';
@@ -40,7 +39,6 @@ const Gallery = () => {
     setShowTutorial(false);
     
     toast({
-      variant: "info",
       title: "Tutorial completed",
       description: "You can access help anytime via the info icon",
     });
@@ -57,7 +55,6 @@ const Gallery = () => {
     const hasSeenViewer = localStorage.getItem('hasSeenViewerTutorial');
     if (!hasSeenViewer) {
       toast({
-        variant: "info",
         title: "Tip: Interactive Card Viewer",
         description: "Try dragging the card or using the effect controls for an immersive experience",
       });
@@ -72,6 +69,7 @@ const Gallery = () => {
   };
   
   if (isFullscreen && selectedCardId) {
+    const selectedCard = (cards || []).find(c => c.id === selectedCardId);
     return (
       <React.Suspense fallback={
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
@@ -79,7 +77,7 @@ const Gallery = () => {
         </div>
       }>
         <FullscreenViewer 
-          cardId={selectedCardId} 
+          card={selectedCard} 
           onClose={handleCloseFullscreen}
         />
       </React.Suspense>
