@@ -1,5 +1,27 @@
 
 import { Card as CardType } from '../types/cardTypes';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
+
+/**
+ * Adapts any card-like object to the current Card type
+ */
+export function adaptToCard(card: any): CardType {
+  return {
+    id: card.id || '',
+    title: card.title || '',
+    description: card.description || '',
+    imageUrl: card.imageUrl || '',
+    thumbnailUrl: card.thumbnailUrl || card.imageUrl || '',
+    tags: card.tags || [],
+    userId: card.userId || '',
+    createdAt: card.createdAt || new Date().toISOString(),
+    updatedAt: card.updatedAt || new Date().toISOString(),
+    effects: card.effects || [],
+    designMetadata: card.designMetadata || DEFAULT_DESIGN_METADATA,
+    // Include any other properties from the original card
+    ...card
+  };
+}
 
 /**
  * Adapts legacy card data to the current Card type

@@ -1,4 +1,3 @@
-
 /**
  * Consolidated Card Types for Cardshow (CRD)
  * This file serves as the central source of truth for all card-related types
@@ -6,6 +5,20 @@
 
 import { BaseEntity, JsonValue } from './index';
 import { User } from './user';
+
+/**
+ * Hotspot data for interactive cards
+ */
+export interface HotspotData {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  content: string;
+  type: 'text' | 'link' | 'image' | 'video';
+  visible: boolean;
+}
 
 /**
  * Fabric Swatch definition for card memorabilia
