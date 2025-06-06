@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/types/cardTypes';
 
 interface CardCreatorProps {
   onComplete?: (card: any) => void;
@@ -58,17 +58,7 @@ const CardCreator: React.FC<CardCreatorProps> = ({ onComplete }) => {
         imageUrl: imagePreview,
         thumbnailUrl: imagePreview,
         tags: [],
-        designMetadata: {
-          ...DEFAULT_DESIGN_METADATA,
-          cardStyle: {
-            ...DEFAULT_DESIGN_METADATA.cardStyle,
-            effect: 'classic',
-            borderRadius: '8px'
-          },
-          textStyle: {
-            ...DEFAULT_DESIGN_METADATA.textStyle
-          }
-        }
+        designMetadata: DEFAULT_DESIGN_METADATA
       });
       
       toast.success('Card created successfully!');

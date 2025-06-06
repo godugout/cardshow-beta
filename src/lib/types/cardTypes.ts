@@ -4,7 +4,7 @@ import { JsonValue } from './index';
 export interface Reaction {
   id: string;
   userId: string;
-  type: 'like' | 'dislike' | 'love' | 'haha' | 'wow' | 'sad' | 'angry';
+  type: 'like' | 'love' | 'haha' | 'wow' | 'sad' | 'angry';
   createdAt: string;
   targetType: 'card' | 'comment' | 'collection';
   targetId: string;
@@ -106,6 +106,8 @@ export interface CardEffect {
   type: string;
   settings: Record<string, any>;
   enabled: boolean;
+  iconUrl?: string;
+  description?: string;
 }
 
 export interface HotspotData {
@@ -181,6 +183,7 @@ export interface CardMetadata {
   manufacturer?: string;
   setName?: string;
   cardNumber?: string;
+  artist?: string;
 }
 
 export interface OaklandMemoryMetadata {
@@ -195,6 +198,9 @@ export interface OaklandMemoryMetadata {
   teamId?: string;
   historicalContext?: string;
   personalSignificance?: string;
+  title?: string;
+  tags?: string[];
+  imageUrl?: string;
 }
 
 export interface DesignMetadata {
@@ -208,11 +214,15 @@ export interface DesignMetadata {
   effectClasses?: string;
 }
 
-export interface CardDesignMetadata extends DesignMetadata {
+export interface CardDesignMetadata {
   cardStyle: CardStyle;
   textStyle: TextStyle;
   marketMetadata: MarketMetadata;
   cardMetadata: CardMetadata;
+  oaklandMemory?: OaklandMemoryMetadata;
+  effects?: string[];
+  effectSettings?: Record<string, any>;
+  effectClasses?: string;
 }
 
 export interface Card {
@@ -282,16 +292,26 @@ export interface CardTemplate {
 }
 
 export interface EnhancedCard extends Card {
-  id: string;
-  title: string;
-  imageUrl: string;
-  description?: string;
-  tags: string[];
-  userId: string;
-  effects: string[];
-  createdAt: string;
-  updatedAt: string;
-  designMetadata: CardDesignMetadata;
+  // EnhancedCard now properly extends Card with all base properties
+  seriesId?: string; 
+  deckId?: string;
+  specialFeatures?: string[];
+  interactiveElements?: string[];
+  graded?: boolean;
+  gradingService?: string;
+  gradingScore?: string;
+  hotspots?: HotspotData[];
+  backSideImage?: string;
+  edition?: number;
+  editionSize?: number;
+  releaseDate?: string;
+  qrCodeData?: string;
+  marketData?: {
+    price?: number;
+    currency?: string;
+    lastSoldPrice?: number;
+    availableForSale?: boolean;
+  };
 }
 
 // Default values
