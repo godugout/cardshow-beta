@@ -51,15 +51,15 @@ export interface CardStats {
  * Card style definition for visual appearance
  */
 export interface CardStyle {
-  template: string;      // Required
-  effect: string;        // Required
-  borderRadius: string;  // Required
+  template: string;
+  effect: string;
+  borderRadius: string;
   borderWidth?: number;
-  borderColor: string;   // Required
+  borderColor: string;
   backgroundColor?: string;
-  shadowColor: string;   // Required
-  frameWidth: number;    // Required
-  frameColor: string;    // Required
+  shadowColor: string;
+  frameWidth: number;
+  frameColor: string;
   [key: string]: JsonValue | undefined;
 }
 
@@ -71,10 +71,10 @@ export interface TextStyle {
   fontSize?: string;
   fontWeight?: string;
   color?: string;
-  titleColor: string;      // Required
-  titleAlignment: string;  // Required
-  titleWeight: string;     // Required
-  descriptionColor: string; // Required
+  titleColor: string;
+  titleAlignment: string;
+  titleWeight: string;
+  descriptionColor: string;
   [key: string]: JsonValue | undefined;
 }
 
@@ -144,9 +144,9 @@ export interface MarketMetadata {
   lastSoldPrice?: number;
   currentAskingPrice?: number;
   estimatedMarketValue?: number;
-  isPrintable?: boolean;      // Made optional for compatibility
-  isForSale?: boolean;        // Made optional for compatibility
-  includeInCatalog?: boolean; // Made optional for compatibility
+  isPrintable?: boolean;
+  isForSale?: boolean;
+  includeInCatalog?: boolean;
   price?: number;
   currency?: string;
   availableForSale?: boolean;
@@ -163,9 +163,9 @@ export interface CardMetadata {
   serialNumber?: string;
   certification?: string;
   gradeScore?: string;
-  category?: string;      // Made optional for compatibility
-  series?: string;        // Made optional for compatibility
-  cardType?: string;      // Made optional for compatibility
+  category?: string;
+  series?: string;
+  cardType?: string;
   cardStyle?: CardStyle;
   textStyle?: TextStyle;
   effects?: string[];
@@ -250,10 +250,10 @@ export interface Comment {
  */
 export interface Card extends BaseEntity {
   title: string;
-  description: string; // Made required to fix compatibility issue with other components
+  description: string;
   imageUrl: string;
-  image?: string; // Legacy support for older components
-  thumbnailUrl?: string; // Made optional for compatibility
+  image?: string;
+  thumbnailUrl: string;
   tags: string[];
   collectionId?: string;
   userId: string;
@@ -273,16 +273,16 @@ export interface Card extends BaseEntity {
   set?: string;
   cardNumber?: string;
   cardType?: string;
-  artist?: string; // For backward compatibility
+  artist?: string;
   backgroundColor?: string;
-  textColor?: string; // Added for data compatibility
+  textColor?: string;
   specialEffect?: string;
   fabricSwatches?: FabricSwatch[];
   stats?: CardStats;
-  position?: string; // Added to fix sample data errors
+  position?: string;
   
   // Design related
-  name?: string; // Legacy support
+  name?: string;
   cardStyle?: string;
   backTemplate?: string;
   designMetadata: DesignMetadata;
@@ -292,7 +292,7 @@ export interface Card extends BaseEntity {
   estimatedValue?: string;
   condition?: string;
   rarity?: CardRarity;
-  gradingScore?: number; // Changed to number for consistency
+  gradingScore?: number;
   
   // Additional fields needed by some components
   creatorId?: string;
@@ -308,10 +308,10 @@ export interface CardTemplate {
   name: string;
   description?: string;
   thumbnail: string;
-  thumbnailUrl?: string; // Added for backward compatibility
+  thumbnailUrl?: string;
   category: string;
-  isOfficial?: boolean; // Added for filtering
-  popularity?: number; // Added for sorting
+  isOfficial?: boolean;
+  popularity?: number;
   designDefaults: {
     cardStyle: Partial<CardStyle>;
     textStyle?: Partial<TextStyle>;

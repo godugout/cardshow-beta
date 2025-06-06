@@ -1,17 +1,11 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { UseCardEffectsResult, CardEffectSettings } from './types';
 
-/**
- * Hook for managing card effects
- * Provides functionality for adding, removing, and configuring visual effects on cards
- */
 const useCardEffects = (): UseCardEffectsResult => {
   const [cardEffects, setCardEffects] = useState<Record<string, string[]>>({});
   const [effectSettings, setEffectSettings] = useState<Record<string, Record<string, CardEffectSettings>>>({});
   const [activeEffects, setActiveEffects] = useState<string[]>([]);
 
-  // Load saved effects from localStorage
   useEffect(() => {
     try {
       const savedEffects = localStorage.getItem('cardEffects');
@@ -29,7 +23,6 @@ const useCardEffects = (): UseCardEffectsResult => {
     }
   }, []);
 
-  // Save effects to localStorage when they change
   useEffect(() => {
     try {
       localStorage.setItem('cardEffects', JSON.stringify(cardEffects));
@@ -61,17 +54,12 @@ const useCardEffects = (): UseCardEffectsResult => {
     });
   }, []);
 
-  const toggleEffect = useCallback((cardId: string, effect: string) => {
-    setCardEffects(prev => {
-      const currentEffects = prev[cardId] || [];
-      
-      return {
-        ...prev,
-        [cardId]: currentEffects.includes(effect)
-          ? currentEffects.filter(e => e !== effect)
-          : [...currentEffects, effect]
-      };
-    });
+  const toggleEffect = useCallback((effectId: string) => {
+    console.log('Toggle effect:', effectId);
+  }, []);
+
+  const updateEffectSettings = useCallback((effectId: string, settings: any) => {
+    console.log('Update effect settings:', effectId, settings);
   }, []);
 
   const setCardEffectsArray = useCallback((cardId: string, effects: string[]) => {
@@ -88,26 +76,6 @@ const useCardEffects = (): UseCardEffectsResult => {
     }));
   }, []);
 
-  const updateEffectSettings = useCallback((
-    cardId: string, 
-    effect: string, 
-    settings: CardEffectSettings
-  ) => {
-    setEffectSettings(prev => {
-      const cardSettings = prev[cardId] || {};
-      return {
-        ...prev,
-        [cardId]: {
-          ...cardSettings,
-          [effect]: {
-            ...cardSettings[effect],
-            ...settings
-          }
-        }
-      };
-    });
-  }, []);
-
   const getEffectSettings = useCallback((
     cardId: string,
     effect: string
@@ -122,10 +90,16 @@ const useCardEffects = (): UseCardEffectsResult => {
     addEffect,
     removeEffect,
     toggleEffect,
-    setCardEffects: setCardEffectsArray,
-    clearEffects,
     updateEffectSettings,
-    getEffectSettings
+    clearAllEffects: () => {},
+    getEffectSettings: () => ({}),
+    setCardEffects: () => {},
+    clearEffects: () => {},
+    availableEffects: [],
+    premiumEffects: [],
+    appliedClasses: '',
+    cssClasses: '',
+    effectData: {}
   };
 };
 

@@ -1,5 +1,5 @@
 
-import { CardEffect, CardEffectsResult, EffectEngine } from '@/lib/types/cardEffects';
+import { CardEffect, CardEffectsResult, EffectEngine } from '@/hooks/card-effects/types';
 import { useRef } from 'react';
 
 /**
@@ -11,14 +11,11 @@ export const createDefaultEffectEngine = (): EffectEngine => {
   const cardRef = useRef<HTMLDivElement>(null);
   
   return {
-    engine: {},
     activeEffects: [],
     toggleEffect: (id: string) => {
-      // Implementation would go here
       console.log('Toggle effect', id);
     },
     updateEffectSettings: (id: string, settings: any) => {
-      // Implementation would go here
       console.log('Update effect settings', id, settings);
     },
     canvasRef,
@@ -35,7 +32,9 @@ export const createDefaultEffectEngine = (): EffectEngine => {
         toggleEffect: () => {},
         updateEffectSettings: () => {},
         clearAllEffects: () => {},
-        getEffectSettings: () => ({})
+        getEffectSettings: () => ({}),
+        cssClasses: '',
+        effectData: {}
       }),
       layerEffects: (primary: CardEffect, secondary: CardEffect): CardEffect => primary,
       getHtmlElement: () => null
@@ -64,7 +63,6 @@ export const createDefaultEffectEngine = (): EffectEngine => {
   };
 };
 
-// Export a hook that provides the engine
 export const useCardEffectsEngine = (): EffectEngine => {
   return createDefaultEffectEngine();
 };

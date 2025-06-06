@@ -9,10 +9,16 @@ const PbrCardRenderer: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [settings, setSettings] = useState<PbrSettings>({
+    metallic: 0.8,
     roughness: 0.2,
-    metalness: 0.8,
-    exposure: 1.0,
+    clearcoat: 0,
+    clearcoatRoughness: 0,
+    ior: 1.5,
+    transmission: 0,
+    reflectivity: 0.5,
+    emissive: '#000000',
     envMapIntensity: 1.0,
+    exposure: 1.0,
     reflectionStrength: 0.5,
   });
   const [activeTab, setActiveTab] = useState('preview');
@@ -22,9 +28,7 @@ const PbrCardRenderer: React.FC = () => {
     
     const { cleanup } = createPbrScene(canvasRef.current, containerRef.current, settings);
     
-    return () => {
-      cleanup();
-    };
+    return cleanup;
   }, [settings]);
   
   const handleSettingsChange = (newSettings: Partial<PbrSettings>) => {
@@ -50,7 +54,6 @@ const PbrCardRenderer: React.FC = () => {
                 className="w-full h-full"
               />
               
-              {/* CSS backdrop-filter for card surface interactions */}
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/20 to-transparent backdrop-blur-[1px] opacity-30" />
             </div>
           </div>

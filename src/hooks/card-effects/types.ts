@@ -6,7 +6,7 @@ export interface PremiumCardEffect {
   premium: boolean;
   category: string;
   iconUrl?: string;
-  thumbnail?: string; // Add thumbnail property
+  thumbnail?: string;
   className: string;
   settings: {
     intensity?: number;
@@ -20,7 +20,6 @@ export interface PremiumCardEffect {
   dependencies?: string[];
   enabled?: boolean;
   type?: 'shader' | 'css' | 'canvas' | 'webgl';
-  // Additional properties for effect registry
   cssClass?: string;
   supportedCardTypes?: string[];
   defaultSettings?: any;
@@ -44,11 +43,14 @@ export interface CardEffectsResult {
   updateEffectSettings: (effectId: string, settings: any) => void;
   clearAllEffects: () => void;
   getEffectSettings: (effectId: string) => any;
+  cssClasses: string;
+  effectData: Record<string, any>;
+  jsxElements?: React.ReactNode[];
 }
 
 export interface EffectEngine {
   engine: any;
-  activeEffects: string[];
+  activeEffects: PremiumCardEffect[];
   toggleEffect: (effectId: string) => void;
   updateEffectSettings: (effectId: string, settings: any) => void;
   canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -66,9 +68,18 @@ export interface EffectEngine {
   loadPreset: (presetId: string) => any[];
 }
 
-// Add missing exports for backward compatibility
-export interface UseCardEffectsResult extends CardEffectsResult {}
+export interface UseCardEffectsResult extends CardEffectsResult {
+  cardEffects: Record<string, string[]>;
+  setActiveEffects: (effects: string[]) => void;
+  addEffect: (cardId: string, effect: string) => void;
+  removeEffect: (cardId: string, effect: string) => void;
+  setCardEffects: (cardId: string, effects: string[]) => void;
+  clearEffects: (cardId: string) => void;
+  getEffectSettings: (cardId: string, effect: string) => CardEffectSettings | undefined;
+}
+
 export interface CardEffectDefinition extends PremiumCardEffect {}
+
 export interface MaterialSimulation {
   id: string;
   name: string;
@@ -77,8 +88,14 @@ export interface MaterialSimulation {
   baseColor?: string;
   weathering?: number;
   metallic?: number;
-  metalness?: number; // Add for compatibility
+  metalness?: number;
   roughness?: number;
   normalIntensity?: number;
   emissive?: string;
+  clearcoat?: number;
+  clearcoatRoughness?: number;
+  ior?: number;
+  transmission?: number;
+  reflectivity?: number;
+  envMapIntensity?: number;
 }

@@ -1,4 +1,3 @@
-
 import { PbrSettings, PbrSceneOptions } from './types';
 import { pbrFragmentShader, pbrVertexShader } from './shaders';
 
@@ -12,7 +11,13 @@ export function createPbrScene(
   
   if (!gl) {
     console.error('WebGL2 not supported');
-    return { cleanup: () => {} };
+    return { 
+      lighting: 'studio', 
+      environment: 'default',
+      exposure: 1,
+      background: true,
+      cleanup: () => {} 
+    };
   }
   
   // Set canvas size to container size
@@ -33,14 +38,26 @@ export function createPbrScene(
   const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, pbrFragmentShader);
   
   if (!vertexShader || !fragmentShader) {
-    return { cleanup: () => resizeObserver.disconnect() };
+    return { 
+      lighting: 'studio', 
+      environment: 'default',
+      exposure: 1,
+      background: true,
+      cleanup: () => resizeObserver.disconnect() 
+    };
   }
   
   // Create shader program
   const program = createProgram(gl, vertexShader, fragmentShader);
   
   if (!program) {
-    return { cleanup: () => resizeObserver.disconnect() };
+    return { 
+      lighting: 'studio', 
+      environment: 'default',
+      exposure: 1,
+      background: true,
+      cleanup: () => resizeObserver.disconnect() 
+    };
   }
   
   gl.useProgram(program);
@@ -67,7 +84,7 @@ export function createPbrScene(
   
   // Set up uniforms
   const roughnessLocation = gl.getUniformLocation(program, 'u_roughness');
-  const metalnessLocation = gl.getUniformLocation(program, 'u_metalness');
+  const metalnessLocation = gl.getUniformLocation(program, 'u_metallic');
   const exposureLocation = gl.getUniformLocation(program, 'u_exposure');
   const envMapIntensityLocation = gl.getUniformLocation(program, 'u_envMapIntensity');
   const reflectionStrengthLocation = gl.getUniformLocation(program, 'u_reflectionStrength');
@@ -155,12 +172,16 @@ export function createPbrScene(
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
     // Update material uniforms from settings
-    gl.uniform1f(roughnessLocation, settings.roughness);
-    gl.uniform1f(metalnessLocation, settings.metalness);
-    gl.uniform1f(exposureLocation, settings.exposure);
-    gl.uniform1f(envMapIntensityLocation, settings.envMapIntensity);
-    gl.uniform1f(reflectionStrengthLocation, settings.reflectionStrength);
-    gl.uniform1f(timeLocation, currentTime);
+    const updateUniforms = () => {
+      gl.uniform1f(roughnessLocation, settings.roughness);
+      gl.uniform1f(metalnessLocation, settings.metallic);
+      gl.uniform1f(exposureLocation, settings.exposure || 1.0);
+      gl.uniform1f(envMapIntensityLocation, settings.envMapIntensity);
+      gl.uniform1f(reflectionStrengthLocation, settings.reflectionStrength || 0.5);
+      gl.uniform1f(timeLocation, currentTime);
+    };
+    
+    updateUniforms();
     
     // Set up camera matrix and rotation
     const aspect = canvas.width / canvas.height;
@@ -192,6 +213,10 @@ export function createPbrScene(
   
   // Return cleanup function
   return {
+    lighting: 'studio',
+    environment: 'default',
+    exposure: settings.exposure || 1.0,
+    background: true,
     cleanup: () => {
       cancelAnimationFrame(animationFrameId);
       resizeObserver.disconnect();

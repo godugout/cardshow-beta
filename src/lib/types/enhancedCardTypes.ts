@@ -1,5 +1,4 @@
 
-// Enhanced card types for the card system
 import { Card } from './cardTypes';
 
 /**
