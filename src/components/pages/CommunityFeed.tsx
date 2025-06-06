@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth';
-import { Card } from '@/lib/types/card';
+import { Card } from '@/lib/types/cardTypes';
 import CardItem from '@/components/CardItem';
 import { toast } from 'sonner';
-import { adaptToCard } from '@/lib/adapters/cardAdapter';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 
 const CommunityFeed: React.FC = () => {
   const { user } = useAuth();
@@ -20,8 +20,8 @@ const CommunityFeed: React.FC = () => {
       try {
         // Mock data - replace with actual API call later
         const mockFeed: Card[] = [
-          adaptToCard({
-            id: '1',
+          {
+            id: 'community-1',
             title: 'Amazing Baseball Card',
             description: 'Check out this rare find!',
             imageUrl: 'https://placekitten.com/200/300',
@@ -30,10 +30,22 @@ const CommunityFeed: React.FC = () => {
             userId: 'user123',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            effects: [] // Add required effects property
-          }),
-          adaptToCard({
-            id: '2',
+            effects: [],
+            reactions: [
+              {
+                id: 'reaction1',
+                userId: 'user2',
+                type: 'like',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                targetType: 'card',
+                targetId: 'community-1'
+              }
+            ],
+            designMetadata: DEFAULT_DESIGN_METADATA
+          },
+          {
+            id: 'community-2',
             title: 'Vintage Football Card',
             description: 'Just pulled this from an old collection.',
             imageUrl: 'https://placekitten.com/200/301',
@@ -42,8 +54,10 @@ const CommunityFeed: React.FC = () => {
             userId: 'user456',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            effects: [] // Add required effects property
-          })
+            effects: [],
+            reactions: [],
+            designMetadata: DEFAULT_DESIGN_METADATA
+          }
         ];
         
         setFeed(mockFeed);

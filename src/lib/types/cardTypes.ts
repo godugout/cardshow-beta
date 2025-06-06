@@ -79,17 +79,6 @@ export interface TextStyle {
 }
 
 /**
- * Card effect definition for visual effects
- */
-export interface CardEffect {
-  id: string;
-  name: string;
-  enabled: boolean;
-  settings: CardEffectSettings;
-  className?: string;
-}
-
-/**
  * Settings for card effects
  */
 export interface CardEffectSettings {
@@ -99,6 +88,17 @@ export interface CardEffectSettings {
   color?: string;
   animationEnabled?: boolean;
   [key: string]: JsonValue | undefined;
+}
+
+/**
+ * Card effect definition for visual effects
+ */
+export interface CardEffect {
+  id: string;
+  name: string;
+  enabled: boolean;
+  settings: CardEffectSettings;
+  className?: string;
 }
 
 /**
@@ -144,9 +144,9 @@ export interface MarketMetadata {
   lastSoldPrice?: number;
   currentAskingPrice?: number;
   estimatedMarketValue?: number;
-  isPrintable?: boolean;
-  isForSale?: boolean;
-  includeInCatalog?: boolean;
+  isPrintable: boolean;
+  isForSale: boolean;
+  includeInCatalog: boolean;
   price?: number;
   currency?: string;
   availableForSale?: boolean;
@@ -226,7 +226,7 @@ export interface Reaction {
   targetId: string;
   type: 'like' | 'love' | 'wow' | 'haha' | 'sad' | 'angry';
   createdAt: string;
-  updatedAt?: string; // Added to make compatible with interaction.Reaction
+  updatedAt: string;
   user?: User;
 }
 

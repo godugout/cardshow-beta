@@ -4,6 +4,7 @@
  */
 import { ReactNode } from 'react';
 import { JsonValue } from '@/lib/types/index';
+import { CardEffect, CardEffectSettings } from '@/lib/types/cardTypes';
 
 export interface PremiumCardEffect {
   id: string;
@@ -22,15 +23,6 @@ export interface PremiumCardEffect {
   cssClass?: string;
   supportedCardTypes?: string[];
   defaultSettings?: any;
-}
-
-export interface CardEffectSettings {
-  intensity?: number;
-  speed?: number;
-  pattern?: string;
-  color?: string;
-  animationEnabled?: boolean;
-  [key: string]: JsonValue | undefined;
 }
 
 export interface CardEffectsResult {
@@ -55,9 +47,9 @@ export interface EffectEngine {
   canvasRef: React.RefObject<HTMLCanvasElement>;
   cardRef: React.RefObject<HTMLDivElement>;
   effects: Map<string, CardEffect>;
-  compositor: any;
-  renderer: any;
-  preview: any;
+  compositor: EffectCompositor;
+  renderer: WebGLRenderer;
+  preview: PreviewGenerator;
   addEffect: (effect: CardEffect) => void;
   removeEffect: (id: string) => void;
   applyEffects: (cardElement: HTMLElement, effects: CardEffect[]) => void;
@@ -108,5 +100,24 @@ export interface MaterialSimulation {
   envMapIntensity?: number;
 }
 
-// Re-export CardEffect from cardTypes.ts to ensure compatibility
-export { CardEffect } from '@/lib/types/cardEffects';
+// Core effect engine interfaces
+export interface EffectCompositor {
+  compose(effects: CardEffect[]): CardEffectsResult;
+  layerEffects(primary: CardEffect, secondary: CardEffect): CardEffect;
+  getHtmlElement(): HTMLElement | null;
+}
+
+export interface WebGLRenderer {
+  initialize(canvas: HTMLCanvasElement): void;
+  applyShader(effect: CardEffect): void;
+  render(): void;
+  dispose(): void;
+}
+
+export interface PreviewGenerator {
+  generateThumbnail(effect: CardEffect, size: { width: number; height: number }): Promise<string>;
+  generatePreview(card: any, effects: CardEffect[]): ReactNode;
+}
+
+// Re-export CardEffect and related types
+export type { CardEffect, CardEffectSettings };

@@ -85,7 +85,11 @@ export const useArCardViewer = () => {
               descriptionColor: '#333'
             },
             cardMetadata: {},
-            marketMetadata: {}
+            marketMetadata: {
+              isPrintable: false,
+              isForSale: false,
+              includeInCatalog: false
+            }
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
@@ -116,7 +120,11 @@ export const useArCardViewer = () => {
               descriptionColor: '#333'
             },
             cardMetadata: {},
-            marketMetadata: {}
+            marketMetadata: {
+              isPrintable: false,
+              isForSale: false,
+              includeInCatalog: false
+            }
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
@@ -136,11 +144,7 @@ export const useArCardViewer = () => {
         error: error instanceof Error ? error : new Error('Failed to fetch cards')
       }));
       
-      toast('Error loading cards', {
-        description: 'Failed to load card data',
-        id: 'error-loading-cards',
-        variant: 'destructive'
-      });
+      toast.error('Failed to load card data');
     }
   }, []);
   
@@ -153,11 +157,7 @@ export const useArCardViewer = () => {
       const selectedCard = prev.cards.find(card => card.id === cardId) || null;
       
       if (!selectedCard) {
-        toast('Card not found', {
-          description: 'The selected card could not be found',
-          id: 'card-not-found',
-          variant: 'destructive'
-        });
+        toast.error('The selected card could not be found');
         return prev;
       }
       
@@ -173,11 +173,7 @@ export const useArCardViewer = () => {
   const changeViewMode = useCallback((mode: ArViewMode) => {
     setState(prev => {
       if (mode === ArViewMode.AR && !prev.selectedCardId) {
-        toast('No card selected', {
-          description: 'Please select a card to view in AR',
-          id: 'no-card-selected',
-          variant: 'destructive'
-        });
+        toast.error('Please select a card to view in AR');
         return prev;
       }
       
@@ -193,10 +189,7 @@ export const useArCardViewer = () => {
         // Request camera permissions
         navigator.mediaDevices?.getUserMedia({ video: true })
           .catch(error => {
-            toast('Camera access denied', {
-              description: 'Please allow camera access to use AR features',
-              id: 'camera-access-denied'
-            });
+            toast.error('Please allow camera access to use AR features');
             setState(prev => ({ ...prev, showCamera: false }));
           });
       }
@@ -207,26 +200,17 @@ export const useArCardViewer = () => {
   
   const toggleInfoPanel = useCallback(() => {
     setState(prev => ({ ...prev, showInfo: !prev.showInfo }));
-    toast('Info panel toggled', {
-      description: state.showInfo ? 'Info panel hidden' : 'Info panel shown',
-      id: 'info-panel-toggled'
-    });
+    toast.success(state.showInfo ? 'Info panel hidden' : 'Info panel shown');
   }, [state.showInfo]);
   
   const toggleControlsPanel = useCallback(() => {
     setState(prev => ({ ...prev, showControls: !prev.showControls }));
-    toast('Controls panel toggled', {
-      description: state.showControls ? 'Controls hidden' : 'Controls shown',
-      id: 'controls-panel-toggled'
-    });
+    toast.success(state.showControls ? 'Controls hidden' : 'Controls shown');
   }, [state.showControls]);
   
   const toggleHighlights = useCallback(() => {
     setState(prev => ({ ...prev, showHighlights: !prev.showHighlights }));
-    toast('Highlights toggled', {
-      description: state.showHighlights ? 'Highlights hidden' : 'Highlights shown',
-      id: 'highlights-toggled'
-    });
+    toast.success(state.showHighlights ? 'Highlights hidden' : 'Highlights shown');
   }, [state.showHighlights]);
   
   const resetCard = useCallback(() => {

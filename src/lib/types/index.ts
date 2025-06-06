@@ -1,53 +1,16 @@
 
-// Generic types used across the application
-export type JsonValue = 
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | { [key: string]: JsonValue };
-
+// Base entity interface for all entities with timestamps
 export interface BaseEntity {
   id: string;
   createdAt: string;
   updatedAt: string;
 }
 
-// Instagram related types
-export interface InstagramPost {
-  id: string;
-  caption: string;
-  mediaUrl: string;
-  permalink: string;
-  timestamp: string;
-  username: string;
-  mediaType?: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
-  thumbnailUrl?: string;
-  postId?: string;
-  children?: InstagramMediaItem[];
-}
+// JSON value types for flexible data storage
+export type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
+export type JsonObject = { [key: string]: JsonValue };
+export type JsonArray = JsonValue[];
 
-export interface InstagramMediaItem {
-  id: string;
-  mediaType: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
-  mediaUrl: string;
-  permalink: string;
-  thumbnail?: string;
-}
-
-export interface InstagramApiResponse {
-  data: InstagramPost[];
-  paging?: {
-    cursors: {
-      before: string;
-      after: string;
-    };
-    next?: string;
-  };
-}
-
-// Re-export core types
-export type { Card, CardStyle, TextStyle, DesignMetadata } from './cardTypes';
-export type { Collection } from './collection';
-export type { EnhancedCard, Series, Deck } from './enhancedCardTypes';
+// Re-export commonly used types
+export type { Card, CardTemplate, Reaction, Comment } from './cardTypes';
+export type { User } from './user';
