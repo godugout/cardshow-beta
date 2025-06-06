@@ -46,3 +46,8 @@ export interface InstagramApiResponse {
     next?: string;
   };
 }
+
+// Re-export core types
+export type { Card, CardStyle, TextStyle, DesignMetadata } from './cardTypes';
+export type { Collection } from './collection';
+export type { EnhancedCard, Series, Deck } from './enhancedCardTypes';

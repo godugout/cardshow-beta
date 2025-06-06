@@ -19,7 +19,7 @@ export interface CardContextType {
   deleteCollection: (id: string) => Promise<boolean>;
   addCardToCollection: (cardId: string, collectionId: string) => Promise<Collection>;
   removeCardFromCollection: (cardId: string, collectionId: string) => Promise<Collection>;
-  refreshCards: () => Promise<void>; // This should be included in the interface
+  refreshCards: () => Promise<void>;
 }
 
 const CardContext = createContext<CardContextType>({
@@ -27,7 +27,7 @@ const CardContext = createContext<CardContextType>({
   collections: [],
   isLoading: false,
   getCard: () => undefined,
-  getCardById: () => undefined, // Added this method
+  getCardById: () => undefined,
   addCard: async () => ({} as Card),
   updateCard: async () => ({} as Card),
   deleteCard: async () => false,
@@ -70,7 +70,6 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return cards.find(card => card.id === id);
   }, [cards]);
   
-  // Add alias for getCardById to match getCard
   const getCardById = useCallback((id: string) => {
     return cards.find(card => card.id === id);
   }, [cards]);
@@ -79,7 +78,6 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
     return new Promise<Card>((resolve) => {
       setTimeout(() => {
-        // Create a complete card from partial data
         const now = new Date().toISOString();
         const newCard: Card = {
           id: uuidv4(),
@@ -159,6 +157,8 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           visibility: collection.visibility || 'public',
           allowComments: collection.allowComments !== undefined ? collection.allowComments : true,
           designMetadata: collection.designMetadata || {},
+          tags: collection.tags || [],
+          featured: collection.featured || false,
           ...collection
         };
         
@@ -278,7 +278,7 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     collections,
     isLoading,
     getCard,
-    getCardById, // Added this method
+    getCardById,
     addCard,
     updateCard,
     deleteCard,
@@ -300,5 +300,5 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useCards = () => useContext(CardContext);
 export const useCardContext = () => useContext(CardContext);
 
-// Use 'export type' for types to fix the isolatedModules issue
+// Export types for use in other files
 export type { Card, Collection };

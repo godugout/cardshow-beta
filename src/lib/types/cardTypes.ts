@@ -1,10 +1,10 @@
+
 /**
  * Consolidated Card Types for Cardshow (CRD)
  * This file serves as the central source of truth for all card-related types
  */
 
 import { BaseEntity, JsonValue } from './index';
-import { Reaction, Comment } from './interaction';
 import { User } from './user';
 
 /**
@@ -193,21 +193,8 @@ export interface DesignMetadata {
   effects?: string[];
   layers?: CardLayer[];
   effectClasses?: string;
+  uploadedImages?: string[];
   [key: string]: JsonValue | undefined;
-}
-
-/**
- * Hotspot data for interactive cards
- */
-export interface HotspotData {
-  id: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  content: string;
-  type: 'text' | 'link' | 'image' | 'video';
-  visible: boolean;
 }
 
 /**
@@ -216,9 +203,38 @@ export interface HotspotData {
 export type CardRarity = 'common' | 'uncommon' | 'rare' | 'ultra-rare' | 'legendary' | 'one-of-one';
 
 /**
- * Base Card interface containing common properties
+ * Reaction interface for card interactions
  */
-export interface BaseCard extends BaseEntity {
+export interface Reaction {
+  id: string;
+  userId: string;
+  targetType: 'card' | 'comment' | 'collection';
+  targetId: string;
+  type: 'like' | 'love' | 'wow' | 'haha' | 'sad' | 'angry';
+  createdAt: string;
+  user?: User;
+}
+
+/**
+ * Comment interface for card comments
+ */
+export interface Comment {
+  id: string;
+  content: string;
+  userId: string;
+  cardId?: string;
+  collectionId?: string;
+  teamId?: string;
+  parentId?: string;
+  createdAt: string;
+  updatedAt: string;
+  user?: User;
+}
+
+/**
+ * Main Card interface that can be extended for specific use cases
+ */
+export interface Card extends BaseEntity {
   title: string;
   description?: string; // Made optional to fix compatibility issues
   imageUrl: string;
@@ -249,6 +265,7 @@ export interface BaseCard extends BaseEntity {
   specialEffect?: string;
   fabricSwatches?: FabricSwatch[];
   stats?: CardStats;
+  position?: string; // Added to fix sample data errors
   
   // Design related
   name?: string; // Legacy support
@@ -261,17 +278,13 @@ export interface BaseCard extends BaseEntity {
   estimatedValue?: string;
   condition?: string;
   rarity?: CardRarity;
+  gradingScore?: number; // Changed to number for consistency
   
   // Additional fields needed by some components
   creatorId?: string;
   createdAt: string;
   updatedAt: string;
 }
-
-/**
- * Main Card interface that can be extended for specific use cases
- */
-export interface Card extends BaseCard {}
 
 /**
  * Card template definition for template system
@@ -291,9 +304,3 @@ export interface CardTemplate {
     effects?: string[];
   };
 }
-
-// Export types from enhancedCardTypes using export type for isolatedModules compatibility
-export type { EnhancedCard, Series, Deck } from './enhancedCardTypes';
-
-// Export renamed Reaction type to avoid conflicts
-export type { Reaction as CardReaction } from './interaction';

@@ -1,21 +1,19 @@
 
 // Enhanced card types for the card system
-import { BaseCard } from './cardTypes';
+import { Card } from './cardTypes';
 
 /**
  * Enhanced Card with additional functionality
  */
-export interface EnhancedCard extends BaseCard {
+export interface EnhancedCard extends Card {
   seriesId?: string; 
   deckId?: string;
   specialFeatures?: string[];
   interactiveElements?: string[];
   graded?: boolean;
   gradingService?: string;
-  gradingScore?: string;
   hotspots?: HotspotData[];
   backSideImage?: string;
-  cardNumber?: string;
   artist?: string;
   artistId?: string;
   edition?: number;
@@ -28,13 +26,7 @@ export interface EnhancedCard extends BaseCard {
     lastSoldPrice?: number;
     availableForSale?: boolean;
   };
-  rarity?: CardRarity;
 }
-
-/**
- * Card rarity types
- */
-export type CardRarity = 'common' | 'uncommon' | 'rare' | 'ultra-rare' | 'legendary' | 'one-of-one';
 
 /**
  * Hotspot data for interactive cards
@@ -69,7 +61,7 @@ export interface Series {
   coverImageUrl?: string;
   isPublished?: boolean;
   cardIds: string[];
-  releaseType?: 'standard' | 'limited' | 'exclusive';
+  releaseType?: 'standard' | 'limited' | 'special';
 }
 
 /**
