@@ -1,4 +1,10 @@
 
+/**
+ * Card Effects Types Module
+ */
+import { ReactNode } from 'react';
+import { JsonValue } from '@/lib/types/index';
+
 export interface PremiumCardEffect {
   id: string;
   name: string;
@@ -7,16 +13,9 @@ export interface PremiumCardEffect {
   category: string;
   iconUrl?: string;
   thumbnail?: string;
-  className: string;
-  settings: {
-    intensity?: number;
-    speed?: number;
-    pattern?: string;
-    color?: string;
-    animationEnabled?: boolean;
-    [key: string]: any;
-  };
   previewUrl?: string;
+  className: string;
+  settings: CardEffectSettings;
   dependencies?: string[];
   enabled?: boolean;
   type?: 'shader' | 'css' | 'canvas' | 'webgl';
@@ -31,7 +30,7 @@ export interface CardEffectSettings {
   pattern?: string;
   color?: string;
   animationEnabled?: boolean;
-  [key: string]: any;
+  [key: string]: JsonValue | undefined;
 }
 
 export interface CardEffectsResult {
@@ -45,7 +44,7 @@ export interface CardEffectsResult {
   getEffectSettings: (effectId: string) => any;
   cssClasses: string;
   effectData: Record<string, any>;
-  jsxElements?: React.ReactNode[];
+  jsxElements?: ReactNode[];
 }
 
 export interface EffectEngine {
@@ -55,27 +54,36 @@ export interface EffectEngine {
   updateEffectSettings: (effectId: string, settings: any) => void;
   canvasRef: React.RefObject<HTMLCanvasElement>;
   cardRef: React.RefObject<HTMLDivElement>;
-  effects: Map<string, any>;
+  effects: Map<string, CardEffect>;
   compositor: any;
   renderer: any;
   preview: any;
-  addEffect: (effect: any) => void;
+  addEffect: (effect: CardEffect) => void;
   removeEffect: (id: string) => void;
-  applyEffects: (cardElement: HTMLElement, effects: any[]) => void;
+  applyEffects: (cardElement: HTMLElement, effects: CardEffect[]) => void;
   updateSettings: (id: string, settings: any) => void;
-  getEffectById: (id: string) => any;
-  createPreset: (name: string, effects: any[]) => string;
-  loadPreset: (presetId: string) => any[];
+  getEffectById: (id: string) => CardEffect | undefined;
+  createPreset: (name: string, effects: CardEffect[]) => string;
+  loadPreset: (presetId: string) => CardEffect[];
 }
 
-export interface UseCardEffectsResult extends CardEffectsResult {
+export interface UseCardEffectsResult {
   cardEffects: Record<string, string[]>;
+  activeEffects: string[];
   setActiveEffects: (effects: string[]) => void;
   addEffect: (cardId: string, effect: string) => void;
   removeEffect: (cardId: string, effect: string) => void;
+  toggleEffect: (effectId: string) => void;
+  updateEffectSettings: (effectId: string, settings: any) => void;
+  clearAllEffects: () => void;
+  getEffectSettings: (effectId: string) => any;
   setCardEffects: (cardId: string, effects: string[]) => void;
   clearEffects: (cardId: string) => void;
-  getEffectSettings: (cardId: string, effect: string) => CardEffectSettings | undefined;
+  availableEffects: PremiumCardEffect[];
+  premiumEffects: PremiumCardEffect[];
+  appliedClasses: string;
+  cssClasses: string;
+  effectData: Record<string, any>;
 }
 
 export interface CardEffectDefinition extends PremiumCardEffect {}
@@ -99,3 +107,6 @@ export interface MaterialSimulation {
   reflectivity?: number;
   envMapIntensity?: number;
 }
+
+// Re-export CardEffect from cardTypes.ts to ensure compatibility
+export { CardEffect } from '@/lib/types/cardEffects';

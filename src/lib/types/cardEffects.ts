@@ -22,15 +22,26 @@ export interface CardEffectSettings {
 
 export interface PremiumCardEffect extends CardEffect {
   premium: boolean;
-  requiresSubscription: boolean;
+  requiresSubscription?: boolean;
   category?: string;
   iconUrl?: string;
+  thumbnail?: string;
+  previewUrl?: string;
+  description?: string;
 }
 
 export interface CardEffectsResult {
   cssClasses: string;
   effectData: Record<string, any>;
   jsxElements?: ReactNode[];
+  availableEffects: PremiumCardEffect[];
+  premiumEffects: PremiumCardEffect[];
+  activeEffects: string[];
+  appliedClasses: string;
+  toggleEffect: (effectId: string) => void;
+  updateEffectSettings: (effectId: string, settings: any) => void;
+  clearAllEffects: () => void;
+  getEffectSettings: (effectId: string) => any;
 }
 
 export type EffectSettings = CardEffectSettings;
@@ -51,7 +62,11 @@ export interface MaterialSimulation {
   textureUrl?: string;
   baseColor?: string;
   type?: string;
+  id?: string;
+  name?: string;
   weathering?: number;
+  metallic?: number;
+  normalIntensity?: number;
 }
 
 // Core effect engine interfaces
@@ -86,4 +101,10 @@ export interface EffectEngine {
   getEffectById(id: string): CardEffect | undefined;
   createPreset(name: string, effects: CardEffect[]): string;
   loadPreset(presetId: string): CardEffect[];
+  engine: any;
+  activeEffects: PremiumCardEffect[];
+  toggleEffect: (effectId: string) => void;
+  updateEffectSettings: (effectId: string, settings: any) => void;
+  canvasRef: React.RefObject<HTMLCanvasElement>;
+  cardRef: React.RefObject<HTMLDivElement>;
 }

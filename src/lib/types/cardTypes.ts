@@ -226,6 +226,7 @@ export interface Reaction {
   targetId: string;
   type: 'like' | 'love' | 'wow' | 'haha' | 'sad' | 'angry';
   createdAt: string;
+  updatedAt?: string; // Added to make compatible with interaction.Reaction
   user?: User;
 }
 

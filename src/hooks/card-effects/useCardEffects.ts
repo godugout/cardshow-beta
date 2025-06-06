@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { UseCardEffectsResult, CardEffectSettings } from './types';
 
@@ -76,12 +77,24 @@ const useCardEffects = (): UseCardEffectsResult => {
     }));
   }, []);
 
-  const getEffectSettings = useCallback((
+  const getEffectSettings = useCallback((effectId: string): any => {
+    // This implementation matches the CardEffectsResult interface signature
+    return {};
+  }, [effectSettings]);
+
+  const getCardEffectSettings = useCallback((
     cardId: string,
     effect: string
   ): CardEffectSettings | undefined => {
     return effectSettings[cardId]?.[effect];
   }, [effectSettings]);
+
+  const clearAllEffects = useCallback(() => {
+    // Clear all effects from all cards
+    setCardEffects({});
+    setEffectSettings({});
+    setActiveEffects([]);
+  }, []);
 
   return {
     cardEffects,
@@ -91,10 +104,10 @@ const useCardEffects = (): UseCardEffectsResult => {
     removeEffect,
     toggleEffect,
     updateEffectSettings,
-    clearAllEffects: () => {},
-    getEffectSettings: () => ({}),
-    setCardEffects: () => {},
-    clearEffects: () => {},
+    clearAllEffects,
+    getEffectSettings,
+    setCardEffects: setCardEffectsArray,
+    clearEffects,
     availableEffects: [],
     premiumEffects: [],
     appliedClasses: '',

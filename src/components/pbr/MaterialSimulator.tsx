@@ -51,97 +51,28 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
     if (previewRef.current) {
       const element = previewRef.current;
       element.style.setProperty('--material-albedo', albedo);
-      element.style.setProperty('--material-roughness', roughness.toString());
-      element.style.setProperty('--material-metalness', metalness.toString());
-      element.style.setProperty('--material-clearcoat', clearcoat.toString());
-      element.style.setProperty('--material-clearcoatRoughness', clearcoatRoughness.toString());
-      element.style.setProperty('--material-ior', ior.toString());
-      element.style.setProperty('--material-transmission', transmission.toString());
-      element.style.setProperty('--material-reflectivity', reflectivity.toString());
+      element.style.setProperty('--material-roughness', String(roughness));
+      element.style.setProperty('--material-metalness', String(metalness));
+      element.style.setProperty('--material-clearcoat', String(clearcoat));
+      element.style.setProperty('--material-clearcoatRoughness', String(clearcoatRoughness));
+      element.style.setProperty('--material-ior', String(ior));
+      element.style.setProperty('--material-transmission', String(transmission));
+      element.style.setProperty('--material-reflectivity', String(reflectivity));
       element.style.setProperty('--material-emissive', emissive);
-      element.style.setProperty('--material-envMapIntensity', envMapIntensity.toString());
-      element.style.setProperty('--material-normalIntensity', normalIntensity.toString());
-      element.style.setProperty('--material-weathering', weathering ? weathering.toString() : '0');
+      element.style.setProperty('--material-envMapIntensity', String(envMapIntensity));
+      element.style.setProperty('--material-normalIntensity', String(normalIntensity));
+      element.style.setProperty('--material-weathering', weathering ? String(weathering) : '0');
     }
   }, [albedo, roughness, metalness, clearcoat, clearcoatRoughness, ior, transmission, reflectivity, emissive, envMapIntensity, normalIntensity, weathering]);
-  
-  const handleAlbedoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newAlbedo = e.target.value;
-    setAlbedo(newAlbedo);
-    onChange({ baseColor: newAlbedo });
-  };
-  
-  const handleRoughnessChange = (value: number[]) => {
-    const newRoughness = value[0];
-    setRoughness(newRoughness);
-    onChange({ roughness: newRoughness });
-  };
-  
-  const handleMetalnessChange = (value: number[]) => {
-    const newMetalness = value[0];
-    setMetalness(newMetalness);
-    onChange({ metalness: newMetalness });
-  };
-  
-  const handleClearcoatChange = (value: number[]) => {
-    const newClearcoat = value[0];
-    setClearcoat(newClearcoat);
-    onChange({ clearcoat: newClearcoat });
-  };
-  
-  const handleClearcoatRoughnessChange = (value: number[]) => {
-    const newClearcoatRoughness = value[0];
-    setClearcoatRoughness(newClearcoatRoughness);
-    onChange({ clearcoatRoughness: newClearcoatRoughness });
-  };
-  
-  const handleIorChange = (value: number[]) => {
-    const newIor = value[0];
-    setIor(newIor);
-    onChange({ ior: newIor });
-  };
-  
-  const handleTransmissionChange = (value: number[]) => {
-    const newTransmission = value[0];
-    setTransmission(newTransmission);
-    onChange({ transmission: newTransmission });
-  };
-  
-  const handleReflectivityChange = (value: number[]) => {
-    const newReflectivity = value[0];
-    setReflectivity(newReflectivity);
-    onChange({ reflectivity: newReflectivity });
-  };
-  
-  const handleEmissiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newEmissive = e.target.value;
-    setEmissive(newEmissive);
-    onChange({ emissive: newEmissive });
-  };
-  
-  const handleEnvMapIntensityChange = (value: number[]) => {
-    const newEnvMapIntensity = value[0];
-    setEnvMapIntensity(newEnvMapIntensity);
-    onChange({ envMapIntensity: newEnvMapIntensity });
-  };
-  
-  const handleNormalIntensityChange = (value: number[]) => {
-    const newNormalIntensity = value[0];
-    setNormalIntensity(newNormalIntensity);
-    onChange({ normalIntensity: newNormalIntensity });
-  };
-  
-  const handleWeatheringChange = (value: number[]) => {
-    const newWeathering = value[0];
-    setWeathering(newWeathering);
-    onChange({ weathering: newWeathering });
-  };
   
   return (
     <div className={cn("grid gap-4", className)}>
       <div className="grid gap-2">
         <Label htmlFor="albedo">Albedo</Label>
-        <Input id="albedo" value={albedo} onChange={handleAlbedoChange} type="color" />
+        <Input id="albedo" value={albedo} onChange={(e) => {
+          setAlbedo(e.target.value);
+          onChange({ baseColor: e.target.value });
+        }} type="color" />
       </div>
       
       <div className="grid gap-2">
@@ -149,9 +80,13 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
         <Slider
           id="roughness"
           defaultValue={[roughness]}
+          value={[roughness]}
           max={1}
           step={0.01}
-          onValueChange={handleRoughnessChange}
+          onValueChange={(value) => {
+            setRoughness(value[0]);
+            onChange({ roughness: value[0] });
+          }}
         />
       </div>
       
@@ -160,9 +95,13 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
         <Slider
           id="metalness"
           defaultValue={[metalness]}
+          value={[metalness]}
           max={1}
           step={0.01}
-          onValueChange={handleMetalnessChange}
+          onValueChange={(value) => {
+            setMetalness(value[0]);
+            onChange({ metalness: value[0] });
+          }}
         />
       </div>
       
@@ -171,9 +110,13 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
         <Slider
           id="clearcoat"
           defaultValue={[clearcoat]}
+          value={[clearcoat]}
           max={1}
           step={0.01}
-          onValueChange={handleClearcoatChange}
+          onValueChange={(value) => {
+            setClearcoat(value[0]);
+            onChange({ clearcoat: value[0] });
+          }}
         />
       </div>
       
@@ -182,9 +125,13 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
         <Slider
           id="clearcoatRoughness"
           defaultValue={[clearcoatRoughness]}
+          value={[clearcoatRoughness]}
           max={1}
           step={0.01}
-          onValueChange={handleClearcoatRoughnessChange}
+          onValueChange={(value) => {
+            setClearcoatRoughness(value[0]);
+            onChange({ clearcoatRoughness: value[0] });
+          }}
         />
       </div>
       
@@ -193,10 +140,14 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
         <Slider
           id="ior"
           defaultValue={[ior]}
+          value={[ior]}
           min={1}
           max={2.5}
           step={0.01}
-          onValueChange={handleIorChange}
+          onValueChange={(value) => {
+            setIor(value[0]);
+            onChange({ ior: value[0] });
+          }}
         />
       </div>
       
@@ -205,9 +156,13 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
         <Slider
           id="transmission"
           defaultValue={[transmission]}
+          value={[transmission]}
           max={1}
           step={0.01}
-          onValueChange={handleTransmissionChange}
+          onValueChange={(value) => {
+            setTransmission(value[0]);
+            onChange({ transmission: value[0] });
+          }}
         />
       </div>
       
@@ -216,15 +171,22 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
         <Slider
           id="reflectivity"
           defaultValue={[reflectivity]}
+          value={[reflectivity]}
           max={1}
           step={0.01}
-          onValueChange={handleReflectivityChange}
+          onValueChange={(value) => {
+            setReflectivity(value[0]);
+            onChange({ reflectivity: value[0] });
+          }}
         />
       </div>
       
       <div className="grid gap-2">
         <Label htmlFor="emissive">Emissive</Label>
-        <Input id="emissive" value={emissive} onChange={handleEmissiveChange} type="color" />
+        <Input id="emissive" value={emissive} onChange={(e) => {
+          setEmissive(e.target.value);
+          onChange({ emissive: e.target.value });
+        }} type="color" />
       </div>
       
       <div className="grid gap-2">
@@ -232,9 +194,13 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
         <Slider
           id="envMapIntensity"
           defaultValue={[envMapIntensity]}
+          value={[envMapIntensity]}
           max={1}
           step={0.01}
-          onValueChange={handleEnvMapIntensityChange}
+          onValueChange={(value) => {
+            setEnvMapIntensity(value[0]);
+            onChange({ envMapIntensity: value[0] });
+          }}
         />
       </div>
       
@@ -243,9 +209,13 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
         <Slider
           id="normalIntensity"
           defaultValue={[normalIntensity]}
+          value={[normalIntensity]}
           max={1}
           step={0.01}
-          onValueChange={handleNormalIntensityChange}
+          onValueChange={(value) => {
+            setNormalIntensity(value[0]);
+            onChange({ normalIntensity: value[0] });
+          }}
         />
       </div>
       
@@ -254,9 +224,13 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
         <Slider
           id="weathering"
           defaultValue={[weathering]}
+          value={[weathering]}
           max={1}
           step={0.01}
-          onValueChange={handleWeatheringChange}
+          onValueChange={(value) => {
+            setWeathering(value[0]);
+            onChange({ weathering: value[0] });
+          }}
         />
       </div>
       
@@ -266,18 +240,6 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
             className="w-full h-full"
             style={{
               backgroundColor: albedo,
-              '--material-albedo': albedo,
-              '--material-roughness': roughness.toString(),
-              '--material-metalness': metalness.toString(),
-              '--material-clearcoat': clearcoat.toString(),
-              '--material-clearcoatRoughness': clearcoatRoughness.toString(),
-              '--material-ior': ior.toString(),
-              '--material-transmission': transmission.toString(),
-              '--material-reflectivity': reflectivity.toString(),
-              '--material-emissive': emissive,
-              '--material-envMapIntensity': envMapIntensity.toString(),
-              '--material-normalIntensity': normalIntensity.toString(),
-              '--material-weathering': weathering.toString(),
             }}
             ref={previewRef}
           />

@@ -18,6 +18,7 @@ const PbrCardRenderer: React.FC = () => {
     reflectivity: 0.5,
     emissive: '#000000',
     envMapIntensity: 1.0,
+    metalness: 0.8,
     exposure: 1.0,
     reflectionStrength: 0.5,
   });
@@ -26,9 +27,9 @@ const PbrCardRenderer: React.FC = () => {
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
     
-    const { cleanup } = createPbrScene(canvasRef.current, containerRef.current, settings);
+    const result = createPbrScene(canvasRef.current, containerRef.current, settings);
     
-    return cleanup;
+    return result.cleanup;
   }, [settings]);
   
   const handleSettingsChange = (newSettings: Partial<PbrSettings>) => {

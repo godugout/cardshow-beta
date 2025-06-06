@@ -1,6 +1,7 @@
 
-import { CardEffect, CardEffectsResult, EffectEngine } from '@/hooks/card-effects/types';
 import { useRef } from 'react';
+import { EffectEngine, CardEffectSettings } from '@/hooks/card-effects/types';
+import { CardEffect } from '@/lib/types/cardEffects';
 
 /**
  * Create a default implementation of the EffectEngine
@@ -11,6 +12,7 @@ export const createDefaultEffectEngine = (): EffectEngine => {
   const cardRef = useRef<HTMLDivElement>(null);
   
   return {
+    engine: {},
     activeEffects: [],
     toggleEffect: (id: string) => {
       console.log('Toggle effect', id);
@@ -24,7 +26,7 @@ export const createDefaultEffectEngine = (): EffectEngine => {
     // Base EffectEngine implementation
     effects,
     compositor: {
-      compose: (effects: CardEffect[]): CardEffectsResult => ({ 
+      compose: (effects: CardEffect[]) => ({ 
         availableEffects: [],
         premiumEffects: [],
         activeEffects: [],
@@ -36,7 +38,7 @@ export const createDefaultEffectEngine = (): EffectEngine => {
         cssClasses: '',
         effectData: {}
       }),
-      layerEffects: (primary: CardEffect, secondary: CardEffect): CardEffect => primary,
+      layerEffects: (primary: CardEffect, secondary: CardEffect): CardEffect => primary as CardEffect,
       getHtmlElement: () => null
     },
     renderer: {
@@ -56,8 +58,10 @@ export const createDefaultEffectEngine = (): EffectEngine => {
       effects.delete(id);
     },
     applyEffects: (cardElement: HTMLElement, effects: CardEffect[]) => {},
-    updateSettings: (id: string, settings: Partial<any>) => {},
-    getEffectById: (id: string) => undefined,
+    updateSettings: (id: string, settings: Partial<CardEffectSettings>) => {},
+    getEffectById: (id: string) => {
+      return effects.get(id);
+    },
     createPreset: (name: string, effects: CardEffect[]) => '',
     loadPreset: (presetId: string) => []
   };

@@ -1,5 +1,5 @@
 
-import { Card } from '@/lib/types/cardTypes';
+import { Card, CardStyle, TextStyle } from '@/lib/types/cardTypes';
 
 /**
  * Legacy CardData type for backward compatibility
@@ -48,6 +48,9 @@ export interface CardData {
       cardType?: string;
     };
     marketMetadata: {
+      isPrintable?: boolean;
+      isForSale?: boolean;
+      includeInCatalog?: boolean;
       price?: number;
       currency?: string;
       availableForSale?: boolean;
@@ -123,14 +126,14 @@ export function adaptCardToCardData(card: Card): CardData {
         currency: 'USD',
         availableForSale: false,
         editionSize: 0,
-        editionNumber: 0
+        editionNumber: 0,
+        isPrintable: false,
+        isForSale: false,
+        includeInCatalog: false
       }
     }
   };
 }
-
-// Import types from cardTypes.ts
-import { CardStyle, TextStyle } from '@/lib/types/cardTypes';
 
 // Export from @/types/card to prevent errors in other imports
 export { Card, CardStyle, TextStyle, CardTemplate };
