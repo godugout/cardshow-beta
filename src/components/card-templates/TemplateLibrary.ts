@@ -1,4 +1,3 @@
-
 import { DesignMetadata } from '@/lib/types/cardTypes';
 
 /**
@@ -59,6 +58,9 @@ const defaultTemplates: CardTemplate[] = [
         cardType: 'player',
       },
       marketMetadata: {
+        isPrintable: false,
+        isForSale: false,
+        includeInCatalog: false,
         price: 0,
         currency: 'USD',
         availableForSale: false,
@@ -106,6 +108,9 @@ const defaultTemplates: CardTemplate[] = [
         cardType: 'player',
       },
       marketMetadata: {
+        isPrintable: false,
+        isForSale: false,
+        includeInCatalog: false,
         price: 0,
         currency: 'USD',
         availableForSale: false,
@@ -153,6 +158,9 @@ const defaultTemplates: CardTemplate[] = [
         cardType: 'player',
       },
       marketMetadata: {
+        isPrintable: false,
+        isForSale: false,
+        includeInCatalog: false,
         price: 0,
         currency: 'USD',
         availableForSale: false,

@@ -1,267 +1,136 @@
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
-import { Card, Collection } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
-import { sampleCards } from '@/lib/data/sampleCards';
-import { adaptToCard } from '@/lib/adapters/cardAdapter';
+import { useState, useEffect, useCallback, useContext } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { Card } from '@/lib/types';
+import { CardContext } from '@/context/CardContext';
+import { useAuth } from '@/context/auth';
+import { cardRepository } from '@/lib/data/cardRepository';
+import { toast } from 'sonner';
 
-export function useCards() {
-  const [cards, setCards] = useState<Card[]>([]);
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const { toast } = useToast();
+export const useCards = () => {
+  const { cards, setCards } = useContext(CardContext);
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchCards = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      console.log('Fetching cards...');
-      
-      // First try to get data from Supabase
-      let cardsFromSupabase = false;
-      
-      // Fetch cards from Supabase
-      try {
-        const { data: cardsData, error: cardsError } = await supabase
-          .from('cards')
-          .select('*');
-          
-        if (!cardsError && cardsData && cardsData.length > 0) {
-          console.log(`Fetched ${cardsData.length} cards from Supabase`);
-          
-          // Process cards
-          const processedCards = cardsData.map(card => {
-            const processedCard = {
-              id: card.id,
-              title: card.title,
-              description: card.description || '',
-              imageUrl: card.image_url || '',
-              thumbnailUrl: card.thumbnail_url || card.image_url || '',
-              collectionId: card.collection_id,
-              userId: card.creator_id || card.user_id,
-              teamId: card.team_id,
-              isPublic: card.is_public,
-              tags: card.tags || [],
-              effects: [],
-              rarity: card.rarity || 'common',
-              createdAt: new Date(card.created_at).toISOString(),
-              updatedAt: new Date(card.updated_at).toISOString(),
-              designMetadata: card.design_metadata || {},
-            };
-            return processedCard as Card;
-          });
-          
-          setCards(processedCards);
-          cardsFromSupabase = true;
-          
-          console.log('Cards loaded from Supabase:', processedCards);
-        }
-      } catch (supabaseError) {
-        console.error('Supabase error:', supabaseError);
+      if (user) {
+        const fetchedCards = await cardRepository.getCardsByUserId(user.id);
+        setCards(fetchedCards);
+      } else {
+        setCards([]);
       }
-      
-      // If no data from Supabase, use sample data
-      if (!cardsFromSupabase) {
-        console.log('Using sample data as fallback');
-        // Load sample cards
-        if (sampleCards && sampleCards.length > 0) {
-          const processedSampleCards = sampleCards.map(card => adaptToCard(card));
-          console.log('Loading sample cards:', processedSampleCards);
-          setCards(processedSampleCards);
-        } else {
-          // Create a fallback card if even sample cards are not available
-          console.log('No sample cards found, creating fallback card');
-          const fallbackCard: Card = adaptToCard({
-            id: 'fallback-card-1',
-            title: 'Sample Card',
-            description: 'This is a sample card to get you started.',
-            imageUrl: '/placeholder-card.png',
-            thumbnailUrl: '/placeholder-card.png',
-            userId: 'sample-user',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            tags: ['sample', 'demo'],
-            effects: []
-          });
-          setCards([fallbackCard]);
-        }
-      }
-      
-      // Successfully loaded cards one way or another
-      toast({
-        title: "Cards loaded",
-        description: `Your card collection is ready to view`,
-        variant: "default",
-      });
-      
-    } catch (err) {
-      const error = err as Error;
-      console.error('Error fetching cards:', error);
-      setError(error);
-      
-      toast({
-        title: 'Error loading cards',
-        description: error.message || 'Failed to load your card collection',
-        variant: 'destructive',
-      });
-      
-      // Even if there's an error, provide some fallback content
-      const fallbackCard: Card = adaptToCard({
-        id: 'error-fallback-card',
-        title: 'Sample Card',
-        description: 'This is a sample card.',
-        imageUrl: '/placeholder-card.png',
-        thumbnailUrl: '/placeholder-card.png',
-        userId: 'sample-user',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        tags: ['sample'],
-        effects: []
-      });
-      setCards([fallbackCard]);
-      
+    } catch (err: any) {
+      console.error('Error fetching cards:', err);
+      setError(err.message || 'Failed to load cards');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }, [toast]);
+  }, [setCards, user]);
 
-  // Automatically fetch cards on initial render
   useEffect(() => {
     fetchCards();
   }, [fetchCards]);
 
-  const createCard = useCallback(async (cardData: Partial<Card>) => {
+  const addCard = async (cardData: Card): Promise<Card> => {
     try {
-      const newCard = adaptToCard({
-        id: `card-${Date.now()}`,
-        title: cardData.title || 'Untitled Card',
-        description: cardData.description || '',
-        imageUrl: cardData.imageUrl || '/lovable-uploads/667e6ad2-af96-40ac-bd16-a69778e14b21.png',
-        thumbnailUrl: cardData.thumbnailUrl || cardData.imageUrl || '/lovable-uploads/667e6ad2-af96-40ac-bd16-a69778e14b21.png',
+      const newCard: Card = {
+        ...cardData,
+        id: uuidv4(),
+        userId: user?.id || 'guest-user',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        userId: 'user-1',
-        teamId: 'team-1',
-        collectionId: cardData.collectionId || '',
-        isPublic: cardData.isPublic !== undefined ? cardData.isPublic : true,
-        tags: cardData.tags || [],
-        effects: cardData.effects || [],
-        ...cardData
-      });
-      
-      setCards(prev => [newCard, ...prev]);
+      };
+
+      await cardRepository.addCard(newCard);
+      setCards(prevCards => [...prevCards, newCard]);
+
+      toast.success('Card created successfully');
       
       return newCard;
-    } catch (err) {
-      const error = err as Error;
-      console.error('Error creating card:', error);
-      toast({
-        title: 'Error creating card',
-        description: error.message,
-        variant: 'destructive',
-      });
+    } catch (error) {
+      toast.error('Failed to create card. Please try again.');
       throw error;
     }
-  }, [toast]);
+  };
 
-  const updateCard = useCallback(async (id: string, updates: Partial<Card>) => {
+  const updateCard = async (cardId: string, updates: Partial<Card>): Promise<void> => {
     try {
-      setCards(prev => 
-        prev.map(card => 
-          card.id === id 
-            ? adaptToCard({ ...card, ...updates, updatedAt: new Date().toISOString() })
-            : card
-        )
+      await cardRepository.updateCard(cardId, updates);
+      setCards(prevCards =>
+        prevCards.map(card => (card.id === cardId ? { ...card, ...updates } : card))
       );
-      
-      return true;
-    } catch (err) {
-      const error = err as Error;
-      console.error('Error updating card:', error);
-      toast({
-        title: 'Error updating card',
-        description: error.message,
-        variant: 'destructive',
-      });
-      return false;
-    }
-  }, [toast]);
 
-  const deleteCard = useCallback(async (id: string) => {
+      toast.success('Card updated successfully');
+    } catch (error) {
+      toast.error('Failed to update card. Please try again.');
+    }
+  };
+
+  const deleteCard = async (cardId: string): Promise<void> => {
     try {
-      setCards(prev => prev.filter(card => card.id !== id));
-      return true;
-    } catch (err) {
-      const error = err as Error;
-      console.error('Error deleting card:', error);
-      toast({
-        title: 'Error deleting card',
-        description: error.message,
-        variant: 'destructive',
-      });
-      return false;
-    }
-  }, [toast]);
+      await cardRepository.deleteCard(cardId);
+      setCards(prevCards => prevCards.filter(card => card.id !== cardId));
 
-  const createCollection = useCallback(async (collectionData: Partial<Collection>) => {
+      toast.success('Card deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete card. Please try again.');
+    }
+  };
+
+  const duplicateCard = async (cardId: string): Promise<void> => {
     try {
-      const newCollection: Collection = {
-        id: `collection-${Date.now()}`,
-        name: collectionData.name || 'Untitled Collection',
-        description: collectionData.description || '',
-        coverImageUrl: collectionData.coverImageUrl || '',
-        userId: 'user-1',
-        teamId: collectionData.teamId || 'team-1',
-        cards: [],
-        isPublic: collectionData.isPublic !== undefined ? collectionData.isPublic : true,
-        visibility: collectionData.visibility || 'public',
-        allowComments: collectionData.allowComments !== undefined ? collectionData.allowComments : true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        designMetadata: collectionData.designMetadata || {},
-        cardIds: collectionData.cardIds || [],
-      };
-      
-      setCollections(prev => [newCollection, ...prev]);
-      
-      return newCollection;
-    } catch (err) {
-      const error = err as Error;
-      console.error('Error creating collection:', error);
-      toast({
-        title: 'Error creating collection',
-        description: error.message,
-        variant: 'destructive',
-      });
-      throw error;
-    }
-  }, [toast]);
+      const cardToDuplicate = cards.find(card => card.id === cardId);
+      if (cardToDuplicate) {
+        const duplicatedCard = {
+          ...cardToDuplicate,
+          id: uuidv4(),
+          title: `${cardToDuplicate.title} (Copy)`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
 
-  const getCard = useCallback((id: string): Card | undefined => {
-    const foundCard = cards.find(card => card.id === id);
-    if (!foundCard) {
-      console.log(`Card with ID ${id} not found in cards array of length ${cards.length}`);
-      // Try to find in sampleCards as fallback
-      const sampleCard = sampleCards.find(card => card.id === id);
-      if (sampleCard) {
-        console.log(`Found card with ID ${id} in sampleCards`);
-        return adaptToCard(sampleCard);
+        await cardRepository.addCard(duplicatedCard);
+        setCards(prevCards => [...prevCards, duplicatedCard]);
+        toast.success('Card duplicated successfully');
       }
+    } catch (error) {
+      toast.error('Failed to duplicate card. Please try again.');
     }
-    return foundCard;
-  }, [cards]);
+  };
+
+  const exportCard = async (cardId: string): Promise<void> => {
+    try {
+      // Simulate exporting card
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('Card exported successfully');
+    } catch (error) {
+      toast.error('Failed to export card. Please try again.');
+    }
+  };
+
+  const shareCard = async (cardId: string): Promise<void> => {
+    try {
+      // Simulate sharing card
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('Card shared successfully');
+    } catch (error) {
+      toast.error('Failed to share card. Please try again.');
+    }
+  };
 
   return {
     cards,
-    collections,
-    loading,
+    isLoading,
     error,
-    fetchCards,
-    createCard,
+    addCard,
     updateCard,
     deleteCard,
-    createCollection,
-    getCard,
-    isLoading: loading,
+    duplicateCard,
+    exportCard,
+    shareCard,
+    fetchCards,
   };
-}
+};

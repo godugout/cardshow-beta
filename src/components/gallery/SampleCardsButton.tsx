@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Database } from 'lucide-react';
@@ -18,14 +17,15 @@ const SampleCardsButton: React.FC<SampleCardsButtonProps> = ({ variant = 'defaul
   // Since addSampleCards doesn't exist in context, let's implement it here
   const addSampleCards = async () => {
     // Mock implementation - in a real app this would fetch sample data
-    const sampleCards = [
-      {
-        id: `sample-${Date.now()}-1`,
-        title: 'Sample Basketball Card',
-        description: 'A sample basketball card',
-        imageUrl: 'https://placehold.co/600x400/orange/white?text=Basketball',
-        tags: ['sample', 'basketball'],
-        userId: 'system',
+    const sampleCards = [];
+    for (let i = 0; i < 10; i++) {
+      const sampleCard = {
+        id: `sample-${i + 1}`,
+        title: `Sample Card ${i + 1}`,
+        description: 'A sample card for demonstration',
+        imageUrl: '/images/card-placeholder.png',
+        tags: ['sample', 'demo'],
+        userId: 'sample-user',
         effects: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -37,49 +37,33 @@ const SampleCardsButton: React.FC<SampleCardsButtonProps> = ({ variant = 'defaul
             borderColor: '#000000',
             shadowColor: 'rgba(0,0,0,0.2)',
             frameWidth: 2,
-            frameColor: '#000000'
+            frameColor: '#000000',
           },
           textStyle: {
             titleColor: '#000000',
             titleAlignment: 'center',
             titleWeight: 'bold',
-            descriptionColor: '#333333'
+            descriptionColor: '#333333',
           },
-          cardMetadata: {},
-          marketMetadata: {}
+          cardMetadata: {
+            category: 'sample',
+            series: 'demo',
+            cardType: 'standard',
+          },
+          marketMetadata: {
+            isPrintable: false,
+            isForSale: false,
+            includeInCatalog: false,
+            price: 0,
+            currency: 'USD',
+            availableForSale: false,
+            editionSize: 1,
+            editionNumber: 1,
+          }
         }
-      },
-      {
-        id: `sample-${Date.now()}-2`,
-        title: 'Sample Baseball Card',
-        description: 'A sample baseball card',
-        imageUrl: 'https://placehold.co/600x400/blue/white?text=Baseball',
-        tags: ['sample', 'baseball'],
-        userId: 'system',
-        effects: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        designMetadata: {
-          cardStyle: {
-            template: 'classic',
-            effect: 'none',
-            borderRadius: '8px',
-            borderColor: '#000000',
-            shadowColor: 'rgba(0,0,0,0.2)',
-            frameWidth: 2,
-            frameColor: '#000000'
-          },
-          textStyle: {
-            titleColor: '#000000',
-            titleAlignment: 'center',
-            titleWeight: 'bold',
-            descriptionColor: '#333333'
-          },
-          cardMetadata: {},
-          marketMetadata: {}
-        }
-      }
-    ];
+      };
+      sampleCards.push(sampleCard);
+    }
     
     // Add the sample cards to the collection
     for (const card of sampleCards) {

@@ -11,6 +11,27 @@ export type JsonValue = string | number | boolean | null | JsonObject | JsonArra
 export type JsonObject = { [key: string]: JsonValue };
 export type JsonArray = JsonValue[];
 
-// Re-export commonly used types
-export type { Card, CardTemplate, Reaction, Comment } from './cardTypes';
+// Instagram post type
+export interface InstagramPost {
+  id: string;
+  imageUrl: string;
+  caption: string;
+  likes: number;
+  comments: number;
+  timestamp: string;
+  userId: string;
+}
+
+// Team member type
+export interface TeamMember {
+  id: string;
+  userId: string;
+  teamId: string;
+  role: 'owner' | 'admin' | 'member';
+  joinedAt: string;
+  permissions: string[];
+}
+
+// Re-export commonly used types from cardTypes only
+export type { Card, CardTemplate } from './cardTypes';
 export type { User } from './user';

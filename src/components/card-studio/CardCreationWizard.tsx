@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CardTemplate } from '@/components/card-templates/TemplateLibrary';
@@ -66,6 +65,9 @@ const DEFAULT_DESIGN_METADATA = {
     cardType: 'standard',
   },
   marketMetadata: {
+    isPrintable: false,
+    isForSale: false,
+    includeInCatalog: false,
     price: 0,
     currency: 'USD',
     availableForSale: false,
