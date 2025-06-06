@@ -1,256 +1,194 @@
-
-import React, { useState } from 'react';
-import { Card } from '@/lib/types/cardTypes';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { Plus, X } from 'lucide-react';
-import { toastUtils } from '@/lib/utils/toast-utils';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, DesignMetadata, MarketMetadata } from '@/lib/types';
+import { useCards } from '@/context/CardContext';
+import { Switch } from "@/components/ui/switch"
+import { toast } from 'sonner';
 
 interface FinalizeStepProps {
-  cardData: Partial<Card>;
-  onUpdate: (updates: Partial<Card>) => void;
+  card: Partial<Card>;
+  designMetadata: DesignMetadata;
+  onUpdateCard: (updates: Partial<Card>) => void;
+  onUpdateDesignMetadata: (updates: Partial<DesignMetadata>) => void;
 }
 
-const FinalizeStep: React.FC<FinalizeStepProps> = ({ cardData, onUpdate }) => {
-  const [tagInput, setTagInput] = useState<string>('');
-  
-  // Metadata defaults with fallbacks
-  const marketMetadata = cardData.designMetadata?.marketMetadata || {
-    price: 0,
-    currency: 'USD',
-    availableForSale: false,
-    editionSize: 1,
-    editionNumber: 1,
-  };
-  
-  const cardMetadata = cardData.designMetadata?.cardMetadata || {
-    category: 'general',
-    series: 'base',
-    cardType: 'standard',
-  };
-
-  // Handle adding a new tag
-  const handleAddTag = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!tagInput.trim()) return;
-    
-    // Check if tag already exists
-    const currentTags = cardData.tags || [];
-    if (currentTags.includes(tagInput.trim().toLowerCase())) {
-      toastUtils.info(
-        "Tag already exists",
-        "This tag is already added to the card"
-      );
-      return;
+const FinalizeStep = () => {
+  const { updateCard } = useCards();
+  const [isPrintable, setIsPrintable] = useState(false);
+  const [isForSale, setIsForSale] = useState(false);
+  const [includeInCatalog, setIncludeInCatalog] = useState(false);
+  const [price, setPrice] = useState<number | undefined>(0);
+  const [currency, setCurrency] = useState<string | undefined>('USD');
+  const [availableForSale, setAvailableForSale] = useState(false);
+  const [editionSize, setEditionSize] = useState<number | undefined>(1);
+  const [editionNumber, setEditionNumber] = useState<number | undefined>(1);
+  const [designMetadata, setDesignMetadata] = useState<DesignMetadata>({
+    cardStyle: {
+      template: 'classic',
+      effect: 'none',
+      borderRadius: '8px',
+      borderColor: '#000000',
+      shadowColor: 'rgba(0,0,0,0.2)',
+      frameWidth: 2,
+      frameColor: '#000000',
+    },
+    textStyle: {
+      titleColor: '#000000',
+      titleAlignment: 'center',
+      titleWeight: 'bold',
+      descriptionColor: '#333333',
+    },
+    cardMetadata: {
+      category: 'sample',
+      series: 'demo',
+      cardType: 'standard',
+    },
+    marketMetadata: {
+      isPrintable: false,
+      isForSale: false,
+      includeInCatalog: false,
+      price: 0,
+      currency: 'USD',
+      availableForSale: false,
+      editionSize: 1,
+      editionNumber: 1,
     }
-    
-    // Add the new tag
-    onUpdate({ 
-      tags: [...currentTags, tagInput.trim().toLowerCase()]
-    });
-    
-    // Reset input
-    setTagInput('');
-  };
+  });
+
+  useEffect(() => {
+    if (designMetadata.marketMetadata) {
+      setIsPrintable(designMetadata.marketMetadata.isPrintable || false);
+      setIsForSale(designMetadata.marketMetadata.isForSale || false);
+      setIncludeInCatalog(designMetadata.marketMetadata.includeInCatalog || false);
+      setPrice(designMetadata.marketMetadata.price);
+      setCurrency(designMetadata.marketMetadata.currency);
+      setAvailableForSale(designMetadata.marketMetadata.availableForSale || false);
+      setEditionSize(designMetadata.marketMetadata.editionSize);
+      setEditionNumber(designMetadata.marketMetadata.editionNumber);
+    }
+  }, [designMetadata]);
   
-  // Handle removing a tag
-  const handleRemoveTag = (tagToRemove: string) => {
-    const updatedTags = (cardData.tags || []).filter(tag => tag !== tagToRemove);
-    onUpdate({ tags: updatedTags });
-  };
-  
-  // Update market metadata
-  const handleMarketMetadataChange = (key: keyof typeof marketMetadata, value: any) => {
-    onUpdate({
-      designMetadata: {
-        ...cardData.designMetadata,
-        marketMetadata: {
-          ...marketMetadata,
-          [key]: value
-        }
+  const updateMarketMetadata = (field: string, value: any) => {
+    const updatedMetadata = {
+      ...designMetadata,
+      marketMetadata: {
+        isPrintable: false,
+        isForSale: false,
+        includeInCatalog: false,
+        ...designMetadata.marketMetadata,
+        [field]: value
       }
-    });
-  };
-  
-  // Update card metadata
-  const handleCardMetadataChange = (key: keyof typeof cardMetadata, value: any) => {
-    onUpdate({
-      designMetadata: {
-        ...cardData.designMetadata,
-        cardMetadata: {
-          ...cardMetadata,
-          [key]: value
-        }
-      }
-    });
+    };
+    setDesignMetadata(updatedMetadata);
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Finalize Card</h2>
-      
-      {/* Basic card details */}
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="title">Card Title</Label>
-          <Input
-            id="title"
-            value={cardData.title || ''}
-            onChange={(e) => onUpdate({ title: e.target.value })}
-            placeholder="Enter card title"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Input
-            id="description"
-            value={cardData.description || ''}
-            onChange={(e) => onUpdate({ description: e.target.value })}
-            placeholder="Brief description of the card"
-          />
-        </div>
+    <div className="grid gap-4">
+      <div>
+        <Label htmlFor="isPrintable" className="text-sm">Is Printable</Label>
+        <Switch 
+          id="isPrintable"
+          checked={isPrintable}
+          onCheckedChange={(checked) => {
+            setIsPrintable(checked);
+            updateMarketMetadata('isPrintable', checked);
+          }}
+        />
       </div>
-      
-      {/* Tags input */}
-      <div className="space-y-2">
-        <Label htmlFor="tags">Tags</Label>
-        <form onSubmit={handleAddTag} className="flex gap-2">
-          <Input
-            id="tags"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            placeholder="Add tags to help find your card"
-          />
-          <Button type="submit" size="sm">
-            <Plus className="h-4 w-4 mr-1" /> Add
-          </Button>
-        </form>
-        
-        {/* Display tags */}
-        <div className="flex flex-wrap gap-2 mt-2">
-          {(cardData.tags || []).map(tag => (
-            <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-              {tag}
-              <button
-                type="button"
-                onClick={() => handleRemoveTag(tag)}
-                className="focus:outline-none"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
-          
-          {(cardData.tags || []).length === 0 && (
-            <p className="text-sm text-gray-500">No tags added yet</p>
-          )}
-        </div>
+
+      <div>
+        <Label htmlFor="isForSale" className="text-sm">Is For Sale</Label>
+        <Switch 
+          id="isForSale"
+          checked={isForSale}
+          onCheckedChange={(checked) => {
+            setIsForSale(checked);
+            updateMarketMetadata('isForSale', checked);
+          }}
+        />
       </div>
-      
-      {/* Card metadata */}
-      <div className="space-y-4">
-        <h3 className="font-medium">Card Details</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
-            <Input
-              id="category"
-              value={cardMetadata.category || ''}
-              onChange={(e) => handleCardMetadataChange('category', e.target.value)}
-              placeholder="e.g., Sports, Collectible, Special"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="series">Series</Label>
-            <Input
-              id="series"
-              value={cardMetadata.series || ''}
-              onChange={(e) => handleCardMetadataChange('series', e.target.value)}
-              placeholder="e.g., Base, Limited Edition"
-            />
-          </div>
-        </div>
+
+      <div>
+        <Label htmlFor="includeInCatalog" className="text-sm">Include In Catalog</Label>
+        <Switch 
+          id="includeInCatalog"
+          checked={includeInCatalog}
+          onCheckedChange={(checked) => {
+            setIncludeInCatalog(checked);
+            updateMarketMetadata('includeInCatalog', checked);
+          }}
+        />
       </div>
-      
-      {/* Market metadata */}
-      <div className="space-y-4">
-        <h3 className="font-medium">Market Information</h3>
-        
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="available-for-sale"
-            checked={!!marketMetadata.availableForSale}
-            onCheckedChange={(checked) => 
-              handleMarketMetadataChange('availableForSale', checked)
-            }
-          />
-          <Label htmlFor="available-for-sale">Available for sale</Label>
-        </div>
-        
-        {marketMetadata.availableForSale && (
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="price">Price</Label>
-              <Input
-                id="price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={marketMetadata.price?.toString() || '0'}
-                onChange={(e) => handleMarketMetadataChange('price', parseFloat(e.target.value) || 0)}
-                className="w-full"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="currency">Currency</Label>
-              <Input
-                id="currency"
-                value={marketMetadata.currency || 'USD'}
-                onChange={(e) => handleMarketMetadataChange('currency', e.target.value)}
-                placeholder="USD"
-              />
-            </div>
-          </div>
-        )}
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="edition-size">Edition Size</Label>
-            <Input
-              id="edition-size"
-              type="number"
-              min="1"
-              value={marketMetadata.editionSize?.toString() || '1'}
-              onChange={(e) => handleMarketMetadataChange('editionSize', parseInt(e.target.value) || 1)}
-              className="w-full"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="edition-number">Edition Number</Label>
-            <Input
-              id="edition-number"
-              type="number"
-              min="1"
-              max={marketMetadata.editionSize || 1}
-              value={marketMetadata.editionNumber?.toString() || '1'}
-              onChange={(e) => {
-                const value = parseInt(e.target.value) || 1;
-                const max = marketMetadata.editionSize || 1;
-                handleMarketMetadataChange('editionNumber', Math.min(value, max));
-              }}
-              className="w-full"
-            />
-          </div>
-        </div>
+
+      <div>
+        <Label htmlFor="price" className="text-sm">Price</Label>
+        <Input
+          id="price"
+          type="number"
+          value={price}
+          onChange={(e) => {
+            const newPrice = parseFloat(e.target.value);
+            setPrice(newPrice);
+            updateMarketMetadata('price', newPrice);
+          }}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="currency" className="text-sm">Currency</Label>
+        <Input
+          id="currency"
+          type="text"
+          value={currency}
+          onChange={(e) => {
+            const newCurrency = e.target.value;
+            setCurrency(newCurrency);
+            updateMarketMetadata('currency', newCurrency);
+          }}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="availableForSale" className="text-sm">Available For Sale</Label>
+        <Switch 
+          id="availableForSale"
+          checked={availableForSale}
+          onCheckedChange={(checked) => {
+            setAvailableForSale(checked);
+            updateMarketMetadata('availableForSale', checked);
+          }}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="editionSize" className="text-sm">Edition Size</Label>
+        <Input
+          id="editionSize"
+          type="number"
+          value={editionSize}
+          onChange={(e) => {
+            const newEditionSize = parseInt(e.target.value);
+            setEditionSize(newEditionSize);
+            updateMarketMetadata('editionSize', newEditionSize);
+          }}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="editionNumber" className="text-sm">Edition Number</Label>
+        <Input
+          id="editionNumber"
+          type="number"
+          value={editionNumber}
+          onChange={(e) => {
+            const newEditionNumber = parseInt(e.target.value);
+            setEditionNumber(newEditionNumber);
+            updateMarketMetadata('editionNumber', newEditionNumber);
+          }}
+        />
       </div>
     </div>
   );

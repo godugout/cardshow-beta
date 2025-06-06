@@ -21,11 +21,12 @@ export interface Collection {
   cardIds: string[];
   coverImageUrl?: string;
   isPublic: boolean;
-  visibility: 'public' | 'private' | 'unlisted';
+  visibility: 'public' | 'private' | 'unlisted' | 'team';
   allowComments: boolean;
   designMetadata?: any;
   tags: string[];
   featured: boolean;
+  teamId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -53,6 +54,26 @@ export interface TeamMember {
   role: 'owner' | 'admin' | 'member';
   joinedAt: string;
   permissions: string[];
+}
+
+// Team type
+export interface Team {
+  id: string;
+  name: string;
+  description?: string;
+  ownerId: string;
+  visibility: 'public' | 'private';
+  logoUrl?: string;
+  logo_url?: string;
+  banner_url?: string;
+  status?: string;
+  website?: string;
+  email?: string;
+  specialties?: string[];
+  primary_color?: string;
+  secondary_color?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Serialization utility

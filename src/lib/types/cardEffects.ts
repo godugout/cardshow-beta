@@ -22,3 +22,19 @@ export interface EffectPreset {
   effects: CardEffect[];
   thumbnail?: string;
 }
+
+export interface CardEffectsResult {
+  availableEffects: PremiumCardEffect[];
+  premiumEffects: PremiumCardEffect[];
+  activeEffects: string[];
+  appliedClasses: string;
+  toggleEffect: (effectId: string) => void;
+  updateEffectSettings: (effectId: string, settings: any) => void;
+  clearAllEffects: () => void;
+  getEffectSettings: (effectId: string) => any;
+  cssClasses: string;
+  effectData: Record<string, any>;
+}
+
+// Export CardEffectSettings for external use
+export type { CardEffectSettings } from './cardTypes';

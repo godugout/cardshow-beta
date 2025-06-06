@@ -89,6 +89,26 @@ const DesignStep: React.FC<DesignStepProps> = ({ cardData, onUpdate }) => {
     });
   };
 
+  const updateDesignMetadata = (updates: Partial<DesignMetadata>) => {
+    const newMetadata = {
+      ...designMetadata,
+      ...updates,
+      marketMetadata: {
+        isPrintable: false,
+        isForSale: false,
+        includeInCatalog: false,
+        price: 0,
+        currency: 'USD',
+        availableForSale: false,
+        editionSize: 1,
+        editionNumber: 1,
+        ...designMetadata.marketMetadata,
+        ...updates.marketMetadata
+      }
+    };
+    setDesignMetadata(newMetadata);
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Design Your Card</h2>

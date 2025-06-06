@@ -7,7 +7,7 @@ import { useAuth } from '@/context/auth';
 import { toast } from 'sonner';
 
 export const useCards = () => {
-  const { cards, addCard: contextAddCard, updateCard: contextUpdateCard, deleteCard: contextDeleteCard } = useCardContext();
+  const { cards, addCard: contextAddCard, updateCard: contextUpdateCard, deleteCard: contextDeleteCard, getCard } = useCardContext();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -111,6 +111,7 @@ export const useCards = () => {
     cards,
     isLoading,
     error,
+    getCard,
     addCard,
     updateCard,
     deleteCard,

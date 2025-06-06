@@ -53,25 +53,11 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
     
     setIsLoading(true);
     try {
-      let data: Reaction[] | null = null;
-      let error: any = null;
-      
       if (cardId) {
-        const result = await reactionRepository.getAllByCardId(cardId);
-        data = result;
-        // If the API returns an error property, handle it here
+        const result = await reactionRepository.getReactionsByCardId(cardId);
+        setReactions(result);
       }
-      
       // Additional endpoints for collection and comment reactions could be added here
-      
-      if (error) {
-        console.error('Error fetching reactions:', error);
-        return;
-      }
-      
-      if (data) {
-        setReactions(data);
-      }
     } catch (err) {
       console.error('Unexpected error fetching reactions:', err);
     } finally {
@@ -119,37 +105,30 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
       
       if (userReaction && isSameType) {
         // Remove reaction if clicking the same type again
-        const success = await reactionRepository.remove(userReaction.id);
+        const targetId = cardId || collectionId || commentId;
+        const targetType = cardId ? 'card' : collectionId ? 'collection' : 'comment';
         
-        if (!success) {
-          toast.error('Failed to update reaction');
-          return;
+        if (targetId && targetType) {
+          await reactionRepository.removeReaction(user.id, targetId, targetType);
+          setReactions(prev => prev.filter(r => r.userId !== user.id));
         }
-        
-        setReactions(prev => prev.filter(r => r.userId !== user.id));
       } else {
         // Add or update reaction
-        const data = await reactionRepository.add(
-          user.id,
-          cardId,
-          collectionId,
-          commentId,
-          type
-        );
+        const targetId = cardId || collectionId || commentId;
+        const targetType = cardId ? 'card' : collectionId ? 'collection' : 'comment';
         
-        if (!data) {
-          toast.error('Failed to update reaction');
-          return;
-        }
-        
-        if (userReaction) {
-          // Update existing reaction
-          setReactions(prev => 
-            prev.map(r => r.userId === user.id ? data : r)
-          );
-        } else {
-          // Add new reaction
-          setReactions(prev => [...prev, data]);
+        if (targetId && targetType) {
+          const data = await reactionRepository.addReaction(user.id, targetId, targetType, type);
+          
+          if (userReaction) {
+            // Update existing reaction
+            setReactions(prev => 
+              prev.map(r => r.userId === user.id ? data : r)
+            );
+          } else {
+            // Add new reaction
+            setReactions(prev => [...prev, data]);
+          }
         }
       }
     } catch (err) {
@@ -280,7 +259,7 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
         </Tooltip>
       </TooltipProvider>
       
-      {/* Reactions summary (can be expanded with user icons for who reacted) */}
+      {/* Reactions summary */}
       {totalReactions > 0 && (
         <div className="text-sm text-muted-foreground ml-1">
           {totalReactions} reaction{totalReactions !== 1 ? 's' : ''}
