@@ -61,7 +61,7 @@ export interface Series {
   coverImageUrl?: string;
   isPublished?: boolean;
   cardIds: string[];
-  releaseType?: 'standard' | 'limited' | 'special';
+  releaseType?: 'standard' | 'limited' | 'special' | 'exclusive';
 }
 
 /**

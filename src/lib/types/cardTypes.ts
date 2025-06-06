@@ -1,3 +1,4 @@
+
 /**
  * Consolidated Card Types for Cardshow (CRD)
  * This file serves as the central source of truth for all card-related types
@@ -249,7 +250,7 @@ export interface Comment {
  */
 export interface Card extends BaseEntity {
   title: string;
-  description?: string; // Made optional to fix compatibility issues
+  description: string; // Made required to fix compatibility issue with other components
   imageUrl: string;
   image?: string; // Legacy support for older components
   thumbnailUrl?: string; // Made optional for compatibility
@@ -274,7 +275,7 @@ export interface Card extends BaseEntity {
   cardType?: string;
   artist?: string; // For backward compatibility
   backgroundColor?: string;
-  textColor?: string;
+  textColor?: string; // Added for data compatibility
   specialEffect?: string;
   fabricSwatches?: FabricSwatch[];
   stats?: CardStats;

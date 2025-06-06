@@ -3,22 +3,9 @@ import { CardEffect, CardEffectsResult, EffectEngine } from '@/lib/types/cardEff
 import { useRef } from 'react';
 
 /**
- * Extended EffectEngine implementation for component usage
- */
-export interface ExtendedEffectEngine extends EffectEngine {
-  // Additional properties used in CardEffectsDemo
-  engine: any;
-  activeEffects: string[];
-  toggleEffect: (id: string) => void;
-  updateEffectSettings: (id: string, settings: any) => void;
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-  cardRef: React.RefObject<HTMLDivElement>;
-}
-
-/**
  * Create a default implementation of the EffectEngine
  */
-export const createDefaultEffectEngine = (): ExtendedEffectEngine => {
+export const createDefaultEffectEngine = (): EffectEngine => {
   const effects = new Map<string, CardEffect>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -26,7 +13,6 @@ export const createDefaultEffectEngine = (): ExtendedEffectEngine => {
   return {
     engine: {},
     activeEffects: [],
-    effects,
     toggleEffect: (id: string) => {
       // Implementation would go here
       console.log('Toggle effect', id);
@@ -39,10 +25,17 @@ export const createDefaultEffectEngine = (): ExtendedEffectEngine => {
     cardRef,
     
     // Base EffectEngine implementation
+    effects,
     compositor: {
       compose: (effects: CardEffect[]): CardEffectsResult => ({ 
-        cssClasses: '', 
-        effectData: {} 
+        availableEffects: [],
+        premiumEffects: [],
+        activeEffects: [],
+        appliedClasses: '',
+        toggleEffect: () => {},
+        updateEffectSettings: () => {},
+        clearAllEffects: () => {},
+        getEffectSettings: () => ({})
       }),
       layerEffects: (primary: CardEffect, secondary: CardEffect): CardEffect => primary,
       getHtmlElement: () => null
@@ -72,6 +65,6 @@ export const createDefaultEffectEngine = (): ExtendedEffectEngine => {
 };
 
 // Export a hook that provides the engine
-export const useCardEffectsEngine = (): ExtendedEffectEngine => {
+export const useCardEffectsEngine = (): EffectEngine => {
   return createDefaultEffectEngine();
 };

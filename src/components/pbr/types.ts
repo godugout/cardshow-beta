@@ -7,6 +7,7 @@ export interface MaterialSimulation {
   baseColor?: string;
   weathering?: number;
   metallic?: number;
+  metalness?: number;
   roughness?: number;
   normalIntensity?: number;
   emissive?: string;
@@ -37,6 +38,11 @@ export interface PbrSettings {
   reflectivity: number;
   emissive: string;
   envMapIntensity: number;
+  
+  // Additional properties needed by components
+  metalness?: number;
+  exposure?: number;
+  reflectionStrength?: number;
 }
 
 export interface PbrSceneOptions {
@@ -44,4 +50,5 @@ export interface PbrSceneOptions {
   environment: string;
   exposure: number;
   background: boolean;
+  cleanup?: boolean; // Add cleanup property that was missing
 }
