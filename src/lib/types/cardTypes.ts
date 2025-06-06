@@ -201,6 +201,7 @@ export interface OaklandMemoryMetadata {
   title?: string;
   tags?: string[];
   imageUrl?: string;
+  description?: string;
 }
 
 export interface DesignMetadata {
@@ -292,7 +293,7 @@ export interface CardTemplate {
 }
 
 export interface EnhancedCard extends Card {
-  // EnhancedCard now properly extends Card with all base properties
+  // Additional properties specific to enhanced cards
   seriesId?: string; 
   deckId?: string;
   specialFeatures?: string[];
@@ -312,6 +313,7 @@ export interface EnhancedCard extends Card {
     lastSoldPrice?: number;
     availableForSale?: boolean;
   };
+  artistId?: string;
 }
 
 // Default values

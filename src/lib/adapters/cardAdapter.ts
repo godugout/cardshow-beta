@@ -13,12 +13,18 @@ const DEFAULT_DESIGN_METADATA = {
     frameColor: '#000000',
     frameWidth: 2,
     shadowColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: '#FFFFFF',
   },
   textStyle: {
     titleColor: '#000000',
     titleAlignment: 'center',
     titleWeight: 'bold',
     descriptionColor: '#333333',
+    fontFamily: 'Inter',
+    fontSize: '16px',
+    fontWeight: 'normal',
+    color: '#000000',
+    textAlign: 'center',
   },
   cardMetadata: {
     category: 'general',
@@ -87,6 +93,18 @@ export const adaptToLegacyCard = (card: Card): CardData => {
     player: card.player,
     team: card.team,
     year: card.year,
-    designMetadata: card.designMetadata || DEFAULT_DESIGN_METADATA
+    designMetadata: DEFAULT_DESIGN_METADATA
+  };
+};
+
+export const createBlankCard = (userId: string): Partial<Card> => {
+  return {
+    title: '',
+    description: '',
+    imageUrl: '',
+    tags: [],
+    userId,
+    effects: [],
+    designMetadata: DEFAULT_DESIGN_METADATA
   };
 };
