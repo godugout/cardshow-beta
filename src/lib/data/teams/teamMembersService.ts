@@ -1,3 +1,4 @@
+
 import { TeamMember } from '@/lib/types';
 import { mapTeamMemberData } from './mappers';
 
@@ -37,3 +38,9 @@ export const teamMembersService = {
     return mapTeamMemberData(memberData);
   }
 };
+
+// Export individual functions for backward compatibility
+export const getTeamMembers = teamMembersService.getTeamMembers;
+export const addTeamMember = teamMembersService.addTeamMember;
+export const updateTeamMemberRole = teamMembersService.updateTeamMemberRole;
+export const removeTeamMember = teamMembersService.removeTeamMember;

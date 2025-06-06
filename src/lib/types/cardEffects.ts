@@ -1,6 +1,5 @@
 
-import { JsonValue } from './index';
-import { ReactNode } from 'react';
+import { CardEffectSettings } from './cardTypes';
 
 export interface CardEffect {
   id: string;
@@ -10,101 +9,16 @@ export interface CardEffect {
   className?: string;
 }
 
-export interface CardEffectSettings {
-  intensity?: number;
-  speed?: number;
-  pattern?: string;
-  color?: string;
-  animationEnabled?: boolean;
-  colorScheme?: string[];
-  [key: string]: JsonValue | undefined;
+export interface PremiumCardEffect extends Omit<CardEffect, 'enabled'> {
+  enabled?: boolean;
+  isPremium: boolean;
+  tier: 'basic' | 'premium' | 'exclusive';
+  unlockLevel?: number;
 }
 
-export interface PremiumCardEffect extends CardEffect {
-  premium: boolean;
-  requiresSubscription?: boolean;
-  category?: string;
-  iconUrl?: string;
+export interface EffectPreset {
+  id: string;
+  name: string;
+  effects: CardEffect[];
   thumbnail?: string;
-  previewUrl?: string;
-  description?: string;
-}
-
-export interface CardEffectsResult {
-  cssClasses: string;
-  effectData: Record<string, any>;
-  jsxElements?: ReactNode[];
-  availableEffects: PremiumCardEffect[];
-  premiumEffects: PremiumCardEffect[];
-  activeEffects: string[];
-  appliedClasses: string;
-  toggleEffect: (effectId: string) => void;
-  updateEffectSettings: (effectId: string, settings: any) => void;
-  clearAllEffects: () => void;
-  getEffectSettings: (effectId: string) => any;
-}
-
-export type EffectSettings = CardEffectSettings;
-
-// Material simulation types with all needed properties
-export interface MaterialSimulation {
-  roughness: number;
-  metalness: number;
-  clearcoat: number;
-  clearcoatRoughness: number;
-  ior: number;
-  transmission: number;
-  reflectivity: number;
-  emissive: string;
-  envMapIntensity: number;
-  
-  // Additional properties needed by MaterialSimulator component
-  textureUrl?: string;
-  baseColor?: string;
-  type?: string;
-  id?: string;
-  name?: string;
-  weathering?: number;
-  metallic?: number;
-  normalIntensity?: number;
-}
-
-// Core effect engine interfaces
-export interface EffectCompositor {
-  compose(effects: CardEffect[]): CardEffectsResult;
-  layerEffects(primary: CardEffect, secondary: CardEffect): CardEffect;
-  getHtmlElement(): HTMLElement | null;
-}
-
-export interface WebGLRenderer {
-  initialize(canvas: HTMLCanvasElement): void;
-  applyShader(effect: CardEffect): void;
-  render(): void;
-  dispose(): void;
-}
-
-export interface PreviewGenerator {
-  generateThumbnail(effect: CardEffect, size: { width: number; height: number }): Promise<string>;
-  generatePreview(card: any, effects: CardEffect[]): ReactNode;
-}
-
-export interface EffectEngine {
-  effects: Map<string, CardEffect>;
-  compositor: EffectCompositor;
-  renderer: WebGLRenderer;
-  preview: PreviewGenerator;
-  
-  addEffect(effect: CardEffect): void;
-  removeEffect(id: string): void;
-  applyEffects(cardElement: HTMLElement, effects: CardEffect[]): void;
-  updateSettings(id: string, settings: Partial<CardEffectSettings>): void;
-  getEffectById(id: string): CardEffect | undefined;
-  createPreset(name: string, effects: CardEffect[]): string;
-  loadPreset(presetId: string): CardEffect[];
-  engine: any;
-  activeEffects: PremiumCardEffect[];
-  toggleEffect: (effectId: string) => void;
-  updateEffectSettings: (effectId: string, settings: any) => void;
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-  cardRef: React.RefObject<HTMLDivElement>;
 }

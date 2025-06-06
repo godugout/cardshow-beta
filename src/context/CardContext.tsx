@@ -22,7 +22,7 @@ export interface CardContextType {
   refreshCards: () => Promise<void>;
 }
 
-const CardContext = createContext<CardContextType>({
+export const CardContext = createContext<CardContextType>({
   cards: [],
   collections: [],
   isLoading: false,

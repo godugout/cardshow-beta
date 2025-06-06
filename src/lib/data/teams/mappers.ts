@@ -11,3 +11,17 @@ export const mapTeamMemberData = (data: any): TeamMember => {
     permissions: data.permissions || []
   };
 };
+
+export const mapTeamFromDb = (data: any) => {
+  return {
+    id: data.id,
+    name: data.name,
+    description: data.description || '',
+    createdAt: data.created_at || new Date().toISOString(),
+    updatedAt: data.updated_at || new Date().toISOString()
+  };
+};
+
+export const mapTeamMemberFromDb = (data: any): TeamMember => {
+  return mapTeamMemberData(data);
+};
