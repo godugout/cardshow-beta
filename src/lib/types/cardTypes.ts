@@ -53,7 +53,7 @@ export interface FabricSwatch {
 export interface CardLayer {
   id: string;
   name: string;
-  type: 'image' | 'text' | 'shape' | 'effect';
+  type: 'image' | 'text' | 'shape' | 'effect' | 'sticker';
   visible: boolean;
   locked: boolean;
   opacity: number;
@@ -199,9 +199,9 @@ export interface OaklandMemoryMetadata {
   historicalContext?: string;
   personalSignificance?: string;
   title?: string;
+  description?: string;
   tags?: string[];
   imageUrl?: string;
-  description?: string;
 }
 
 export interface DesignMetadata {
@@ -269,6 +269,23 @@ export interface Card {
   value?: number;
   gradingCompany?: string;
   gradingScore?: number;
+}
+
+export interface Collection {
+  id: string;
+  name: string;
+  description?: string;
+  coverImageUrl: string;
+  userId: string;
+  teamId?: string;
+  cards: Card[];
+  isPublic: boolean;
+  visibility: 'public' | 'private' | 'unlisted';
+  allowComments: boolean;
+  createdAt: string;
+  updatedAt: string;
+  designMetadata: DesignMetadata;
+  cardIds: string[];
 }
 
 export interface CardTemplate {

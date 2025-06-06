@@ -9,7 +9,6 @@ export interface EnhancedCard extends Card {
   interactiveElements?: string[];
   graded?: boolean;
   gradingService?: string;
-  gradingScore?: string;
   hotspots?: HotspotData[];
   backSideImage?: string;
   edition?: number;
