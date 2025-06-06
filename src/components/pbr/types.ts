@@ -1,3 +1,4 @@
+
 export interface MaterialSimulation {
   id: string;
   name: string;
@@ -24,4 +25,23 @@ export interface MaterialPreset {
   name: string;
   material: PBRMaterial;
   weathering?: number;
+}
+
+export interface PbrSettings {
+  metallic: number;
+  roughness: number;
+  clearcoat: number;
+  clearcoatRoughness: number;
+  ior: number;
+  transmission: number;
+  reflectivity: number;
+  emissive: string;
+  envMapIntensity: number;
+}
+
+export interface PbrSceneOptions {
+  lighting: 'studio' | 'outdoor' | 'dramatic';
+  environment: string;
+  exposure: number;
+  background: boolean;
 }

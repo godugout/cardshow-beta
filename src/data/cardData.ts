@@ -1,3 +1,4 @@
+
 import { CardData } from '@/types/card';
 
 export const sampleCardData: CardData[] = [
@@ -308,3 +309,6 @@ export const sampleCardData: CardData[] = [
     }
   }
 ];
+
+// Export cardData for backward compatibility
+export const cardData = sampleCardData;

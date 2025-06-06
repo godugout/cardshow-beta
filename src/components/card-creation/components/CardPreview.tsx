@@ -31,8 +31,18 @@ const CardPreview = React.forwardRef<HTMLDivElement, CardPreviewProps>(({
   }
   
   // Use safe access for card style properties with defaults
-  const cardStyle = card.designMetadata?.cardStyle || {};
-  const textStyle = card.designMetadata?.textStyle || {};
+  const cardStyle = card.designMetadata?.cardStyle || {
+    backgroundColor: '#FFFFFF',
+    borderRadius: '8px',
+    borderColor: '#000000'
+  };
+  
+  const textStyle = card.designMetadata?.textStyle || {
+    titleColor: '#FFFFFF',
+    titleWeight: 'bold',
+    titleAlignment: 'center',
+    descriptionColor: '#DDDDDD'
+  };
   
   return (
     <div className="relative" ref={ref}>
