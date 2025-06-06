@@ -1,11 +1,13 @@
+
 import React from 'react';
-import { Card } from '@/lib/types/cardTypes';
+import { Card, DesignMetadata } from '@/lib/types/cardTypes';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { ColorPicker } from '@/components/ui/color-picker';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 
 interface DesignStepProps {
   cardData: Partial<Card>;
@@ -37,76 +39,26 @@ const EFFECT_OPTIONS = [
   { value: 'matte', label: 'Matte' },
 ];
 
-const DEFAULT_CARD_STYLE = {
-  template: 'classic',
-  effect: 'none',
-  borderRadius: '8px',
-  borderWidth: 2,
-  borderColor: '#000000',
-  backgroundColor: '#FFFFFF',
-  shadowColor: 'rgba(0,0,0,0.2)',
-  frameWidth: 2,
-  frameColor: '#000000',
-};
-
 const DesignStep: React.FC<DesignStepProps> = ({ cardData, onUpdate }) => {
   // Ensure we have default design metadata
-  const designMetadata = cardData.designMetadata || {
-    cardStyle: DEFAULT_CARD_STYLE,
-    textStyle: {
-      titleColor: '#000000',
-      titleAlignment: 'center',
-      titleWeight: 'bold',
-      descriptionColor: '#333333',
-    },
-    cardMetadata: {
-      category: 'general',
-      series: 'base',
-      cardType: 'standard',
-    },
-    marketMetadata: {
-      price: 0,
-      currency: 'USD',
-      availableForSale: false,
-      editionSize: 1,
-      editionNumber: 1,
-    }
-  };
+  const designMetadata = cardData.designMetadata || DEFAULT_DESIGN_METADATA;
 
   // Ensure cardStyle is never undefined
-  const cardStyle = designMetadata.cardStyle || DEFAULT_CARD_STYLE;
+  const cardStyle = designMetadata.cardStyle || DEFAULT_DESIGN_METADATA.cardStyle;
 
   // Handle updates to card style properties
   const handleCardStyleChange = (property: keyof typeof cardStyle, value: any) => {
-    onUpdate({
-      designMetadata: {
-        ...designMetadata,
-        cardStyle: {
-          ...cardStyle,
-          [property]: value
-        }
-      }
-    });
-  };
-
-  const updateDesignMetadata = (updates: Partial<DesignMetadata>) => {
-    const newMetadata = {
+    const updatedDesignMetadata: DesignMetadata = {
       ...designMetadata,
-      ...updates,
-      marketMetadata: {
-        isPrintable: false,
-        isForSale: false,
-        includeInCatalog: false,
-        price: 0,
-        currency: 'USD',
-        availableForSale: false,
-        editionSize: 1,
-        editionNumber: 1,
-        ...designMetadata.marketMetadata,
-        ...updates.marketMetadata
+      cardStyle: {
+        ...cardStyle,
+        [property]: value
       }
     };
-    setDesignMetadata(newMetadata);
+
+    onUpdate({
+      designMetadata: updatedDesignMetadata
+    });
   };
 
   return (

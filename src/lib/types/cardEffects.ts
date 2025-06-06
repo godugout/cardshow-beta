@@ -9,11 +9,21 @@ export interface CardEffect {
   className?: string;
 }
 
-export interface PremiumCardEffect extends Omit<CardEffect, 'enabled'> {
-  enabled?: boolean;
+export interface PremiumCardEffect extends CardEffect {
   isPremium: boolean;
   tier: 'basic' | 'premium' | 'exclusive';
   unlockLevel?: number;
+  description: string;
+  premium: boolean;
+  category: string;
+  iconUrl?: string;
+  thumbnail?: string;
+  previewUrl?: string;
+  dependencies?: string[];
+  type?: 'shader' | 'css' | 'canvas' | 'webgl';
+  cssClass?: string;
+  supportedCardTypes?: string[];
+  defaultSettings?: any;
 }
 
 export interface EffectPreset {

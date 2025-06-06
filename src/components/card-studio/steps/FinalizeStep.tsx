@@ -1,88 +1,64 @@
-import React, { useState, useEffect, useCallback } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, DesignMetadata, MarketMetadata } from '@/lib/types';
-import { useCards } from '@/context/CardContext';
 import { Switch } from "@/components/ui/switch"
-import { toast } from 'sonner';
+import { DEFAULT_MARKET_METADATA } from '@/lib/utils/cardDefaults';
 
 interface FinalizeStepProps {
-  card: Partial<Card>;
-  designMetadata: DesignMetadata;
-  onUpdateCard: (updates: Partial<Card>) => void;
-  onUpdateDesignMetadata: (updates: Partial<DesignMetadata>) => void;
+  cardData: Partial<Card>;
+  onUpdate: (updates: Partial<Card>) => void;
 }
 
-const FinalizeStep = () => {
-  const { updateCard } = useCards();
-  const [isPrintable, setIsPrintable] = useState(false);
-  const [isForSale, setIsForSale] = useState(false);
-  const [includeInCatalog, setIncludeInCatalog] = useState(false);
-  const [price, setPrice] = useState<number | undefined>(0);
-  const [currency, setCurrency] = useState<string | undefined>('USD');
-  const [availableForSale, setAvailableForSale] = useState(false);
-  const [editionSize, setEditionSize] = useState<number | undefined>(1);
-  const [editionNumber, setEditionNumber] = useState<number | undefined>(1);
-  const [designMetadata, setDesignMetadata] = useState<DesignMetadata>({
-    cardStyle: {
-      template: 'classic',
-      effect: 'none',
-      borderRadius: '8px',
-      borderColor: '#000000',
-      shadowColor: 'rgba(0,0,0,0.2)',
-      frameWidth: 2,
-      frameColor: '#000000',
-    },
-    textStyle: {
-      titleColor: '#000000',
-      titleAlignment: 'center',
-      titleWeight: 'bold',
-      descriptionColor: '#333333',
-    },
-    cardMetadata: {
-      category: 'sample',
-      series: 'demo',
-      cardType: 'standard',
-    },
-    marketMetadata: {
-      isPrintable: false,
-      isForSale: false,
-      includeInCatalog: false,
-      price: 0,
-      currency: 'USD',
-      availableForSale: false,
-      editionSize: 1,
-      editionNumber: 1,
-    }
-  });
+const FinalizeStep: React.FC<FinalizeStepProps> = ({ cardData, onUpdate }) => {
+  const marketMetadata = cardData.designMetadata?.marketMetadata || DEFAULT_MARKET_METADATA;
+  
+  const [isPrintable, setIsPrintable] = useState(marketMetadata.isPrintable || false);
+  const [isForSale, setIsForSale] = useState(marketMetadata.isForSale || false);
+  const [includeInCatalog, setIncludeInCatalog] = useState(marketMetadata.includeInCatalog || false);
+  const [price, setPrice] = useState<number>(marketMetadata.price || 0);
+  const [currency, setCurrency] = useState<string>(marketMetadata.currency || 'USD');
+  const [availableForSale, setAvailableForSale] = useState(marketMetadata.availableForSale || false);
+  const [editionSize, setEditionSize] = useState<number>(marketMetadata.editionSize || 1);
+  const [editionNumber, setEditionNumber] = useState<number>(marketMetadata.editionNumber || 1);
 
   useEffect(() => {
-    if (designMetadata.marketMetadata) {
-      setIsPrintable(designMetadata.marketMetadata.isPrintable || false);
-      setIsForSale(designMetadata.marketMetadata.isForSale || false);
-      setIncludeInCatalog(designMetadata.marketMetadata.includeInCatalog || false);
-      setPrice(designMetadata.marketMetadata.price);
-      setCurrency(designMetadata.marketMetadata.currency);
-      setAvailableForSale(designMetadata.marketMetadata.availableForSale || false);
-      setEditionSize(designMetadata.marketMetadata.editionSize);
-      setEditionNumber(designMetadata.marketMetadata.editionNumber);
-    }
-  }, [designMetadata]);
+    const currentMarketMetadata = cardData.designMetadata?.marketMetadata || DEFAULT_MARKET_METADATA;
+    setIsPrintable(currentMarketMetadata.isPrintable || false);
+    setIsForSale(currentMarketMetadata.isForSale || false);
+    setIncludeInCatalog(currentMarketMetadata.includeInCatalog || false);
+    setPrice(currentMarketMetadata.price || 0);
+    setCurrency(currentMarketMetadata.currency || 'USD');
+    setAvailableForSale(currentMarketMetadata.availableForSale || false);
+    setEditionSize(currentMarketMetadata.editionSize || 1);
+    setEditionNumber(currentMarketMetadata.editionNumber || 1);
+  }, [cardData]);
   
   const updateMarketMetadata = (field: string, value: any) => {
-    const updatedMetadata = {
-      ...designMetadata,
-      marketMetadata: {
-        isPrintable: false,
-        isForSale: false,
-        includeInCatalog: false,
-        ...designMetadata.marketMetadata,
-        [field]: value
-      }
+    const currentDesignMetadata = cardData.designMetadata || {
+      cardStyle: {},
+      textStyle: {},
+      cardMetadata: {},
+      marketMetadata: DEFAULT_MARKET_METADATA
     };
-    setDesignMetadata(updatedMetadata);
+
+    const updatedMarketMetadata: MarketMetadata = {
+      ...DEFAULT_MARKET_METADATA,
+      ...currentDesignMetadata.marketMetadata,
+      [field]: value
+    };
+
+    const updatedDesignMetadata = {
+      ...currentDesignMetadata,
+      marketMetadata: updatedMarketMetadata
+    };
+
+    onUpdate({
+      designMetadata: updatedDesignMetadata
+    });
   };
 
   return (

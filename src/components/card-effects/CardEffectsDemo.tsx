@@ -93,6 +93,17 @@ const CardEffectsDemo: React.FC<CardEffectsDemoProps> = ({
     const effectsFromPreset = engine.loadPreset(presetId);
     // No need to set active effects here as the engine hook handles this
   };
+
+  // Convert PremiumCardEffect to CardEffect by ensuring enabled is set
+  const convertToCardEffect = (effect: any): CardEffect => {
+    return {
+      ...effect,
+      enabled: effect.enabled !== undefined ? effect.enabled : true
+    };
+  };
+
+  // Get available effects as CardEffect[]
+  const availableCardEffects = Array.from(engine.effects.values()).map(convertToCardEffect);
   
   return (
     <div className="w-full max-w-6xl mx-auto p-4">
@@ -225,7 +236,7 @@ const CardEffectsDemo: React.FC<CardEffectsDemoProps> = ({
         {/* Effects Controls */}
         <div>
           <EffectsControlPanel
-            availableEffects={Array.from(engine.effects.values())}
+            availableEffects={availableCardEffects}
             activeEffects={activeEffects}
             onToggleEffect={toggleEffect}
             onUpdateEffectSettings={updateEffectSettings}
