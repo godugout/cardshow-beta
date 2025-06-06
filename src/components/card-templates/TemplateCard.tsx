@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle } from 'lucide-react';
-import { CardTemplate } from '@/lib/types/cardTypes';
+import { CardTemplate } from './TemplateLibrary';
 import { cn } from '@/lib/utils';
 import EffectsEngine from '../card-effects/EffectsEngine';
 
@@ -21,6 +22,7 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
   previewImage,
   className = ''
 }) => {
+  // Determine which effects to apply based on template type
   const getTemplateEffects = (): string[] => {
     const effects: string[] = [];
     
@@ -102,7 +104,7 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
         
         {/* Template info overlay */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-white">
-          <div className="flex justify-between items-items-center">
+          <div className="flex justify-between items-center">
             <h3 className="font-bold text-sm">{template.name}</h3>
             {template.style === "premium" && (
               <Badge variant="default" className="bg-amber-500 hover:bg-amber-600">Premium</Badge>

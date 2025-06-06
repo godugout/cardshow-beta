@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/navigation/PageLayout';
 import { Button } from '@/components/ui/button';
-import { useArCards } from '@/hooks/useArCards';
+import { useArCardViewer } from '@/hooks/useArCardViewer';
 import { 
   ArrowLeft, 
   Camera, 
@@ -15,7 +15,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { Card } from '@/lib/types';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogContent } from '@/components/ui/alert-dialog';
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import {
@@ -36,9 +36,6 @@ const ArCardViewerPage: React.FC = () => {
     cards,
     loading,
     error,
-    currentCard,
-    nextCard,
-    previousCard,
     activeCard,
     arCards,
     availableCards,
@@ -54,7 +51,7 @@ const ArCardViewerPage: React.FC = () => {
     handleRotate,
     handleAddCard,
     handleRemoveCard,
-  } = useArCards();
+  } = useArCardViewer(id);
 
   // Start camera when entering AR mode
   useEffect(() => {
@@ -342,7 +339,8 @@ const ArCardViewerPage: React.FC = () => {
                       onClick={() => {
                         handleAddCard(card.id);
                         setShowAddCardSheet(false);
-                        toast.success("Card added", {
+                        toast({
+                          title: "Card added",
                           description: `${card.title} added to AR scene`
                         });
                       }}

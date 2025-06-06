@@ -10,26 +10,6 @@ export * from './types/user';
 export * from './types/interaction';
 export * from './types/collection';
 
-// Define base types used throughout the application
-
-export interface BaseEntity {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
-
-// Make sure SearchFilters is properly defined as an object type
-export interface SearchFilters {
-  category?: string;
-  tags?: string[];
-  type?: string;
-  rarity?: string;
-  minPrice?: number;
-  maxPrice?: number;
-}
-
 // Keep the utility function for backward compatibility
 import { DesignMetadata } from './types/cardTypes';
 
@@ -46,6 +26,22 @@ export function serializeMetadata(metadata: DesignMetadata | undefined): Record<
   // Handle specific nested objects that might need special serialization
   if (metadata.oaklandMemory && typeof metadata.oaklandMemory === 'object') {
     serialized.oaklandMemory = JSON.parse(JSON.stringify(metadata.oaklandMemory));
+  }
+  
+  // Handle layers which might contain functions or complex objects
+  if (metadata.layers && Array.isArray(metadata.layers)) {
+    serialized.layers = metadata.layers.map(layer => {
+      const layerCopy = { ...layer } as Record<string, any>;
+      
+      // Convert any non-serializable values
+      Object.keys(layerCopy).forEach(key => {
+        if (typeof layerCopy[key] === 'function') {
+          delete layerCopy[key];
+        }
+      });
+      
+      return layerCopy;
+    });
   }
   
   return serialized;

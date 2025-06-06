@@ -72,16 +72,13 @@ export const CardDetailed: React.FC<CardDetailedProps> = ({
     }
   };
 
-  // Convert to Card type for CardThumbnail component
-  const cardForThumbnail: Card = card as Card;
-
   return (
     <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-8", className)}>
       {/* Card Preview */}
       <div className="flex justify-center">
         <div className="max-w-md w-full">
           <CardThumbnail 
-            card={cardForThumbnail} 
+            card={card} 
             onClick={() => onView && onView(card.id)}
             enableEffects={enableEffects}
             activeEffects={activeEffects} 

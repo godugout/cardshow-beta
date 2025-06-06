@@ -1,135 +1,117 @@
-
 import React from 'react';
 import { Card } from '@/lib/types/cardTypes';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { ColorPicker } from '@/components/ui/color-picker';
-import { CardStyle, DEFAULT_CARD_STYLE } from '@/components/card-templates/TemplateTypes';
 
 interface DesignStepProps {
   cardData: Partial<Card>;
   onUpdate: (updates: Partial<Card>) => void;
 }
 
-const DesignStep: React.FC<DesignStepProps> = ({ cardData, onUpdate }) => {
-  const currentCardStyle = cardData.designMetadata?.cardStyle || DEFAULT_CARD_STYLE;
+const TEMPLATE_OPTIONS = [
+  { value: 'classic', label: 'Classic' },
+  { value: 'modern', label: 'Modern' },
+  { value: 'vintage', label: 'Vintage' },
+  { value: 'minimalist', label: 'Minimalist' },
+  { value: 'bold', label: 'Bold' },
+];
 
-  const updateCardStyle = (updates: Partial<CardStyle>) => {
-    const newCardStyle = { ...currentCardStyle, ...updates };
+const BORDER_RADIUS_OPTIONS = [
+  { value: '0px', label: 'Square' },
+  { value: '4px', label: 'Slightly Rounded' },
+  { value: '8px', label: 'Rounded' },
+  { value: '16px', label: 'Very Rounded' },
+  { value: '24px', label: 'Pill' },
+];
+
+const EFFECT_OPTIONS = [
+  { value: 'none', label: 'None' },
+  { value: 'holographic', label: 'Holographic' },
+  { value: 'gold-foil', label: 'Gold Foil' },
+  { value: 'silver-foil', label: 'Silver Foil' },
+  { value: 'gloss', label: 'Gloss' },
+  { value: 'matte', label: 'Matte' },
+];
+
+const DEFAULT_CARD_STYLE = {
+  template: 'classic',
+  effect: 'none',
+  borderRadius: '8px',
+  borderWidth: 2,
+  borderColor: '#000000',
+  backgroundColor: '#FFFFFF',
+  shadowColor: 'rgba(0,0,0,0.2)',
+  frameWidth: 2,
+  frameColor: '#000000',
+};
+
+const DesignStep: React.FC<DesignStepProps> = ({ cardData, onUpdate }) => {
+  // Ensure we have default design metadata
+  const designMetadata = cardData.designMetadata || {
+    cardStyle: DEFAULT_CARD_STYLE,
+    textStyle: {
+      titleColor: '#000000',
+      titleAlignment: 'center',
+      titleWeight: 'bold',
+      descriptionColor: '#333333',
+    },
+    cardMetadata: {
+      category: 'general',
+      series: 'base',
+      cardType: 'standard',
+    },
+    marketMetadata: {
+      price: 0,
+      currency: 'USD',
+      availableForSale: false,
+      editionSize: 1,
+      editionNumber: 1,
+    }
+  };
+
+  // Ensure cardStyle is never undefined
+  const cardStyle = designMetadata.cardStyle || DEFAULT_CARD_STYLE;
+
+  // Handle updates to card style properties
+  const handleCardStyleChange = (property: keyof typeof cardStyle, value: any) => {
     onUpdate({
       designMetadata: {
-        ...cardData.designMetadata,
-        cardStyle: newCardStyle
+        ...designMetadata,
+        cardStyle: {
+          ...cardStyle,
+          [property]: value
+        }
       }
     });
   };
 
-  const effectOptions = [
-    { value: 'none', label: 'None' },
-    { value: 'holographic', label: 'Holographic' },
-    { value: 'refractor', label: 'Refractor' },
-    { value: 'prismatic', label: 'Prismatic' },
-    { value: 'chrome', label: 'Chrome' },
-    { value: 'vintage', label: 'Vintage' }
-  ];
-
-  const templateOptions = [
-    { value: 'classic', label: 'Classic' },
-    { value: 'modern', label: 'Modern' },
-    { value: 'vintage', label: 'Vintage' },
-    { value: 'minimal', label: 'Minimal' }
-  ];
-
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Card Preview */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Preview</h3>
-          <div 
-            className="aspect-[2.5/3.5] max-w-xs rounded-lg border-2 shadow-lg"
-            style={{
-              backgroundColor: currentCardStyle.backgroundColor,
-              borderColor: currentCardStyle.borderColor,
-              borderRadius: currentCardStyle.borderRadius,
-              borderWidth: `${currentCardStyle.borderWidth}px`
-            }}
-          >
-            {cardData.imageUrl && (
-              <img 
-                src={cardData.imageUrl} 
-                alt="Card preview"
-                className="w-full h-full object-cover rounded-lg"
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Design Controls */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Card Design</h3>
-          
-          {/* Background Color */}
-          <div className="space-y-2">
-            <Label>Background Color</Label>
-            <ColorPicker
-              color={currentCardStyle.backgroundColor}
-              onChange={(color) => updateCardStyle({ backgroundColor: color })}
-            />
-          </div>
-
-          {/* Border Color */}
-          <div className="space-y-2">
-            <Label>Border Color</Label>
-            <ColorPicker
-              color={currentCardStyle.borderColor}
-              onChange={(color) => updateCardStyle({ borderColor: color })}
-            />
-          </div>
-
-          {/* Effect */}
-          <div className="space-y-2">
-            <Label>Card Effect</Label>
-            <Select 
-              value={currentCardStyle.effect} 
-              onValueChange={(value) => updateCardStyle({ effect: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select effect" />
-              </SelectTrigger>
-              <SelectContent>
-                {effectOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Shadow Color */}
-          <div className="space-y-2">
-            <Label>Shadow Color</Label>
-            <ColorPicker
-              color={currentCardStyle.shadowColor}
-              onChange={(color) => updateCardStyle({ shadowColor: color })}
-            />
-          </div>
-
-          {/* Template */}
+      <h2 className="text-xl font-semibold">Design Your Card</h2>
+      
+      <Tabs defaultValue="layout" className="w-full">
+        <TabsList className="grid grid-cols-3 mb-4">
+          <TabsTrigger value="layout">Layout</TabsTrigger>
+          <TabsTrigger value="border">Border</TabsTrigger>
+          <TabsTrigger value="effects">Effects</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="layout" className="space-y-4">
           <div className="space-y-2">
             <Label>Card Template</Label>
             <Select 
-              value={currentCardStyle.template} 
-              onValueChange={(value) => updateCardStyle({ template: value })}
+              value={cardStyle.template || 'classic'}
+              onValueChange={(value) => handleCardStyleChange('template', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select template" />
               </SelectTrigger>
               <SelectContent>
-                {templateOptions.map((option) => (
+                {TEMPLATE_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -137,52 +119,121 @@ const DesignStep: React.FC<DesignStepProps> = ({ cardData, onUpdate }) => {
               </SelectContent>
             </Select>
           </div>
-
-          {/* Border Radius */}
+          
           <div className="space-y-2">
             <Label>Border Radius</Label>
-            <Input
-              type="text"
-              value={currentCardStyle.borderRadius}
-              onChange={(e) => updateCardStyle({ borderRadius: e.target.value })}
-              placeholder="8px"
-            />
+            <Select 
+              value={cardStyle.borderRadius || '8px'}
+              onValueChange={(value) => handleCardStyleChange('borderRadius', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select border radius" />
+              </SelectTrigger>
+              <SelectContent>
+                {BORDER_RADIUS_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-
-          {/* Border Width */}
+        </TabsContent>
+        
+        <TabsContent value="border" className="space-y-4">
           <div className="space-y-2">
-            <Label>Border Width</Label>
-            <Input
-              type="number"
-              value={currentCardStyle.borderWidth}
-              onChange={(e) => updateCardStyle({ borderWidth: parseInt(e.target.value) || 0 })}
-              min="0"
-              max="10"
+            <div className="flex justify-between">
+              <Label>Border Color</Label>
+              <div className="w-24">
+                <Input 
+                  type="text" 
+                  value={cardStyle.borderColor || '#000000'} 
+                  onChange={(e) => handleCardStyleChange('borderColor', e.target.value)}
+                  className="h-8 text-xs"
+                />
+              </div>
+            </div>
+            <ColorPicker 
+              color={cardStyle.borderColor || '#000000'}
+              onChange={(color) => handleCardStyleChange('borderColor', color)}
+              className="w-full"
             />
           </div>
-
-          {/* Frame Color */}
+          
           <div className="space-y-2">
-            <Label>Frame Color</Label>
-            <ColorPicker
-              color={currentCardStyle.frameColor}
-              onChange={(color) => updateCardStyle({ frameColor: color })}
+            <div className="flex justify-between">
+              <Label>Frame Color</Label>
+              <div className="w-24">
+                <Input 
+                  type="text" 
+                  value={cardStyle.frameColor || '#000000'} 
+                  onChange={(e) => handleCardStyleChange('frameColor', e.target.value)}
+                  className="h-8 text-xs"
+                />
+              </div>
+            </div>
+            <ColorPicker 
+              color={cardStyle.frameColor || '#000000'}
+              onChange={(color) => handleCardStyleChange('frameColor', color)}
+              className="w-full"
             />
           </div>
-
-          {/* Frame Width */}
+          
           <div className="space-y-2">
-            <Label>Frame Width</Label>
-            <Input
-              type="number"
-              value={currentCardStyle.frameWidth}
-              onChange={(e) => updateCardStyle({ frameWidth: parseInt(e.target.value) || 0 })}
-              min="0"
-              max="20"
+            <div className="flex justify-between">
+              <Label>Frame Width</Label>
+              <span className="text-sm">{cardStyle.frameWidth || 2}px</span>
+            </div>
+            <Slider
+              value={[cardStyle.frameWidth || 2]}
+              min={0}
+              max={10}
+              step={1}
+              onValueChange={([value]) => handleCardStyleChange('frameWidth', value)}
             />
           </div>
-        </div>
-      </div>
+        </TabsContent>
+        
+        <TabsContent value="effects" className="space-y-4">
+          <div className="space-y-2">
+            <Label>Card Effect</Label>
+            <Select 
+              value={cardStyle.effect || 'none'}
+              onValueChange={(value) => handleCardStyleChange('effect', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select effect" />
+              </SelectTrigger>
+              <SelectContent>
+                {EFFECT_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Label>Shadow Color</Label>
+              <div className="w-24">
+                <Input 
+                  type="text" 
+                  value={cardStyle.shadowColor || 'rgba(0,0,0,0.2)'} 
+                  onChange={(e) => handleCardStyleChange('shadowColor', e.target.value)}
+                  className="h-8 text-xs"
+                />
+              </div>
+            </div>
+            <ColorPicker 
+              color={cardStyle.shadowColor || 'rgba(0,0,0,0.2)'}
+              onChange={(color) => handleCardStyleChange('shadowColor', color)}
+              className="w-full"
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

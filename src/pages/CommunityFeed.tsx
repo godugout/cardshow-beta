@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import PageLayout from '@/components/navigation/PageLayout';
 import { Card } from '@/lib/types/cardTypes';
@@ -64,10 +65,10 @@ const CommunityFeed = () => {
         setFeedCards(communityCards);
       } catch (error) {
         console.error('Error fetching community feed:', error);
-        // Fixed toast call
         toast({
           title: 'Error loading feed',
           description: 'Failed to load community cards',
+          variant: 'destructive',
         });
       } finally {
         setLoading(false);

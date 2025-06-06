@@ -10,7 +10,7 @@ export const effectRegistry: Record<string, CardEffectDefinition> = {
     id: 'holographic',
     name: 'Holographic',
     description: 'Rainbow reflective effect that shifts with viewing angle',
-    thumbnailUrl: '/effects/holographic-thumb.jpg',
+    thumbnail: '/effects/holographic-thumb.jpg',
     category: 'premium',
     defaultSettings: {
       intensity: 0.7,
@@ -20,30 +20,14 @@ export const effectRegistry: Record<string, CardEffectDefinition> = {
       animationEnabled: true
     },
     cssClass: 'effect-holographic',
-    supportedCardTypes: ['standard', 'premium', 'collectible'],
-    premium: true,
-    isPremium: true,
-    enabled: true,
-    settings: {
-      intensity: 0.7,
-      speed: 1.0,
-      pattern: 'linear',
-      colorScheme: ['#ff0099', '#00ffcc', '#ffcc00', '#00ccff'],
-      animationEnabled: true
-    },
-    renderer: (element: HTMLElement, settings: any) => {
-      // Apply holographic effect to the element
-      element.classList.add('effect-holographic');
-      element.style.setProperty('--hologram-intensity', settings.intensity.toString());
-      element.style.setProperty('--motion-speed', settings.speed.toString());
-    }
+    supportedCardTypes: ['standard', 'premium', 'collectible']
   },
   
   Refractor: {
     id: 'refractor',
     name: 'Refractor',
     description: 'Light-bending prismatic effect with angular highlights',
-    thumbnailUrl: '/effects/refractor-thumb.jpg',
+    thumbnail: '/effects/refractor-thumb.jpg',
     category: 'premium',
     defaultSettings: {
       intensity: 0.6,
@@ -53,31 +37,15 @@ export const effectRegistry: Record<string, CardEffectDefinition> = {
       animationEnabled: true
     },
     cssClass: 'effect-refractor',
-    supportedCardTypes: ['premium', 'collectible'],
-    premium: true,
-    isPremium: true,
-    enabled: true,
-    settings: {
-      intensity: 0.6,
-      speed: 0.8,
-      pattern: 'angular',
-      colorScheme: ['#80ffea', '#8aff80', '#ffca80'],
-      animationEnabled: true
-    },
-    renderer: (element: HTMLElement, settings: any) => {
-      // Apply refractor effect to the element
-      element.classList.add('card-refractor');
-      element.style.setProperty('--refractor-intensity', settings.intensity.toString());
-      element.style.setProperty('--motion-speed', settings.speed.toString());
-    }
+    supportedCardTypes: ['premium', 'collectible']
   },
   
   Chrome: {
     id: 'chrome',
     name: 'Chrome',
     description: 'Metallic chrome finish with reflection and shine',
-    thumbnailUrl: '/effects/chrome-thumb.jpg',
-    category: 'metallic',
+    thumbnail: '/effects/chrome-thumb.jpg',
+    category: 'standard',
     defaultSettings: {
       intensity: 0.5,
       speed: 0.5,
@@ -85,29 +53,15 @@ export const effectRegistry: Record<string, CardEffectDefinition> = {
       animationEnabled: false
     },
     cssClass: 'effect-chrome',
-    supportedCardTypes: ['standard', 'premium', 'collectible'],
-    premium: false,
-    isPremium: false,
-    enabled: true,
-    settings: {
-      intensity: 0.5,
-      speed: 0.5,
-      colorScheme: ['#ffffff', '#d0d0d0', '#a0a0a0'],
-      animationEnabled: false
-    },
-    renderer: (element: HTMLElement, settings: any) => {
-      // Apply chrome effect to the element
-      element.classList.add('card-chrome');
-      element.style.setProperty('--chrome-intensity', settings.intensity.toString());
-    }
+    supportedCardTypes: ['standard', 'premium', 'collectible']
   },
   
   Vintage: {
     id: 'vintage',
     name: 'Vintage',
     description: 'Classic aged look with subtle grain and color shift',
-    thumbnailUrl: '/effects/vintage-thumb.jpg',
-    category: 'vintage',
+    thumbnail: '/effects/vintage-thumb.jpg',
+    category: 'standard',
     defaultSettings: {
       intensity: 0.4,
       speed: 0.2,
@@ -115,29 +69,15 @@ export const effectRegistry: Record<string, CardEffectDefinition> = {
       animationEnabled: false
     },
     cssClass: 'effect-vintage',
-    supportedCardTypes: ['standard', 'collectible'],
-    premium: false,
-    isPremium: false,
-    enabled: true,
-    settings: {
-      intensity: 0.4,
-      speed: 0.2,
-      colorScheme: ['#ffe6cc', '#ffccaa'],
-      animationEnabled: false
-    },
-    renderer: (element: HTMLElement, settings: any) => {
-      // Apply vintage effect to the element
-      element.classList.add('card-vintage');
-      element.style.setProperty('--vintage-intensity', settings.intensity.toString());
-    }
+    supportedCardTypes: ['standard', 'collectible']
   },
   
   Shimmer: {
     id: 'shimmer',
     name: 'Shimmer',
     description: 'Subtle animated glow effect that pulses and moves',
-    thumbnailUrl: '/effects/shimmer-thumb.jpg',
-    category: 'special',
+    thumbnail: '/effects/shimmer-thumb.jpg',
+    category: 'standard',
     defaultSettings: {
       intensity: 0.4,
       speed: 1.2,
@@ -145,29 +85,14 @@ export const effectRegistry: Record<string, CardEffectDefinition> = {
       animationEnabled: true
     },
     cssClass: 'effect-shimmer',
-    supportedCardTypes: ['standard', 'premium', 'collectible'],
-    premium: false,
-    isPremium: false,
-    enabled: true,
-    settings: {
-      intensity: 0.4,
-      speed: 1.2,
-      color: '#ffffff',
-      animationEnabled: true
-    },
-    renderer: (element: HTMLElement, settings: any) => {
-      // Apply shimmer effect to the element
-      element.classList.add('effect-shimmer');
-      element.style.setProperty('--shimmer-intensity', settings.intensity.toString());
-      element.style.setProperty('--motion-speed', settings.speed.toString());
-    }
+    supportedCardTypes: ['standard', 'premium', 'collectible']
   }
 };
 
 /**
  * Get effect definitions by category
  */
-export const getEffectsByCategory = (category: 'premium' | 'standard' | 'special' | 'all' | string): CardEffectDefinition[] => {
+export const getEffectsByCategory = (category: 'premium' | 'standard' | 'special' | 'all'): CardEffectDefinition[] => {
   if (category === 'all') {
     return Object.values(effectRegistry);
   }

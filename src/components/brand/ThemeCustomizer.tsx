@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -7,8 +6,9 @@ import { ColorPicker } from '@/components/ui/color-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { useTheme } from 'next-themes';
+import { createToast } from '@/types/toast';
 
 interface ThemeCustomizerProps {
   className?: string;
@@ -41,11 +41,10 @@ const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ className }) => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
     localStorage.setItem('customCss', customCss);
 
-    toast({
-      id: Math.random().toString(36).substring(2, 9),
+    toast(createToast({
       title: "Theme updated",
       description: "Your theme settings have been saved"
-    });
+    }));
   };
 
   const handleReset = () => {
@@ -67,11 +66,10 @@ const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ className }) => {
     localStorage.removeItem('darkMode');
     localStorage.removeItem('customCss');
 
-    toast({
-      id: Math.random().toString(36).substring(2, 9),
+    toast(createToast({
       title: "Theme reset",
       description: "Theme has been reset to default values"
-    });
+    }));
   };
 
   return (

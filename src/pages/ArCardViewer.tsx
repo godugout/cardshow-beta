@@ -10,7 +10,7 @@ import { CrdButton } from '@/components/ui/crd-button';
 import { Camera, Smartphone, Scan, Info } from 'lucide-react';
 import CardMedia from '@/components/gallery/CardMedia';
 import { toast } from 'sonner';
-import { useArCards } from '@/hooks/useArCards';
+import { useArCardViewer } from '@/hooks/useArCardViewer';
 import ArModeView from '@/components/ar/ArModeView';
 
 const ArCardViewer = () => {
@@ -19,13 +19,8 @@ const ArCardViewer = () => {
   const navigate = useNavigate();
   
   const {
-    cards: arCards,
-    currentCard,
-    loading,
-    error,
-    nextCard,
-    previousCard,
     activeCard,
+    arCards,
     availableCards,
     isArMode,
     isFlipped,
@@ -41,7 +36,7 @@ const ArCardViewer = () => {
     handleRotate,
     handleAddCard,
     handleRemoveCard
-  } = useArCards();
+  } = useArCardViewer(id);
 
   if (isArMode) {
     return (
@@ -49,14 +44,14 @@ const ArCardViewer = () => {
         activeCards={arCards}
         availableCards={availableCards}
         onExitAr={handleExitAr}
-        onCameraError={(errorMsg: string) => handleCameraError(errorMsg)}
+        onCameraError={handleCameraError}
         onTakeSnapshot={handleTakeSnapshot}
         onFlip={handleFlip}
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         onRotate={handleRotate}
-        onAddCard={(cardId: string) => handleAddCard(cardId)}
-        onRemoveCard={(cardId: string) => handleRemoveCard(cardId)}
+        onAddCard={handleAddCard}
+        onRemoveCard={handleRemoveCard}
       />
     );
   }

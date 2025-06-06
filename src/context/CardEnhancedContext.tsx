@@ -2,14 +2,13 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import { Card, DEFAULT_DESIGN_METADATA } from '@/lib/types/cardTypes';
+import { Card } from '@/lib/types/cardTypes';
 import { EnhancedCard, Series, Deck } from '@/lib/types/enhancedCardTypes';
 import { sampleCards } from '@/data/sampleCards';
 
 // Convert sample cards to enhanced cards
 const enhancedSampleCards: EnhancedCard[] = sampleCards.map(card => ({
   ...card,
-  designMetadata: card.designMetadata || DEFAULT_DESIGN_METADATA,
   rarity: Math.random() > 0.8 ? 'rare' : Math.random() > 0.5 ? 'uncommon' : 'common',
   cardNumber: `${Math.floor(Math.random() * 100)}/100`,
   seriesId: Math.random() > 0.5 ? 'series-001' : 'series-002',
@@ -20,6 +19,33 @@ const enhancedSampleCards: EnhancedCard[] = sampleCards.map(card => ({
   qrCodeData: `https://example.com/card/${card.id}`,
   hotspots: [],
   effects: card.effects || [],
+  designMetadata: {
+    cardStyle: {
+      template: 'classic',
+      effect: 'none',
+      borderRadius: '12px',
+      borderColor: '#000000',
+      shadowColor: 'rgba(0,0,0,0.2)',
+      frameWidth: 2,
+      frameColor: '#000000'
+    },
+    textStyle: {
+      titleColor: '#000000',
+      titleAlignment: 'center',
+      titleWeight: 'bold',
+      descriptionColor: '#666666'
+    },
+    cardMetadata: {
+      category: 'sports',
+      series: 'basketball',
+      cardType: 'player',
+    },
+    marketMetadata: {
+      isPrintable: false,
+      isForSale: false,
+      includeInCatalog: true
+    }
+  },
   marketData: {
     price: Math.floor(Math.random() * 100) + 10,
     currency: 'USD',
@@ -124,20 +150,18 @@ export const CardEnhancedProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // Card operations
   const addCard = async (cardData: Partial<EnhancedCard>): Promise<EnhancedCard> => {
     const newCard: EnhancedCard = {
+      ...cardData as EnhancedCard,
       id: cardData.id || uuidv4(),
       title: cardData.title || 'Untitled Card',
       description: cardData.description || '',
       imageUrl: cardData.imageUrl || '',
       thumbnailUrl: cardData.thumbnailUrl || cardData.imageUrl || '',
-      tags: cardData.tags || [],
-      userId: cardData.userId || 'anonymous',
-      effects: cardData.effects || [],
-      designMetadata: cardData.designMetadata || DEFAULT_DESIGN_METADATA,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      userId: cardData.userId || 'anonymous',
       rarity: cardData.rarity || 'common',
       cardNumber: cardData.cardNumber || `1/${cardData.editionSize || 1}`,
-      ...cardData,
+      effects: cardData.effects || [],
     };
     
     setCards(prev => [newCard, ...prev]);

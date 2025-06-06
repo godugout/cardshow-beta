@@ -23,18 +23,6 @@ interface ElementLibraryBrowserProps {
   filterTypes?: ElementType[];
 }
 
-// Define category type more specifically
-const ELEMENT_CATEGORIES = [
-  'all', 
-  'sports', 
-  'entertainment', 
-  'decorative', 
-  'seasonal', 
-  'teams'
-] as const;
-
-type ElementCategoryType = typeof ELEMENT_CATEGORIES[number];
-
 const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
   onElementSelect,
   selectedElementId,
@@ -43,7 +31,7 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
   const [elements, setElements] = useState<CardElement[]>([]);
   const [activeTab, setActiveTab] = useState<ElementType | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<ElementCategoryType>('all');
+  const [categoryFilter, setCategoryFilter] = useState<ElementCategory | 'all'>('all');
   const [officialFilter, setOfficialFilter] = useState<'all' | 'official' | 'community'>('all');
   
   // Load elements on component mount
@@ -86,7 +74,7 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
       const query = searchQuery.toLowerCase();
       filteredElements = filteredElements.filter(
         element => 
-          element.title.toLowerCase().includes(query) ||
+          element.name.toLowerCase().includes(query) ||
           element.tags.some(tag => tag.toLowerCase().includes(query)) ||
           (element.description && element.description.toLowerCase().includes(query))
       );
@@ -113,13 +101,18 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
   ];
   
   // Category options
-  const categoryOptions = [
+  const categoryOptions: { value: ElementCategory | 'all'; label: string }[] = [
     { value: 'all', label: 'All Categories' },
     { value: 'sports', label: 'Sports' },
     { value: 'entertainment', label: 'Entertainment' },
+    { value: 'achievement', label: 'Achievement' },
     { value: 'decorative', label: 'Decorative' },
     { value: 'seasonal', label: 'Seasonal' },
-    { value: 'teams', label: 'Teams' }
+    { value: 'holiday', label: 'Holiday' },
+    { value: 'teams', label: 'Teams' },
+    { value: 'brands', label: 'Brands' },
+    { value: 'custom', label: 'Custom' },
+    { value: 'other', label: 'Other' }
   ];
 
   return (
@@ -153,7 +146,7 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
           
           <Select
             value={categoryFilter}
-            onValueChange={(value) => setCategoryFilter(value as ElementCategoryType)}
+            onValueChange={(value) => setCategoryFilter(value as ElementCategory | 'all')}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Category" />
@@ -199,7 +192,7 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
                     {element.thumbnailUrl ? (
                       <img 
                         src={element.thumbnailUrl} 
-                        alt={element.title}
+                        alt={element.name}
                         className="max-w-full max-h-full object-contain"
                       />
                     ) : (
@@ -209,7 +202,7 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
                     )}
                   </div>
                   <div>
-                    <h3 className="font-medium text-sm truncate">{element.title}</h3>
+                    <h3 className="font-medium text-sm truncate">{element.name}</h3>
                     <div className="flex items-center gap-1 mt-1 flex-wrap">
                       <Badge 
                         variant={element.isOfficial ? "default" : "outline"}
@@ -243,63 +236,42 @@ const ElementLibraryBrowser: React.FC<ElementLibraryBrowserProps> = ({
             onClick={() => {
               // Add some demo elements
               const demoSticker = elementLibrary.createElement('sticker', {
-                title: 'Star Sticker',
                 name: 'Star Sticker',
-                imageUrl: '/placeholder.svg', // Add required imageUrl
                 assetUrl: '/placeholder.svg',
                 thumbnailUrl: '/placeholder.svg',
                 description: 'A sample star sticker',
                 tags: ['star', 'sample', 'decoration'],
                 category: 'decorative',
                 isOfficial: true,
-                isPremium: false,
-                position: { x: 0, y: 0, z: 0 },
+                position: { x: 0, y: 0, z: 0, rotation: 0 },
                 size: { width: 100, height: 100, scale: 1, aspectRatio: 1, preserveAspectRatio: true },
-                style: { opacity: 1 },
-                creatorId: 'demo',
-                downloadCount: 0,
-                rating: 0,
-                ratingCount: 0
+                style: { opacity: 1 }
               });
               
               const demoLogo = elementLibrary.createElement('logo', {
-                title: 'Sample Team Logo',
                 name: 'Sample Team Logo',
-                imageUrl: '/placeholder.svg', // Add required imageUrl
                 assetUrl: '/placeholder.svg',
                 thumbnailUrl: '/placeholder.svg',
                 description: 'A sample team logo',
                 tags: ['team', 'logo', 'sports'],
                 category: 'teams',
                 isOfficial: true,
-                isPremium: false,
-                position: { x: 0, y: 0, z: 0 },
+                position: { x: 0, y: 0, z: 0, rotation: 0 },
                 size: { width: 120, height: 120, scale: 1, aspectRatio: 1, preserveAspectRatio: true },
-                style: { opacity: 1 },
-                creatorId: 'demo',
-                downloadCount: 0,
-                rating: 0,
-                ratingCount: 0
+                style: { opacity: 1 }
               });
               
               const demoFrame = elementLibrary.createElement('frame', {
-                title: 'Gold Frame',
                 name: 'Gold Frame',
-                imageUrl: '/placeholder.svg', // Add required imageUrl
                 assetUrl: '/placeholder.svg',
                 thumbnailUrl: '/placeholder.svg',
                 description: 'A decorative gold frame',
                 tags: ['frame', 'gold', 'decoration'],
                 category: 'decorative',
                 isOfficial: true,
-                isPremium: false,
-                position: { x: 0, y: 0, z: 0 },
+                position: { x: 0, y: 0, z: 0, rotation: 0 },
                 size: { width: 300, height: 400, scale: 1, aspectRatio: 0.75, preserveAspectRatio: true },
-                style: { opacity: 1 },
-                creatorId: 'demo',
-                downloadCount: 0,
-                rating: 0,
-                ratingCount: 0
+                style: { opacity: 1 }
               });
               
               loadElements();

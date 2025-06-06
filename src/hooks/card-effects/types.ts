@@ -1,53 +1,52 @@
 
-/**
- * Card Effects System Types
- */
-
-export type EffectCategory = 'holographic' | 'prismatic' | 'refractor' | 'metallic' | 'vintage' | 'special' | 'premium' | 'foil' | 'classic' | 'modern' | 'standard';
-
 export interface CardEffectSettings {
   intensity?: number;
   speed?: number;
-  color?: string;
-  opacity?: number;
-  scale?: number;
-  rotation?: number;
   pattern?: string;
-  animationEnabled?: boolean;
+  color?: string;
   colorScheme?: string[];
+  animationEnabled?: boolean;
   [key: string]: any;
 }
 
-export interface PremiumCardEffect {
+export interface UseCardEffectsResult {
+  cardEffects: Record<string, string[]>;
+  activeEffects: string[];
+  setActiveEffects: (effects: string[]) => void;
+  addEffect: (cardId: string, effect: string) => void;
+  removeEffect: (cardId: string, effect: string) => void;
+  toggleEffect: (cardId: string, effect: string) => void;
+  setCardEffects: (cardId: string, effects: string[]) => void;
+  clearEffects: (cardId: string) => void;
+  updateEffectSettings: (cardId: string, effect: string, settings: CardEffectSettings) => void;
+  getEffectSettings: (cardId: string, effect: string) => CardEffectSettings | undefined;
+}
+
+export interface CardEffect {
   id: string;
   name: string;
-  description: string;
-  category: EffectCategory;
   enabled: boolean;
   settings: CardEffectSettings;
   className?: string;
-  iconUrl?: string;
-  isPremium?: boolean;
-  previewUrl?: string;
-  thumbnailUrl?: string;
 }
 
-// Re-export as CardEffect for backward compatibility
-export type CardEffect = PremiumCardEffect;
-
-// Add CardEffectDefinition for compatibility with effects registry
-export interface CardEffectDefinition extends PremiumCardEffect {
-  displayName?: string;
-  thumbnailUrl?: string;
-  defaultSettings?: CardEffectSettings;
-  thumbnail?: string; // For backward compatibility
-  premium?: boolean;
-  cssClass?: string;
-  supportedCardTypes?: string[];
-  renderer?: (element: HTMLElement, settings: any) => void;
+export interface CardEffectDefinition {
+  id: string;
+  name: string;
+  description: string;
+  thumbnail: string;
+  category: 'premium' | 'standard' | 'special';
+  defaultSettings: CardEffectSettings;
+  cssClass: string;
+  supportedCardTypes: string[];
+  renderFunction?: (settings: CardEffectSettings) => React.ReactNode;
 }
 
-// Material simulation types
+export interface PremiumCardEffect extends CardEffect {
+  premium: boolean;
+  requiresSubscription: boolean;
+}
+
 export interface MaterialSimulation {
   roughness: number;
   metalness: number;
@@ -58,28 +57,4 @@ export interface MaterialSimulation {
   reflectivity: number;
   emissive: string;
   envMapIntensity: number;
-  
-  // Additional properties needed by MaterialSimulator component
-  textureUrl?: string;
-  baseColor?: string;
-  type?: string;
-  weathering?: number;
-}
-
-export interface UseCardEffectsResult {
-  effects: PremiumCardEffect[];
-  categories: EffectCategory[];
-  activeEffects: string[];
-  toggleEffect: (effectId: string) => void;
-  updateEffectSettings: (effectId: string, settings: Partial<CardEffectSettings>) => void;
-  applyEffectsToElement: (element: HTMLElement) => void;
-  effectsLoading: boolean;
-}
-
-// Effect category interface for utils
-export interface EffectCategoryInfo {
-  id: string;
-  name: string;
-  description: string;
-  effects: PremiumCardEffect[];
 }

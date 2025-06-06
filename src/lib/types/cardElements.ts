@@ -1,19 +1,53 @@
 
-import { JsonValue } from '../types';
-import { User } from './user';
+import { JsonValue } from './index';
 
-export type ElementType = 'sticker' | 'logo' | 'frame' | 'badge' | 'overlay' | 'decoration';
-export type ElementCategory = 'sports' | 'holiday' | 'decorative' | 'teams' | 'brands' | 'seasonal' | 'abstract' | 'custom';
+/**
+ * Base type for all card elements
+ */
+export interface CardElement {
+  id: string;
+  type: ElementType;
+  name: string;
+  assetUrl: string;
+  thumbnailUrl?: string;
+  description?: string;
+  tags: string[];
+  category: ElementCategory;
+  isOfficial: boolean;
+  position: ElementPosition;
+  size: ElementSize;
+  style?: ElementStyle;
+  metadata?: Record<string, JsonValue>;
+  createdAt: string;
+  updatedAt: string;
+  creatorId?: string;
+}
 
-// Position interface for element placement
+/**
+ * Available element types
+ */
+export type ElementType = 'sticker' | 'logo' | 'frame' | 'badge' | 'overlay';
+
+/**
+ * Element categories for organization
+ */
+export type ElementCategory = 
+  'sports' | 'entertainment' | 'achievement' | 'decorative' | 
+  'seasonal' | 'holiday' | 'teams' | 'brands' | 'custom' | 'other';
+
+/**
+ * Element position properties
+ */
 export interface ElementPosition {
   x: number;
   y: number;
   z: number;
-  rotation?: number;
+  rotation: number;
 }
 
-// Size interface for element dimensions
+/**
+ * Element size properties
+ */
 export interface ElementSize {
   width: number;
   height: number;
@@ -22,66 +56,146 @@ export interface ElementSize {
   preserveAspectRatio: boolean;
 }
 
-// Style interface for element styling
+/**
+ * Element style properties
+ */
 export interface ElementStyle {
   opacity: number;
-  blendMode?: string;
-  filter?: string;
-  [key: string]: any;
+  borderWidth?: number;
+  borderColor?: string;
+  borderRadius?: number;
+  shadowColor?: string;
+  shadowBlur?: number;
+  shadowOffsetX?: number;
+  shadowOffsetY?: number;
+  blendMode?: ElementBlendMode;
 }
 
-export interface CardElement {
-  id: string;
-  name: string;
-  title: string; // Add title as primary display name
-  description?: string;
-  type: ElementType;
-  category: ElementCategory;
-  imageUrl: string; // Required property
-  thumbnailUrl: string;
-  assetUrl: string; // Add primary asset URL
-  url?: string; // Keep as fallback
-  tags: string[];
-  isOfficial: boolean;
-  isPremium: boolean;
-  creatorId?: string;
-  creator?: User;
-  isFavorite?: boolean;
-  popularity?: number;
-  
-  // Placement and styling properties
-  position: ElementPosition;
-  size: ElementSize;
-  style: ElementStyle;
-  
-  // Usage statistics
-  downloadCount: number;
-  rating: number;
-  ratingCount: number;
-  
-  createdAt: string;
-  updatedAt: string;
+/**
+ * Blend modes for element compositing
+ */
+export type ElementBlendMode = 
+  'normal' | 'multiply' | 'screen' | 'overlay' | 
+  'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 
+  'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 
+  'color' | 'luminosity';
+
+/**
+ * Sticker specific properties
+ */
+export interface StickerElement extends CardElement {
+  type: 'sticker';
+  isAnimated: boolean;
+  animationData?: {
+    frameCount?: number;
+    duration?: number;
+    loop?: boolean;
+    autoPlay?: boolean;
+  };
 }
 
-export interface ElementCollection {
-  id: string;
-  name: string;
-  description?: string;
-  elements: CardElement[];
-  isOfficial: boolean;
-  creatorId?: string;
-  createdAt: string;
-  updatedAt: string;
+/**
+ * Logo specific properties
+ */
+export interface LogoElement extends CardElement {
+  type: 'logo';
+  isVector: boolean;
+  vectorData?: string; // SVG content for vector logos
+  colorScheme?: string[];
+  originalSize?: {
+    width: number;
+    height: number;
+  };
 }
 
+/**
+ * Frame specific properties
+ */
+export interface FrameElement extends CardElement {
+  type: 'frame';
+  frameType: 'full' | 'corners' | 'top' | 'bottom' | 'left' | 'right' | 'custom';
+  thickness: number;
+  colorScheme?: string[];
+  pattern?: string;
+  isResizable: boolean;
+  innerPadding?: number;
+}
+
+/**
+ * Badge specific properties
+ */
+export interface BadgeElement extends CardElement {
+  type: 'badge';
+  badgeType: 'achievement' | 'rank' | 'certification' | 'special' | 'custom';
+  badgeTier?: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
+  value?: string;
+  issuedBy?: string;
+  issuedDate?: string;
+}
+
+/**
+ * Overlay specific properties
+ */
+export interface OverlayElement extends CardElement {
+  type: 'overlay';
+  overlayType: 'filter' | 'texture' | 'pattern' | 'gradient' | 'light' | 'custom';
+  blendMode: ElementBlendMode;
+  intensity: number;
+  colorScheme?: string[];
+  isInteractive?: boolean;
+  interactiveData?: Record<string, JsonValue>;
+}
+
+/**
+ * Element upload metadata
+ */
 export interface ElementUploadMetadata {
-  title: string;
-  description?: string; // Add description property
-  category: ElementCategory;
-  tags: string[];
-  isPublic: boolean;
   fileName: string;
   fileSize: number;
   mimeType: string;
-  isAnimated: boolean;
+  dimensions?: {
+    width: number;
+    height: number;
+  };
+  hasTransparency?: boolean;
+  isAnimated?: boolean;
+}
+
+/**
+ * Element library collection
+ */
+export interface ElementLibraryCollection {
+  id: string;
+  name: string;
+  description?: string;
+  elementIds: string[];
+  thumbnail?: string;
+  category?: ElementCategory;
+  isPublic: boolean;
+  creatorId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Element placement options
+ */
+export interface ElementPlacementOptions {
+  position?: Partial<ElementPosition>;
+  size?: Partial<ElementSize>;
+  style?: Partial<ElementStyle>;
+  snapToGrid?: boolean;
+  centerOnCard?: boolean;
+  lockAspectRatio?: boolean;
+}
+
+/**
+ * Element transformation matrix
+ */
+export interface ElementTransform {
+  translateX: number;
+  translateY: number;
+  rotate: number;
+  scaleX: number;
+  scaleY: number;
 }

@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import { CardEffectSettings } from '@/hooks/card-effects/types';
 import { toast } from 'sonner';
-import { CardEffect } from '@/lib/types/cardTypes';
+import { CardEffect } from '../types/cardTypes';
 
 export const useCardEffectsStack = (initialEffects: string[] = []) => {
   const [activeEffects, setActiveEffects] = useState<string[]>(initialEffects);
@@ -28,17 +28,16 @@ export const useCardEffectsStack = (initialEffects: string[] = []) => {
         [effect]: defaultSettings
       }));
       
-      // Add to effect stack with required type property
+      // Add to effect stack
       setEffectStack(prev => [
         ...prev, 
         { 
           id: `${effect}-${Date.now()}`, 
           name: effect, 
-          type: effect, // Add the required type property
           enabled: true, 
           settings: defaultSettings,
           className: `effect-${effect.toLowerCase()}`
-        } as CardEffect
+        }
       ]);
       
       toast.success(`${effect} effect added`);

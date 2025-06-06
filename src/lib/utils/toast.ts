@@ -1,7 +1,8 @@
 
-import { toast as sonnerToast } from 'sonner';
+import { toast as sonnerToast, type ToastT } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import { ToastVariant } from '@/types/toast';
+
+type ToastVariant = 'default' | 'success' | 'error' | 'warning' | 'destructive' | 'info';
 
 interface ToastOptions {
   duration?: number;
@@ -26,19 +27,19 @@ export function toast(props: ToastProps, options?: ToastOptions): string {
     id
   };
 
-  // Map our custom variants to sonner variants
   switch (variant) {
     case 'success':
       sonnerToast.success(title, { ...toastOptions, description });
+      break;
+    case 'error':
+    case 'destructive':
+      sonnerToast.error(title, { ...toastOptions, description });
       break;
     case 'warning':
       sonnerToast.warning(title, { ...toastOptions, description });
       break;
     case 'info':
       sonnerToast.info(title, { ...toastOptions, description });
-      break;
-    case 'destructive':
-      sonnerToast.error(title, { ...toastOptions, description });
       break;
     default:
       sonnerToast(title, { ...toastOptions, description });
@@ -47,4 +48,6 @@ export function toast(props: ToastProps, options?: ToastOptions): string {
   return id;
 }
 
-export default toast;
+// Re-export other types and functions from sonner
+export type { ToastT as ToasterToast };
+export { toast as default };

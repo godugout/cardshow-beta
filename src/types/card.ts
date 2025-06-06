@@ -17,13 +17,11 @@ export interface CardData {
   updatedAt: string;
   // Additional properties used in home components
   backgroundColor?: string;
-  textColor?: string;  // Added for backward compatibility
   name?: string;
   team?: string;
   jersey?: string;
   set?: string;
   year?: string;
-  player?: string; // Added player property
   specialEffect?: string;
   cardType?: string;
   artist?: string;
@@ -37,7 +35,6 @@ export interface CardData {
       frameColor: string;
       frameWidth: number;
       shadowColor: string;
-      backgroundColor?: string; // Added backgroundColor as optional
     };
     textStyle: {
       titleColor: string;
@@ -99,7 +96,6 @@ export function adaptCardToCardData(card: Card): CardData {
     artist: card.artist,
     cardNumber: card.cardNumber,
     backgroundColor: card.backgroundColor,
-    textColor: card.textColor,
     specialEffect: card.specialEffect,
     designMetadata: card.designMetadata || {
       cardStyle: {

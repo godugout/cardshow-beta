@@ -1,53 +1,13 @@
 
-import { Card } from '@/lib/types/cardTypes';
-import { Card as SchemaCard } from '@/lib/schema/types';
-import { CardData } from '@/types/card';
+import { Card as CardType } from '../types/cardTypes';
 
-// Create default values for required properties that might be missing
-const DEFAULT_DESIGN_METADATA = {
-  cardStyle: {
-    template: 'classic',
-    effect: 'none',
-    borderRadius: '8px',
-    borderColor: '#000000',
-    frameColor: '#000000',
-    frameWidth: 2,
-    shadowColor: 'rgba(0,0,0,0.2)',
-    backgroundColor: '#FFFFFF',
-  },
-  textStyle: {
-    titleColor: '#000000',
-    titleAlignment: 'center',
-    titleWeight: 'bold',
-    descriptionColor: '#333333',
-    fontFamily: 'Inter',
-    fontSize: '16px',
-    fontWeight: 'normal',
-    color: '#000000',
-    textAlign: 'center',
-  },
-  cardMetadata: {
-    category: 'general',
-    series: 'base',
-    cardType: 'standard',
-  },
-  marketMetadata: {
-    price: 0,
-    currency: 'USD',
-    availableForSale: false,
-    editionSize: 0,
-    editionNumber: 0,
-    isPrintable: false,
-    isForSale: false,
-    includeInCatalog: false
-  }
-};
-
-// Adapter function to convert between card types
-export const adaptCardToSchema = (card: Partial<Card>): SchemaCard => {
+/**
+ * Adapts legacy card data to the current Card type
+ */
+export function adaptToLegacyCard(card: Partial<CardType>): any {
   return {
     id: card.id || '',
-    title: card.title || 'Untitled Card',
+    title: card.title || '',
     description: card.description || '',
     imageUrl: card.imageUrl || '',
     thumbnailUrl: card.thumbnailUrl || card.imageUrl || '',
@@ -56,28 +16,42 @@ export const adaptCardToSchema = (card: Partial<Card>): SchemaCard => {
     createdAt: card.createdAt || new Date().toISOString(),
     updatedAt: card.updatedAt || new Date().toISOString(),
     effects: card.effects || [],
-    designMetadata: card.designMetadata || DEFAULT_DESIGN_METADATA
+    // Ensure all required nested properties exist
+    designMetadata: {
+      cardStyle: {
+        template: 'classic',
+        effect: 'none',
+        borderRadius: '8px',
+        borderColor: '#000000',
+        frameWidth: 2,
+        frameColor: '#000000',
+        shadowColor: 'rgba(0,0,0,0.2)',
+        ...(card.designMetadata?.cardStyle || {})
+      },
+      textStyle: {
+        titleColor: '#FFFFFF',
+        titleAlignment: 'center',
+        titleWeight: 'bold',
+        descriptionColor: '#DDDDDD',
+        ...(card.designMetadata?.textStyle || {})
+      },
+      cardMetadata: {
+        ...(card.designMetadata?.cardMetadata || {})
+      },
+      marketMetadata: {
+        ...(card.designMetadata?.marketMetadata || {})
+      },
+      ...(card.designMetadata || {})
+    },
+    // Include any other properties from the original card
+    ...card
   };
-};
+}
 
-export const adaptToCard = (schema: Partial<SchemaCard>): Card => {
-  return {
-    id: schema.id || '',
-    title: schema.title || 'Untitled Card',
-    description: schema.description || '',
-    imageUrl: schema.imageUrl || '',
-    thumbnailUrl: schema.thumbnailUrl || schema.imageUrl || '',
-    tags: schema.tags || [],
-    userId: schema.userId || '',
-    createdAt: schema.createdAt || new Date().toISOString(),
-    updatedAt: schema.updatedAt || new Date().toISOString(),
-    effects: schema.effects || [],
-    designMetadata: schema.designMetadata || DEFAULT_DESIGN_METADATA
-  } as Card;
-};
-
-// Add missing adaptToLegacyCard function
-export const adaptToLegacyCard = (card: Card): CardData => {
+/**
+ * Adapts a card to match a specific schema format
+ */
+export function adaptCardToSchema(card: CardType): any {
   return {
     id: card.id,
     title: card.title,
@@ -85,26 +59,10 @@ export const adaptToLegacyCard = (card: Card): CardData => {
     imageUrl: card.imageUrl,
     thumbnailUrl: card.thumbnailUrl || card.imageUrl,
     tags: card.tags || [],
-    userId: card.userId || '',
-    effects: card.effects || [],
     createdAt: card.createdAt,
     updatedAt: card.updatedAt,
-    textColor: card.textColor,
-    player: card.player,
-    team: card.team,
-    year: card.year,
-    designMetadata: DEFAULT_DESIGN_METADATA
+    userId: card.userId,
+    effects: card.effects || [],
+    designMetadata: card.designMetadata
   };
-};
-
-export const createBlankCard = (userId: string): Partial<Card> => {
-  return {
-    title: '',
-    description: '',
-    imageUrl: '',
-    tags: [],
-    userId,
-    effects: [],
-    designMetadata: DEFAULT_DESIGN_METADATA
-  };
-};
+}

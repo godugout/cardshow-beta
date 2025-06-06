@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/context/auth';
-import { Reaction } from '@/lib/types/cardTypes';
+import { Reaction } from '@/lib/types';
 import { reactionRepository } from '@/lib/data';
 import { toast } from 'sonner';
 import { Heart, ThumbsUp, MessageCircle, Star, Award, Share } from 'lucide-react';
@@ -53,25 +53,25 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
     
     setIsLoading(true);
     try {
-      let data: Reaction[] = [];
+      let data: Reaction[] | null = null;
+      let error: any = null;
       
       if (cardId) {
-        const rawData = await reactionRepository.getAllByCardId(cardId);
-        // Convert the raw data to match our Reaction interface
-        data = rawData.map(reaction => ({
-          id: reaction.id,
-          userId: reaction.userId,
-          type: reaction.type,
-          createdAt: reaction.createdAt,
-          targetType: (cardId ? 'card' : collectionId ? 'collection' : 'comment') as 'card' | 'comment' | 'collection',
-          targetId: cardId || collectionId || commentId || '',
-          cardId: reaction.cardId,
-          collectionId: reaction.collectionId,
-          commentId: reaction.commentId
-        }));
+        const result = await reactionRepository.getAllByCardId(cardId);
+        data = result;
+        // If the API returns an error property, handle it here
       }
       
-      setReactions(data);
+      // Additional endpoints for collection and comment reactions could be added here
+      
+      if (error) {
+        console.error('Error fetching reactions:', error);
+        return;
+      }
+      
+      if (data) {
+        setReactions(data);
+      }
     } catch (err) {
       console.error('Unexpected error fetching reactions:', err);
     } finally {
@@ -119,35 +119,28 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
       
       if (userReaction && isSameType) {
         // Remove reaction if clicking the same type again
-        await reactionRepository.remove(userReaction.id);
+        const success = await reactionRepository.remove(userReaction.id);
+        
+        if (!success) {
+          toast.error('Failed to update reaction');
+          return;
+        }
+        
         setReactions(prev => prev.filter(r => r.userId !== user.id));
       } else {
         // Add or update reaction
-        const targetType = cardId ? 'card' : collectionId ? 'collection' : 'comment';
-        const targetId = cardId || collectionId || commentId || '';
-        
-        const rawData = await reactionRepository.create({
-          userId: user.id,
+        const data = await reactionRepository.add(
+          user.id,
           cardId,
           collectionId,
           commentId,
-          type,
-          targetType,
-          targetId
-        });
+          type
+        );
         
-        // Convert to our Reaction interface
-        const data: Reaction = {
-          id: rawData.id,
-          userId: rawData.userId,
-          type: rawData.type,
-          createdAt: rawData.createdAt,
-          targetType: targetType as 'card' | 'comment' | 'collection',
-          targetId,
-          cardId: rawData.cardId,
-          collectionId: rawData.collectionId,
-          commentId: rawData.commentId
-        };
+        if (!data) {
+          toast.error('Failed to update reaction');
+          return;
+        }
         
         if (userReaction) {
           // Update existing reaction
@@ -287,7 +280,7 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
         </Tooltip>
       </TooltipProvider>
       
-      {/* Reactions summary */}
+      {/* Reactions summary (can be expanded with user icons for who reacted) */}
       {totalReactions > 0 && (
         <div className="text-sm text-muted-foreground ml-1">
           {totalReactions} reaction{totalReactions !== 1 ? 's' : ''}

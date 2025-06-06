@@ -20,30 +20,27 @@ const OaklandMemoryGrid: React.FC<OaklandMemoryGridProps> = ({ cards }) => {
         const oaklandMemory = card.designMetadata?.oaklandMemory;
         if (!oaklandMemory) return null;
         
-        // Type assertion to ensure we have the correct type
-        const typedMemory = oaklandMemory as OaklandMemoryData;
-        
         const memoryData: OaklandMemoryData = {
-          title: card.title || '',
+          title: card.title || card.name || '',
           description: card.description,
-          date: typedMemory.date,
-          opponent: typedMemory.opponent,
-          score: typedMemory.score,
-          location: typedMemory.location,
-          section: typedMemory.section,
-          memoryType: typedMemory.memoryType,
-          attendees: typedMemory.attendees || [],
+          date: oaklandMemory.date,
+          opponent: oaklandMemory.opponent,
+          score: oaklandMemory.score,
+          location: oaklandMemory.location,
+          section: oaklandMemory.section,
+          memoryType: oaklandMemory.memoryType,
+          attendees: oaklandMemory.attendees || [],
           tags: card.tags || [],
-          imageUrl: typedMemory.imageUrl || card.imageUrl || '',
-          historicalContext: typedMemory.historicalContext,
-          personalSignificance: typedMemory.personalSignificance,
+          imageUrl: oaklandMemory.imageUrl || card.imageUrl || '',
+          historicalContext: oaklandMemory.historicalContext,
+          personalSignificance: oaklandMemory.personalSignificance,
         };
         
         return (
           <Link key={card.id} to={`/teams/oakland/memories/${card.id}`}>
             <OaklandMemoryCard 
               memory={memoryData}
-              templateType={(typedMemory.template as OaklandTemplateType) || 'classic'}
+              templateType={(oaklandMemory.template as OaklandTemplateType) || 'classic'}
             />
           </Link>
         );

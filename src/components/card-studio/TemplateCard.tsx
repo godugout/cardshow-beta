@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle } from 'lucide-react';
-import { CardTemplate } from '@/lib/types/cardTypes';
+import { CardTemplate } from '@/components/card-templates/TemplateLibrary';
 import { cn } from '@/lib/utils';
 
 interface TemplateCardProps {
@@ -109,4 +109,3 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
 };
 
 export default TemplateCard;
-

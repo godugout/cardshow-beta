@@ -2,7 +2,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCards } from '@/context/CardContext';
-import { Card } from '@/lib/types/cardTypes';
+import { Card } from '@/lib/types';
 import { toast } from 'sonner';
 
 export const useGalleryCards = () => {
@@ -20,8 +20,6 @@ export const useGalleryCards = () => {
 
   // Sort cards based on the selected sort order
   const sortedCards = useMemo(() => {
-    if (!Array.isArray(cards)) return [];
-    
     return [...cards].sort((a, b) => {
       switch (sortOrder) {
         case 'newest':
@@ -50,32 +48,19 @@ export const useGalleryCards = () => {
       const imageUrl = card.imageUrl || card.thumbnailUrl || '/placeholder.svg';
       
       // Create a properly structured card object
-      const processedCard: Card = {
+      return {
         ...card,
         imageUrl: imageUrl,
         // Process other card data
         designMetadata: {
           ...card.designMetadata,
           oaklandMemory: card.designMetadata?.oaklandMemory ? {
+            ...card.designMetadata.oaklandMemory,
             title: card.title || '',
-            description: card.description || '',
-            date: card.designMetadata.oaklandMemory.date,
-            opponent: card.designMetadata.oaklandMemory.opponent,
-            score: card.designMetadata.oaklandMemory.score,
-            location: card.designMetadata.oaklandMemory.location,
-            section: card.designMetadata.oaklandMemory.section,
-            memoryType: card.designMetadata.oaklandMemory.memoryType,
-            attendees: card.designMetadata.oaklandMemory.attendees,
-            tags: card.designMetadata.oaklandMemory.tags,
-            imageUrl: card.designMetadata.oaklandMemory.imageUrl,
-            historicalContext: card.designMetadata.oaklandMemory.historicalContext,
-            personalSignificance: card.designMetadata.oaklandMemory.personalSignificance,
-            template: card.designMetadata.oaklandMemory.template
+            description: card.description || ''
           } : undefined
         }
       };
-      
-      return processedCard;
     });
     
     // Debug info

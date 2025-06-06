@@ -1,90 +1,131 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { PremiumCardEffect, CardEffectSettings, UseCardEffectsResult, EffectCategory } from './types';
-import { getBasicEffects, getEffectCategories } from './utils';
+import { useState, useCallback, useEffect } from 'react';
+import { UseCardEffectsResult, CardEffectSettings } from './types';
 
-export const useCardEffects = (): UseCardEffectsResult => {
-  const [effects, setEffects] = useState<PremiumCardEffect[]>([]);
-  const [categories, setCategories] = useState<EffectCategory[]>([]);
+/**
+ * Hook for managing card effects
+ * Provides functionality for adding, removing, and configuring visual effects on cards
+ */
+const useCardEffects = (): UseCardEffectsResult => {
+  const [cardEffects, setCardEffects] = useState<Record<string, string[]>>({});
+  const [effectSettings, setEffectSettings] = useState<Record<string, Record<string, CardEffectSettings>>>({});
   const [activeEffects, setActiveEffects] = useState<string[]>([]);
-  const [effectsLoading, setEffectsLoading] = useState(true);
 
-  // Initialize effects
+  // Load saved effects from localStorage
   useEffect(() => {
-    const loadEffects = async () => {
-      try {
-        // In a real app, this might be an API call
-        const allEffects = getBasicEffects();
-        setEffects(allEffects);
-        
-        // Extract unique categories from effects
-        const uniqueCategories = [...new Set(allEffects.map(effect => effect.category))];
-        setCategories(uniqueCategories);
-        
-        setEffectsLoading(false);
-      } catch (error) {
-        console.error('Failed to load effects:', error);
-        setEffectsLoading(false);
+    try {
+      const savedEffects = localStorage.getItem('cardEffects');
+      const savedSettings = localStorage.getItem('effectSettings');
+      
+      if (savedEffects) {
+        setCardEffects(JSON.parse(savedEffects));
       }
-    };
-
-    loadEffects();
+      
+      if (savedSettings) {
+        setEffectSettings(JSON.parse(savedSettings));
+      }
+    } catch (error) {
+      console.error('Failed to load saved effects:', error);
+    }
   }, []);
 
-  const toggleEffect = useCallback((effectId: string) => {
-    setActiveEffects(prev => {
-      if (prev.includes(effectId)) {
-        return prev.filter(id => id !== effectId);
-      } else {
-        return [...prev, effectId];
-      }
+  // Save effects to localStorage when they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('cardEffects', JSON.stringify(cardEffects));
+      localStorage.setItem('effectSettings', JSON.stringify(effectSettings));
+    } catch (error) {
+      console.error('Failed to save effects:', error);
+    }
+  }, [cardEffects, effectSettings]);
+
+  const addEffect = useCallback((cardId: string, effect: string) => {
+    setCardEffects(prev => {
+      const currentEffects = prev[cardId] || [];
+      if (currentEffects.includes(effect)) return prev;
+      
+      return {
+        ...prev,
+        [cardId]: [...currentEffects, effect]
+      };
     });
   }, []);
 
-  const updateEffectSettings = useCallback((effectId: string, settings: Partial<CardEffectSettings>) => {
-    setEffects(prev => prev.map(effect => {
-      if (effect.id === effectId) {
-        return {
-          ...effect,
-          settings: {
-            ...effect.settings,
-            ...settings
-          }
-        };
-      }
-      return effect;
+  const removeEffect = useCallback((cardId: string, effect: string) => {
+    setCardEffects(prev => {
+      const currentEffects = prev[cardId] || [];
+      return {
+        ...prev,
+        [cardId]: currentEffects.filter(e => e !== effect)
+      };
+    });
+  }, []);
+
+  const toggleEffect = useCallback((cardId: string, effect: string) => {
+    setCardEffects(prev => {
+      const currentEffects = prev[cardId] || [];
+      
+      return {
+        ...prev,
+        [cardId]: currentEffects.includes(effect)
+          ? currentEffects.filter(e => e !== effect)
+          : [...currentEffects, effect]
+      };
+    });
+  }, []);
+
+  const setCardEffectsArray = useCallback((cardId: string, effects: string[]) => {
+    setCardEffects(prev => ({
+      ...prev,
+      [cardId]: [...effects]
     }));
   }, []);
 
-  // Apply effects to a DOM element
-  const applyEffectsToElement = useCallback((element: HTMLElement) => {
-    // Clear existing effect classes
-    element.className = element.className.replace(/effect-\w+/g, '');
-    
-    // Apply active effects
-    activeEffects.forEach(effectId => {
-      const effect = effects.find(e => e.id === effectId);
-      if (effect && effect.enabled) {
-        if (effect.className) {
-          element.classList.add(effect.className);
+  const clearEffects = useCallback((cardId: string) => {
+    setCardEffects(prev => ({
+      ...prev,
+      [cardId]: []
+    }));
+  }, []);
+
+  const updateEffectSettings = useCallback((
+    cardId: string, 
+    effect: string, 
+    settings: CardEffectSettings
+  ) => {
+    setEffectSettings(prev => {
+      const cardSettings = prev[cardId] || {};
+      return {
+        ...prev,
+        [cardId]: {
+          ...cardSettings,
+          [effect]: {
+            ...cardSettings[effect],
+            ...settings
+          }
         }
-        
-        // Apply settings as CSS custom properties
-        Object.entries(effect.settings).forEach(([key, value]) => {
-          element.style.setProperty(`--${key}`, String(value));
-        });
-      }
+      };
     });
-  }, [activeEffects, effects]);
+  }, []);
+
+  const getEffectSettings = useCallback((
+    cardId: string,
+    effect: string
+  ): CardEffectSettings | undefined => {
+    return effectSettings[cardId]?.[effect];
+  }, [effectSettings]);
 
   return {
-    effects,
-    categories,
+    cardEffects,
     activeEffects,
+    setActiveEffects,
+    addEffect,
+    removeEffect,
     toggleEffect,
+    setCardEffects: setCardEffectsArray,
+    clearEffects,
     updateEffectSettings,
-    applyEffectsToElement,
-    effectsLoading
+    getEffectSettings
   };
 };
 

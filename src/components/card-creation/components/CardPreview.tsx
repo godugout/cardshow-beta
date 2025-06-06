@@ -1,76 +1,93 @@
 
 import React from 'react';
-import { Card, DEFAULT_CARD_STYLE, DEFAULT_TEXT_STYLE } from '@/lib/types/cardTypes';
+import { cn } from '@/lib/utils';
+import { Card } from '@/lib/types/cardTypes';
 
 interface CardPreviewProps {
-  cardData: Card;
+  card?: Partial<Card>;
   className?: string;
   effectClasses?: string;
 }
 
-const CardPreview: React.FC<CardPreviewProps> = ({ cardData, className = '', effectClasses = '' }) => {
-  // Use default values if designMetadata is not available
-  const cardStyle = cardData.designMetadata?.cardStyle || DEFAULT_CARD_STYLE;
-  const textStyle = cardData.designMetadata?.textStyle || DEFAULT_TEXT_STYLE;
-
-  const cardStyles = {
-    backgroundColor: cardData.backgroundColor || cardStyle.backgroundColor,
-    borderRadius: cardData.borderRadius || cardStyle.borderRadius,
-    borderColor: cardData.borderColor || cardStyle.borderColor,
-    color: textStyle.titleColor,
-    fontWeight: textStyle.titleWeight,
-    textAlign: textStyle.titleAlignment as 'left' | 'center' | 'right',
-    '--description-color': textStyle.descriptionColor,
-  } as React.CSSProperties;
-
-  return (
-    <div className={`card-preview ${className} ${effectClasses}`}>
+const CardPreview = React.forwardRef<HTMLDivElement, CardPreviewProps>(({
+  card,
+  className,
+  effectClasses = ''
+}, ref) => {
+  if (!card || !card.imageUrl) {
+    return (
       <div 
-        className="w-64 h-96 rounded-lg border-2 shadow-lg p-4 flex flex-col"
-        style={cardStyles}
-      >
-        {cardData.imageUrl && (
-          <div className="flex-1 mb-4">
-            <img 
-              src={cardData.imageUrl} 
-              alt="Card preview"
-              className="w-full h-full object-cover rounded"
-            />
-          </div>
+        ref={ref}
+        className={cn(
+          "aspect-[2.5/3.5] bg-gray-100 rounded-lg border flex flex-col items-center justify-center text-gray-400",
+          className
         )}
-        
-        <div className="space-y-2">
-          {cardData.title && (
-            <h3 className="text-lg font-bold truncate">
-              {cardData.title}
-            </h3>
-          )}
+      >
+        <p className="text-center px-4">
+          Upload an image to see your card preview
+        </p>
+      </div>
+    );
+  }
+  
+  // Use safe access for card style properties with defaults
+  const cardStyle = card.designMetadata?.cardStyle || {};
+  const textStyle = card.designMetadata?.textStyle || {};
+  
+  return (
+    <div className="relative" ref={ref}>
+      <div 
+        className={cn(
+          "aspect-[2.5/3.5] rounded-lg overflow-hidden shadow-xl transition-all duration-300",
+          effectClasses,
+          className
+        )}
+        style={{
+          backgroundColor: cardStyle.backgroundColor || '#FFFFFF',
+          borderRadius: cardStyle.borderRadius || '8px',
+          borderWidth: '2px',
+          borderStyle: 'solid',
+          borderColor: cardStyle.borderColor || '#000000',
+        }}
+      >
+        <div className="relative w-full h-full">
+          <img 
+            src={card.imageUrl} 
+            alt={card.title || "Card preview"} 
+            className="w-full h-full object-cover"
+          />
           
-          {cardData.description && (
-            <p 
-              className="text-sm opacity-90 line-clamp-3"
-              style={{ color: textStyle.descriptionColor }}
-            >
-              {cardData.description}
-            </p>
-          )}
-          
-          {cardData.tags && cardData.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {cardData.tags.slice(0, 3).map((tag, index) => (
-                <span 
-                  key={index}
-                  className="text-xs px-2 py-1 bg-black/10 rounded-full"
+          {card.title && (
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+              <h3 
+                className="text-white text-sm font-bold truncate"
+                style={{ 
+                  color: textStyle.titleColor || '#FFFFFF',
+                  fontWeight: textStyle.titleWeight || 'bold',
+                  textAlign: (textStyle.titleAlignment as any) || 'center'
+                }}
+              >
+                {card.title}
+              </h3>
+              {card.player && (
+                <p 
+                  className="text-white/80 text-xs truncate"
+                  style={{ 
+                    color: textStyle.descriptionColor || '#DDDDDD',
+                  }}
                 >
-                  {tag}
-                </span>
-              ))}
+                  {card.player}
+                  {card.team && ` • ${card.team}`}
+                </p>
+              )}
             </div>
           )}
         </div>
       </div>
     </div>
   );
-};
+});
+
+CardPreview.displayName = 'CardPreview';
 
 export default CardPreview;

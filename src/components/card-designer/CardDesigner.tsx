@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import CardDesignerCanvas from './CardDesignerCanvas';
@@ -31,7 +32,6 @@ const CardDesigner: React.FC<CardDesignerProps> = ({
       const defaultLayers: CardLayer[] = [
         {
           id: generateId(),
-          name: 'Base Image',
           type: 'image',
           content: '',
           position: { x: 50, y: 50, z: 0 },
@@ -41,15 +41,7 @@ const CardDesigner: React.FC<CardDesignerProps> = ({
           zIndex: 0,
           visible: true,
           locked: false,
-          blendMode: 'normal',
-          transform: {
-            x: 50,
-            y: 50,
-            rotation: 0,
-            scaleX: 1,
-            scaleY: 1,
-            z: 0
-          }
+          effectIds: []
         }
       ];
       setLayers(defaultLayers);
@@ -67,7 +59,6 @@ const CardDesigner: React.FC<CardDesignerProps> = ({
   const addLayer = useCallback((type: 'image' | 'text' | 'shape') => {
     const newLayer: CardLayer = {
       id: generateId(),
-      name: `${type.charAt(0).toUpperCase() + type.slice(1)} Layer`,
       type,
       content: type === 'text' ? 'New Text' : '',
       position: { x: 50, y: 50, z: layers.length },
@@ -77,15 +68,7 @@ const CardDesigner: React.FC<CardDesignerProps> = ({
       zIndex: layers.length,
       visible: true,
       locked: false,
-      blendMode: 'normal',
-      transform: {
-        x: 50,
-        y: 50,
-        rotation: 0,
-        scaleX: 1,
-        scaleY: 1,
-        z: layers.length
-      }
+      effectIds: []
     };
     
     setLayers(prev => [...prev, newLayer]);
@@ -158,7 +141,6 @@ const CardDesigner: React.FC<CardDesignerProps> = ({
         const newLayer = { 
           ...layer, 
           id: generateId(),
-          name: `${layer.name} Copy`,
           position: { 
             ...layer.position, 
             x: layer.position.x + 10, 

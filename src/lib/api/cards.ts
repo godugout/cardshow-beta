@@ -1,5 +1,5 @@
 
-import { Card } from '@/lib/types/cardTypes';
+import { Card } from '@/lib/types/card';
 import { adaptToCard } from '@/lib/adapters/cardAdapter';
 
 // Mock API functions for CardShow
@@ -13,10 +13,13 @@ export const fetchCards = async (): Promise<Card[]> => {
       imageUrl: '/sample-card-1.jpg',
       thumbnailUrl: '/sample-card-1-thumb.jpg',
       tags: ['sample', 'card'],
-      userId: 'user1',
+      player: 'John Doe',
+      team: 'Team A',
+      year: '2023',
+      userId: 'user1', // Add required userId
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      effects: []
+      effects: [] // Add required effects property
     }),
     adaptToCard({
       id: '2',
@@ -25,10 +28,13 @@ export const fetchCards = async (): Promise<Card[]> => {
       imageUrl: '/sample-card-2.jpg',
       thumbnailUrl: '/sample-card-2-thumb.jpg',
       tags: ['sample', 'card'],
-      userId: 'user2',
+      player: 'Jane Smith',
+      team: 'Team B',
+      year: '2022',
+      userId: 'user2', // Add required userId
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      effects: ['Holographic']
+      effects: ['Holographic'] // Add required effects property
     }),
   ];
 };

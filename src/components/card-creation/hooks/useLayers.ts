@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { CardLayer } from '../types/cardTypes';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,32 +21,27 @@ export function useLayers({ initialLayers = [], onChange }: UseLayersOptions = {
     let content = '';
     let width: number | 'auto' = 100;
     let height: number | 'auto' = 100;
-    let name = '';
     
     switch (type) {
       case 'text':
         content = 'Double click to edit text';
         width = 'auto';
         height = 'auto';
-        name = 'Text Layer';
         break;
       case 'image':
         width = 200;
         height = 200;
-        name = 'Image Layer';
         break;
       case 'shape':
         // Set specific shape properties
         width = 100;
         height = 100;
-        name = 'Shape Layer';
         break;
     }
     
-    // Create the new layer with all required properties
+    // Create the new layer
     const newLayer: CardLayer = {
       id: options.id || uuidv4(),
-      name: options.name || name,
       type,
       content: options.content || content,
       position: options.position || {
@@ -62,26 +58,13 @@ export function useLayers({ initialLayers = [], onChange }: UseLayersOptions = {
       zIndex: layers.length + 1,
       visible: options.visible !== undefined ? options.visible : true,
       locked: options.locked || false,
-      blendMode: 'normal',
-      transform: {
-        x: 200,
-        y: 250,
-        rotation: 0,
-        scaleX: 1,
-        scaleY: 1,
-        z: layers.length + 1
-      },
       ...(type === 'text' && {
         textStyle: options.textStyle || {
           fontFamily: 'Arial',
           fontSize: 18,
           fontWeight: 'normal',
           color: '#000000',
-          textAlign: 'center',
-          titleColor: '#000000',
-          titleAlignment: 'center',
-          titleWeight: 'bold',
-          descriptionColor: '#333333'
+          textAlign: 'center'
         }
       }),
       ...(type === 'shape' && {
@@ -195,7 +178,6 @@ export function useLayers({ initialLayers = [], onChange }: UseLayersOptions = {
     const duplicate: CardLayer = {
       ...layerToDuplicate,
       id: uuidv4(),
-      name: `${layerToDuplicate.name} Copy`,
       position: {
         ...layerToDuplicate.position,
         x: layerToDuplicate.position.x + 20,

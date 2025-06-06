@@ -3,16 +3,12 @@ import React, { useState } from 'react';
 import CardUpload from './home/CardUpload';
 import CardCollection from './home/CardCollection';
 import CardShowcase from './home/CardShowcase';
-import { sampleCards } from '@/lib/sampleCards';
-import { adaptCardToCardData } from '@/types/card';
+import { cardData } from '@/data/cardData';
 
 const OldCardCreator: React.FC = () => {
   const [view, setView] = useState<'showcase' | 'collection' | 'upload'>('collection');
   const [activeCard, setActiveCard] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  
-  // Convert Card[] to CardData[] for compatibility
-  const cardData = sampleCards.map(card => adaptCardToCardData(card));
   
   const selectCard = (index: number) => {
     setActiveCard(index);

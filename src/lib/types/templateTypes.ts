@@ -5,18 +5,40 @@ export interface CardTemplate {
   id: string;
   name: string;
   description?: string;
-  thumbnail: string; // Required in this version
-  thumbnailUrl?: string;
+  thumbnail: string;
+  thumbnailUrl?: string; // Added for backward compatibility
   category: string;
-  isOfficial?: boolean;
+  tags?: string[];
   popularity?: number;
-  tags?: string[]; // Add tags property
-  designDefaults?: { // Optional in this version
+  isOfficial?: boolean;
+  isPublic?: boolean;
+  userId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  designDefaults?: {
     cardStyle: Partial<CardStyle>;
     textStyle?: Partial<TextStyle>;
     effects?: string[];
   };
-  previewUrl?: string;
-  sport?: string;
-  style?: string;
+  cardStyle?: Partial<CardStyle>;
+  textStyle?: Partial<TextStyle>;
+  layers?: any[];
+  effects?: string[];
+  backgroundColor?: string;
+  imageUrl?: string;
+  [key: string]: any;
+}
+
+export interface TemplateCategory {
+  id: string;
+  name: string;
+  description?: string;
+  thumbnailUrl?: string;
+  count?: number;
+}
+
+export interface TemplateSuggestion {
+  template: CardTemplate;
+  matchScore: number;
+  reason: string;
 }

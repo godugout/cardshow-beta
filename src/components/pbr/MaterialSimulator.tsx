@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { MaterialSimulation } from '@/hooks/card-effects/types';
 import './fabric-materials.css';
@@ -84,7 +85,7 @@ const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
     
     // Apply weathering if specified
     if (material.weathering) {
-      applyWeatheringEffect(ctx, width, height, material.weathering.toString());
+      applyWeatheringEffect(ctx, width, height, material.weathering);
     }
     
     // Apply lighting effects

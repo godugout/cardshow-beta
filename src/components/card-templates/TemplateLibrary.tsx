@@ -1,115 +1,104 @@
 
 import React from 'react';
-import { CardTemplate } from '@/lib/types/cardTypes';
 
-// Template definitions
-export const TEMPLATE_LIBRARY: CardTemplate[] = [
+export interface CardTemplate {
+  id: string;
+  name: string;
+  previewUrl: string;
+  sport?: string;
+  style?: 'standard' | 'premium';
+  effects: string[];
+  category?: string;
+  tags?: string[];
+  description?: string;
+}
+
+export interface TemplateLibraryProps {
+  onSelect?: (template: CardTemplate) => void;
+  filterBySport?: string;
+  filterByCategory?: string;
+}
+
+// Sample templates - in a real app these would come from an API
+export const CARD_TEMPLATES: CardTemplate[] = [
   {
-    id: 'classic',
-    name: 'Classic Baseball',
-    description: 'Traditional baseball card design',
-    thumbnail: '/templates/classic.jpg',
-    category: 'sports',
+    id: 'topps-chrome',
+    name: 'Topps Chrome',
+    previewUrl: '/placeholder-card.png',
     sport: 'baseball',
-    style: 'classic',
-    previewUrl: '/templates/classic-preview.jpg',
-    designDefaults: {
-      cardStyle: {
-        template: 'classic',
-        effect: 'none',
-        borderRadius: '8px',
-        borderColor: '#000000',
-        frameWidth: 2,
-        frameColor: '#000000'
-      },
-      textStyle: {
-        titleColor: '#000000',
-        titleAlignment: 'center',
-        titleWeight: 'bold'
-      }
-    }
+    style: 'premium',
+    effects: ['Chrome']
   },
   {
-    id: 'modern',
-    name: 'Modern',
-    description: 'Clean modern design',
-    thumbnail: '/templates/modern.jpg',
-    category: 'modern',
-    sport: 'all',
-    style: 'modern',
-    previewUrl: '/templates/modern-preview.jpg',
-    designDefaults: {
-      cardStyle: {
-        template: 'modern',
-        effect: 'none',
-        borderRadius: '12px',
-        borderColor: '#333333',
-        frameWidth: 1,
-        frameColor: '#333333'
-      }
-    }
+    id: 'panini-prizm',
+    name: 'Panini Prizm',
+    previewUrl: '/placeholder-card.png',
+    sport: 'basketball',
+    style: 'premium',
+    effects: ['Refractor']
   },
   {
-    id: 'vintage',
-    name: 'Vintage',
-    description: 'Retro vintage style',
-    thumbnail: '/templates/vintage.jpg',
-    category: 'vintage',
-    sport: 'all',
-    style: 'vintage',
-    previewUrl: '/templates/vintage-preview.jpg',
-    designDefaults: {
-      cardStyle: {
-        template: 'vintage',
-        effect: 'vintage',
-        borderRadius: '4px',
-        borderColor: '#8B4513',
-        frameWidth: 3,
-        frameColor: '#8B4513'
-      }
-    }
+    id: 'upper-deck',
+    name: 'Upper Deck',
+    previewUrl: '/placeholder-card.png',
+    sport: 'hockey',
+    style: 'standard',
+    effects: []
+  },
+  {
+    id: 'fleer-ultra',
+    name: 'Fleer Ultra',
+    previewUrl: '/placeholder-card.png',
+    sport: 'baseball',
+    style: 'premium',
+    effects: ['Holographic']
+  },
+  {
+    id: 'donruss',
+    name: 'Donruss',
+    previewUrl: '/placeholder-card.png',
+    sport: 'basketball',
+    style: 'standard',
+    effects: []
   }
 ];
 
-// Export the CardTemplate type explicitly
-export type { CardTemplate };
-
-// Default export for compatibility
-export default TEMPLATE_LIBRARY;
-
-interface TemplateLibraryProps {
-  onSelectTemplate: (template: CardTemplate) => void;
-  selectedTemplate?: CardTemplate;
-}
-
-export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ 
-  onSelectTemplate, 
-  selectedTemplate 
+const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
+  onSelect,
+  filterBySport,
+  filterByCategory
 }) => {
+  const filteredTemplates = CARD_TEMPLATES.filter(template => {
+    if (filterBySport && template.sport !== filterBySport) {
+      return false;
+    }
+    if (filterByCategory && template.category !== filterByCategory) {
+      return false;
+    }
+    return true;
+  });
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-      {TEMPLATE_LIBRARY.map((template) => (
-        <div
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {filteredTemplates.map(template => (
+        <div 
           key={template.id}
-          className={`cursor-pointer border rounded-lg p-4 transition-all ${
-            selectedTemplate?.id === template.id 
-              ? 'border-blue-500 bg-blue-50' 
-              : 'border-gray-200 hover:border-gray-300'
-          }`}
-          onClick={() => onSelectTemplate(template)}
+          className="cursor-pointer border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+          onClick={() => onSelect?.(template)}
         >
-          <div className="aspect-[2.5/3.5] bg-gray-100 rounded mb-2">
-            <img 
-              src={template.thumbnail} 
-              alt={template.name}
-              className="w-full h-full object-cover rounded"
-            />
+          <img 
+            src={template.previewUrl} 
+            alt={template.name}
+            className="w-full aspect-[2.5/3.5] object-cover"
+          />
+          <div className="p-3 bg-gray-50">
+            <h3 className="font-medium text-sm">{template.name}</h3>
+            <p className="text-xs text-gray-500">{template.sport || 'All Sports'}</p>
           </div>
-          <h3 className="font-medium text-sm">{template.name}</h3>
-          <p className="text-xs text-gray-500">{template.description}</p>
         </div>
       ))}
     </div>
   );
 };
 
+export default TemplateLibrary;
