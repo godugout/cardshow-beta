@@ -9,6 +9,7 @@ import { sampleCards } from '@/data/sampleCards';
 // Convert sample cards to enhanced cards
 const enhancedSampleCards: EnhancedCard[] = sampleCards.map(card => ({
   ...card,
+  designMetadata: card.designMetadata || DEFAULT_DESIGN_METADATA,
   rarity: Math.random() > 0.8 ? 'rare' : Math.random() > 0.5 ? 'uncommon' : 'common',
   cardNumber: `${Math.floor(Math.random() * 100)}/100`,
   seriesId: Math.random() > 0.5 ? 'series-001' : 'series-002',
@@ -19,7 +20,6 @@ const enhancedSampleCards: EnhancedCard[] = sampleCards.map(card => ({
   qrCodeData: `https://example.com/card/${card.id}`,
   hotspots: [],
   effects: card.effects || [],
-  designMetadata: card.designMetadata || DEFAULT_DESIGN_METADATA,
   marketData: {
     price: Math.floor(Math.random() * 100) + 10,
     currency: 'USD',

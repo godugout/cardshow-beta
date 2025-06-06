@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Card, DEFAULT_DESIGN_METADATA } from '@/lib/types/cardTypes';
 import { useAuth } from '@/hooks/useAuth';

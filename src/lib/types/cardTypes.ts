@@ -292,30 +292,6 @@ export interface CardTemplate {
   };
 }
 
-export interface EnhancedCard extends Card {
-  // Additional properties specific to enhanced cards
-  seriesId?: string; 
-  deckId?: string;
-  specialFeatures?: string[];
-  interactiveElements?: string[];
-  graded?: boolean;
-  gradingService?: string;
-  gradingScore?: string;
-  hotspots?: HotspotData[];
-  backSideImage?: string;
-  edition?: number;
-  editionSize?: number;
-  releaseDate?: string;
-  qrCodeData?: string;
-  marketData?: {
-    price?: number;
-    currency?: string;
-    lastSoldPrice?: number;
-    availableForSale?: boolean;
-  };
-  artistId?: string;
-}
-
 // Default values
 export const DEFAULT_CARD_STYLE: CardStyle = {
   template: 'classic',

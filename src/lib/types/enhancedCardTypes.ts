@@ -1,11 +1,8 @@
 
-// Enhanced card types for the card system
-import { BaseCard } from './cardTypes';
+import { Card, CardDesignMetadata, HotspotData, CardRarity } from './cardTypes';
 
-/**
- * Enhanced Card with additional functionality
- */
-export interface EnhancedCard extends BaseCard {
+export interface EnhancedCard extends Card {
+  // Additional properties specific to enhanced cards
   seriesId?: string; 
   deckId?: string;
   specialFeatures?: string[];
@@ -15,9 +12,6 @@ export interface EnhancedCard extends BaseCard {
   gradingScore?: string;
   hotspots?: HotspotData[];
   backSideImage?: string;
-  cardNumber?: string;
-  artist?: string;
-  artistId?: string;
   edition?: number;
   editionSize?: number;
   releaseDate?: string;
@@ -28,77 +22,34 @@ export interface EnhancedCard extends BaseCard {
     lastSoldPrice?: number;
     availableForSale?: boolean;
   };
-  rarity?: CardRarity;
+  artistId?: string;
 }
 
-/**
- * Card rarity types
- */
-export type CardRarity = 'common' | 'uncommon' | 'rare' | 'ultra-rare' | 'legendary' | 'one-of-one';
-
-/**
- * Hotspot data for interactive cards
- */
-export interface HotspotData {
-  id: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  content: string;
-  type: 'text' | 'link' | 'image' | 'video';
-  visible: boolean;
-}
-
-/**
- * Series of cards
- */
 export interface Series {
   id: string;
-  name?: string;
   title: string;
   description: string;
-  releaseDate: string;
-  cards: EnhancedCard[];
-  totalCards: number;
-  rarity?: string;
-  creator?: string;
-  artistId?: string;
+  coverImageUrl: string;
+  artistId: string;
   createdAt: string;
   updatedAt: string;
-  coverImageUrl?: string;
-  isPublished?: boolean;
+  releaseDate: string;
+  totalCards: number;
+  isPublished: boolean;
+  cards: EnhancedCard[];
   cardIds: string[];
-  releaseType?: 'standard' | 'limited' | 'exclusive';
+  releaseType: 'standard' | 'limited' | 'special';
 }
 
-/**
- * Deck of cards
- */
 export interface Deck {
   id: string;
   name: string;
   description: string;
-  cards: EnhancedCard[];
-  creator?: string;
-  ownerId?: string;
+  coverImageUrl: string;
+  ownerId: string;
   createdAt: string;
   updatedAt: string;
-  isPublic: boolean;
-  coverImageUrl?: string;
+  cards: EnhancedCard[];
   cardIds: string[];
-}
-
-/**
- * Card set for play
- */
-export interface CardSet {
-  id: string;
-  name: string;
-  description: string;
-  cards: EnhancedCard[];
-  category: string;
-  rules?: string;
-  createdAt: string;
-  updatedAt: string;
+  isPublic: boolean;
 }
