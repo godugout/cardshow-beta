@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useTransition } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/navigation/PageLayout';
@@ -7,7 +6,7 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useMobileOptimization } from '@/hooks/useMobileOptimization';
 import { PlusCircle, Info } from 'lucide-react';
 import { Card } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useCards } from '@/hooks/useCards';
@@ -20,7 +19,6 @@ const Gallery = () => {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showTutorial, setShowTutorial] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [isPending, startTransition] = useTransition();
   
@@ -39,9 +37,7 @@ const Gallery = () => {
     localStorage.setItem('hasSeenGalleryTutorial', 'true');
     setShowTutorial(false);
     
-    toast({
-      variant: "info",
-      title: "Tutorial completed",
+    toast.info("Tutorial completed", {
       description: "You can access help anytime via the info icon",
     });
   };
@@ -56,9 +52,7 @@ const Gallery = () => {
     
     const hasSeenViewer = localStorage.getItem('hasSeenViewerTutorial');
     if (!hasSeenViewer) {
-      toast({
-        variant: "info",
-        title: "Tip: Interactive Card Viewer",
+      toast.info("Tip: Interactive Card Viewer", {
         description: "Try dragging the card or using the effect controls for an immersive experience",
       });
     }
@@ -72,6 +66,7 @@ const Gallery = () => {
   };
   
   if (isFullscreen && selectedCardId) {
+    const selectedCard = cards.find(card => card.id === selectedCardId);
     return (
       <React.Suspense fallback={
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
@@ -79,7 +74,7 @@ const Gallery = () => {
         </div>
       }>
         <FullscreenViewer 
-          cardId={selectedCardId} 
+          card={selectedCard} 
           onClose={handleCloseFullscreen}
         />
       </React.Suspense>
@@ -91,8 +86,7 @@ const Gallery = () => {
       fetchCards();
     });
     
-    toast({
-      title: "Gallery refreshed",
+    toast.success("Gallery refreshed", {
       description: "Your card collection has been refreshed",
     });
   };

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/navigation/PageLayout';
@@ -15,7 +14,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { Card } from '@/lib/types';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { AlertDialog, AlertDialogContent } from '@/components/ui/alert-dialog';
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import {
@@ -339,8 +338,7 @@ const ArCardViewerPage: React.FC = () => {
                       onClick={() => {
                         handleAddCard(card.id);
                         setShowAddCardSheet(false);
-                        toast({
-                          title: "Card added",
+                        toast.success("Card added", {
                           description: `${card.title} added to AR scene`
                         });
                       }}

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { useCards } from '@/context/CardContext';
 import { ArrowLeft, Eye, Smartphone, Share2, Download } from 'lucide-react';
 import { Card } from '@/lib/types';
 import { sampleCards } from '@/lib/data/sampleCards';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { adaptToCard } from '@/lib/adapters/cardAdapter';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 import { DetailedViewCard, ensureDetailedViewCard } from '@/types/detailedCardTypes';
@@ -76,10 +75,8 @@ const CardDetail = () => {
       }
     } else {
       console.error('CardDetail: Card not found at all for ID:', id);
-      toast({
-        title: "Card not found",
-        description: "The requested card could not be found",
-        variant: "destructive"
+      toast.error("Card not found", {
+        description: "The requested card could not be found"
       });
     }
   }, [id, cards, getCard]);
@@ -131,23 +128,20 @@ const CardDetail = () => {
         text: resolvedCard.description || `Check out this ${resolvedCard.title} card!`,
         url: shareUrl,
       })
-      .then(() => toast({
-        title: "Shared successfully",
+      .then(() => toast.success("Shared successfully", {
         description: "Card has been shared"
       }))
       .catch(error => {
         console.error('Error sharing card:', error);
         navigator.clipboard.writeText(shareUrl).then(() => {
-          toast({
-            title: "Link copied",
+          toast.success("Link copied", {
             description: "Card URL copied to clipboard"
           });
         });
       });
     } else {
       navigator.clipboard.writeText(shareUrl).then(() => {
-        toast({
-          title: "Link copied",
+        toast.success("Link copied", {
           description: "Card URL copied to clipboard"
         });
       });
