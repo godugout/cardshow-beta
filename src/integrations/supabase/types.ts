@@ -1406,13 +1406,17 @@ export type Database = {
           id: string
           metadata: Json | null
           mime_type: string
+          optimization_metadata: Json | null
+          original_dimensions: Json | null
           original_filename: string
+          processing_status: string | null
           storage_path: string
           tags: string[] | null
           thumbnail_path: string | null
           title: string | null
           updated_at: string
           user_id: string
+          variants: Json | null
           width: number | null
         }
         Insert: {
@@ -1423,13 +1427,17 @@ export type Database = {
           id?: string
           metadata?: Json | null
           mime_type: string
+          optimization_metadata?: Json | null
+          original_dimensions?: Json | null
           original_filename: string
+          processing_status?: string | null
           storage_path: string
           tags?: string[] | null
           thumbnail_path?: string | null
           title?: string | null
           updated_at?: string
           user_id: string
+          variants?: Json | null
           width?: number | null
         }
         Update: {
@@ -1440,13 +1448,17 @@ export type Database = {
           id?: string
           metadata?: Json | null
           mime_type?: string
+          optimization_metadata?: Json | null
+          original_dimensions?: Json | null
           original_filename?: string
+          processing_status?: string | null
           storage_path?: string
           tags?: string[] | null
           thumbnail_path?: string | null
           title?: string | null
           updated_at?: string
           user_id?: string
+          variants?: Json | null
           width?: number | null
         }
         Relationships: []
@@ -1603,6 +1615,53 @@ export type Database = {
             columns: ["frame_id"]
             isOneToOne: false
             referencedRelation: "design_frames"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      image_variants: {
+        Row: {
+          asset_id: string | null
+          created_at: string | null
+          file_size: number | null
+          format: string | null
+          height: number | null
+          id: string
+          quality: number | null
+          storage_path: string
+          variant_type: string
+          width: number | null
+        }
+        Insert: {
+          asset_id?: string | null
+          created_at?: string | null
+          file_size?: number | null
+          format?: string | null
+          height?: number | null
+          id?: string
+          quality?: number | null
+          storage_path: string
+          variant_type: string
+          width?: number | null
+        }
+        Update: {
+          asset_id?: string | null
+          created_at?: string | null
+          file_size?: number | null
+          format?: string | null
+          height?: number | null
+          id?: string
+          quality?: number | null
+          storage_path?: string
+          variant_type?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "image_variants_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "digital_assets"
             referencedColumns: ["id"]
           },
         ]
@@ -1943,6 +2002,224 @@ export type Database = {
           id?: string
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      oakland_events: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          era: string | null
+          event_date: string | null
+          event_type: string
+          featured_memory_id: string | null
+          id: string
+          is_historical: boolean | null
+          location: string | null
+          memories_count: number | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          era?: string | null
+          event_date?: string | null
+          event_type: string
+          featured_memory_id?: string | null
+          id?: string
+          is_historical?: boolean | null
+          location?: string | null
+          memories_count?: number | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          era?: string | null
+          event_date?: string | null
+          event_type?: string
+          featured_memory_id?: string | null
+          id?: string
+          is_historical?: boolean | null
+          location?: string | null
+          memories_count?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oakland_events_featured_memory_id_fkey"
+            columns: ["featured_memory_id"]
+            isOneToOne: false
+            referencedRelation: "oakland_memories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oakland_expressions: {
+        Row: {
+          audio_url: string | null
+          category: string
+          created_at: string | null
+          decade: string | null
+          emotion_tags: string[] | null
+          era: string | null
+          id: string
+          source: string | null
+          text_content: string
+          usage_count: number | null
+        }
+        Insert: {
+          audio_url?: string | null
+          category: string
+          created_at?: string | null
+          decade?: string | null
+          emotion_tags?: string[] | null
+          era?: string | null
+          id?: string
+          source?: string | null
+          text_content: string
+          usage_count?: number | null
+        }
+        Update: {
+          audio_url?: string | null
+          category?: string
+          created_at?: string | null
+          decade?: string | null
+          emotion_tags?: string[] | null
+          era?: string | null
+          id?: string
+          source?: string | null
+          text_content?: string
+          usage_count?: number | null
+        }
+        Relationships: []
+      }
+      oakland_memories: {
+        Row: {
+          attendees: string[] | null
+          audio_url: string | null
+          community_reactions: Json | null
+          created_at: string | null
+          description: string | null
+          effect_settings: Json | null
+          emotions: string[] | null
+          era: string | null
+          fan_expressions: string[] | null
+          game_date: string | null
+          historical_context: string | null
+          id: string
+          image_url: string | null
+          is_featured: boolean | null
+          location: string | null
+          memory_type: string
+          opponent: string | null
+          personal_significance: string | null
+          score: string | null
+          section: string | null
+          tags: string[] | null
+          template_id: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+          video_url: string | null
+          visibility: string | null
+        }
+        Insert: {
+          attendees?: string[] | null
+          audio_url?: string | null
+          community_reactions?: Json | null
+          created_at?: string | null
+          description?: string | null
+          effect_settings?: Json | null
+          emotions?: string[] | null
+          era?: string | null
+          fan_expressions?: string[] | null
+          game_date?: string | null
+          historical_context?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          location?: string | null
+          memory_type: string
+          opponent?: string | null
+          personal_significance?: string | null
+          score?: string | null
+          section?: string | null
+          tags?: string[] | null
+          template_id?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+          video_url?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          attendees?: string[] | null
+          audio_url?: string | null
+          community_reactions?: Json | null
+          created_at?: string | null
+          description?: string | null
+          effect_settings?: Json | null
+          emotions?: string[] | null
+          era?: string | null
+          fan_expressions?: string[] | null
+          game_date?: string | null
+          historical_context?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          location?: string | null
+          memory_type?: string
+          opponent?: string | null
+          personal_significance?: string | null
+          score?: string | null
+          section?: string | null
+          tags?: string[] | null
+          template_id?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+          video_url?: string | null
+          visibility?: string | null
+        }
+        Relationships: []
+      }
+      oakland_templates: {
+        Row: {
+          category: string
+          config: Json
+          created_at: string | null
+          description: string | null
+          era: string | null
+          id: string
+          name: string
+          preview_url: string | null
+          tags: string[] | null
+          usage_count: number | null
+        }
+        Insert: {
+          category: string
+          config?: Json
+          created_at?: string | null
+          description?: string | null
+          era?: string | null
+          id?: string
+          name: string
+          preview_url?: string | null
+          tags?: string[] | null
+          usage_count?: number | null
+        }
+        Update: {
+          category?: string
+          config?: Json
+          created_at?: string | null
+          description?: string | null
+          era?: string | null
+          id?: string
+          name?: string
+          preview_url?: string | null
+          tags?: string[] | null
+          usage_count?: number | null
         }
         Relationships: []
       }

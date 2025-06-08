@@ -1,17 +1,107 @@
+import { supabase } from './client';
+import type { Collection } from '@/lib/types';
+import { convertDbToCollection, convertCollectionToDb } from './utils/collection-converter';
 
-import { cardCollectionOperations } from './collection-operations/card-operations';
-import { getCollectionOperations } from './collection-operations/get-operations';
-import { modifyCollectionOperations } from './collection-operations/modify-operations';
+export const createCollection = async (collectionData: Partial<Collection>) => {
+  try {
+    const collectionToDb = convertCollectionToDb(collectionData);
+    const { data, error } = await supabase
+      .from('collections')
+      .insert([collectionToDb])
+      .select()
+      .single();
 
-// Combine all operations into a single export
-export const collectionOperations = {
-  ...getCollectionOperations,
-  ...modifyCollectionOperations,
-  ...cardCollectionOperations
+    if (error) {
+      console.error('Error creating collection:', error);
+      return { data: null, error: error.message };
+    }
+
+    return { data: convertDbToCollection(data), error: null };
+  } catch (error: any) {
+    console.error('Error creating collection:', error);
+    return { data: null, error: error.message };
+  }
 };
 
-// Re-export utility for checking collection existence
-export { checkCollectionExists } from './utils/collection-existence';
+export const getUserCollections = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('collections')
+      .select('*')
+      .eq('owner_id', userId)
+      .order('created_at', { ascending: false });
 
-// Re-export the collection converter utility
-export { convertDbCollectionToApp } from './utils/collection-converter';
+    if (error) {
+      console.error('Error fetching user collections:', error);
+      return { data: null, error: error.message };
+    }
+
+    const collections = data.map(convertDbToCollection);
+    return { data: collections, error: null };
+  } catch (error: any) {
+    console.error('Error fetching user collections:', error);
+    return { data: null, error: error.message };
+  }
+};
+
+export const getPublicCollections = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('collections')
+      .select('*')
+      .eq('visibility', 'public')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching public collections:', error);
+      return { data: null, error: error.message };
+    }
+
+    const collections = data.map(convertDbToCollection);
+    return { data: collections, error: null };
+  } catch (error: any) {
+    console.error('Error fetching public collections:', error);
+    return { data: null, error: error.message };
+  }
+};
+
+export const updateCollection = async (collectionId: string, updates: Partial<Collection>) => {
+  try {
+    const collectionToDb = convertCollectionToDb(updates);
+    const { data, error } = await supabase
+      .from('collections')
+      .update(collectionToDb)
+      .eq('id', collectionId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating collection:', error);
+      return { data: null, error: error.message };
+    }
+
+    return { data: convertDbToCollection(data), error: null };
+  } catch (error: any) {
+    console.error('Error updating collection:', error);
+    return { data: null, error: error.message };
+  }
+};
+
+export const deleteCollection = async (collectionId: string) => {
+  try {
+    const { error } = await supabase
+      .from('collections')
+      .delete()
+      .eq('id', collectionId);
+
+    if (error) {
+      console.error('Error deleting collection:', error);
+      return { error: error.message };
+    }
+
+    return { error: null };
+  } catch (error: any) {
+    console.error('Error deleting collection:', error);
+    return { error: error.message };
+  }
+};

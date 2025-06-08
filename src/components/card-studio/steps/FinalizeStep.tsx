@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -6,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, DesignMetadata, MarketMetadata } from '@/lib/types';
 import { Switch } from "@/components/ui/switch"
-import { DEFAULT_MARKET_METADATA } from '@/lib/utils/cardDefaults';
+import { DEFAULT_MARKET_METADATA, DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 
 interface FinalizeStepProps {
   cardData: Partial<Card>;
@@ -38,12 +37,7 @@ const FinalizeStep: React.FC<FinalizeStepProps> = ({ cardData, onUpdate }) => {
   }, [cardData]);
   
   const updateMarketMetadata = (field: string, value: any) => {
-    const currentDesignMetadata = cardData.designMetadata || {
-      cardStyle: {},
-      textStyle: {},
-      cardMetadata: {},
-      marketMetadata: DEFAULT_MARKET_METADATA
-    };
+    const currentDesignMetadata = cardData.designMetadata || DEFAULT_DESIGN_METADATA;
 
     const updatedMarketMetadata: MarketMetadata = {
       ...DEFAULT_MARKET_METADATA,
@@ -51,7 +45,7 @@ const FinalizeStep: React.FC<FinalizeStepProps> = ({ cardData, onUpdate }) => {
       [field]: value
     };
 
-    const updatedDesignMetadata = {
+    const updatedDesignMetadata: DesignMetadata = {
       ...currentDesignMetadata,
       marketMetadata: updatedMarketMetadata
     };

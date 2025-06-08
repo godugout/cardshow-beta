@@ -24,6 +24,7 @@ export interface PremiumCardEffect extends CardEffect {
   cssClass?: string;
   supportedCardTypes?: string[];
   defaultSettings?: any;
+  enabled: boolean; // Make this required to match CardEffect
 }
 
 export interface EffectPreset {

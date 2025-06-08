@@ -1,5 +1,16 @@
 
-import { DesignMetadata } from '@/lib/types/cardTypes';
+import { DesignMetadata, MarketMetadata } from '@/lib/types/cardTypes';
+
+export const DEFAULT_MARKET_METADATA: MarketMetadata = {
+  isPrintable: false,
+  isForSale: false,
+  includeInCatalog: false,
+  price: 0,
+  currency: 'USD',
+  availableForSale: false,
+  editionSize: 0,
+  editionNumber: 0
+};
 
 export const DEFAULT_DESIGN_METADATA: DesignMetadata = {
   cardStyle: {
@@ -22,14 +33,5 @@ export const DEFAULT_DESIGN_METADATA: DesignMetadata = {
     series: 'base',
     cardType: 'standard',
   },
-  marketMetadata: {
-    isPrintable: false,
-    isForSale: false,
-    includeInCatalog: false,
-    price: 0,
-    currency: 'USD',
-    availableForSale: false,
-    editionSize: 0,
-    editionNumber: 0
-  }
+  marketMetadata: DEFAULT_MARKET_METADATA
 };
