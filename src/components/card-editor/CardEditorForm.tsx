@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card } from '@/lib/types';
+import { Card } from '@/lib/types/unifiedCardTypes';
 import { useCards } from '@/context/CardContext';
 import { toast } from 'sonner';
 import TagInput from './TagInput';

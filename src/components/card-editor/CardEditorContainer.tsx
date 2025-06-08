@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCards } from '@/context/CardContext';
@@ -11,6 +10,7 @@ import CardEditorNavigation from './components/CardEditorNavigation';
 import CardEditorPreview from './components/CardEditorPreview';
 import CardEditorActions from './components/CardEditorActions';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
+import { Card } from '@/lib/types/unifiedCardTypes';
 
 interface CardEditorContainerProps {
   card?: any;
@@ -54,17 +54,13 @@ const CardEditorContainer: React.FC<CardEditorContainerProps> = ({
   );
   
   const handleSubmit = async () => {
-    const cardData = {
+    const cardData: Partial<Card> = {
       ...cardState.getCardData(),
       designMetadata: {
         cardStyle: cardState.cardStyle || DEFAULT_DESIGN_METADATA.cardStyle,
         textStyle: DEFAULT_DESIGN_METADATA.textStyle,
         cardMetadata: DEFAULT_DESIGN_METADATA.cardMetadata,
         marketMetadata: DEFAULT_DESIGN_METADATA.marketMetadata,
-        effects: cardState.selectedEffects || [],
-        player: cardState.player,
-        team: cardState.team,
-        year: cardState.year,
       }
     };
     

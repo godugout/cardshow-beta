@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card } from '@/lib/types';
+import { Card } from '@/lib/types/unifiedCardTypes';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 
 interface InfoPanelProps {
@@ -33,7 +33,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({ card, showInfo = true }) => {
           <p>Card Number: {toDisplayString(cardMetadata.cardNumber || 'N/A')}</p>
           <p>Card Type: {toDisplayString(cardMetadata.cardType || 'Standard')}</p>
           <p>Series: {toDisplayString(cardMetadata.series || 'Base')}</p>
-          <p>Artist: {toDisplayString(cardMetadata.artist || 'Unknown')}</p>
+          <p>Artist: {toDisplayString(cardMetadata.artist || card.artist || 'Unknown')}</p>
         </div>
         <div>
           <h3 className="text-lg font-semibold mb-2">Market Info</h3>

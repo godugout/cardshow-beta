@@ -1,4 +1,21 @@
 
+export interface CardEffectSettings {
+  intensity?: number;
+  speed?: number;
+  pattern?: string;
+  color?: string;
+  animationEnabled?: boolean;
+  [key: string]: any;
+}
+
+export interface CardEffect {
+  id: string;
+  name: string;
+  enabled: boolean;
+  settings: CardEffectSettings;
+  className?: string;
+}
+
 export interface PremiumCardEffect {
   id: string;
   name: string;
@@ -9,6 +26,8 @@ export interface PremiumCardEffect {
   cssClass: string;
   previewImage?: string;
   price?: number;
+  enabled?: boolean;
+  settings?: CardEffectSettings;
 }
 
 export interface CardEffectsResult {

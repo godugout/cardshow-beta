@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -292,8 +291,8 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
       case 3:
         return (
           <EffectsStep
-            effectStack={[]} // This needs to be replaced with actual effect stack
-            addEffect={() => {}} // These need to be replaced with actual functions
+            effectStack={[]}
+            addEffect={() => {}}
             removeEffect={() => {}}
             updateEffectSettings={() => {}}
             onContinue={goToNextStep}
@@ -310,6 +309,7 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
         return (
           <FinalizeStep
             cardData={cardData}
+            onUpdate={updateCardData}
             onSave={handleSave}
           />
         );
