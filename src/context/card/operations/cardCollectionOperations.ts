@@ -20,7 +20,7 @@ export const addCardToCollection = async (
     setIsLoading(true);
     setError(null);
     
-    const { error } = await collectionOperations.addCardToCollection(cardId, collectionId);
+    const { error } = await collectionOperations.addCardToCollection(collectionId, cardId);
     
     if (error) {
       setError(error.message);
@@ -84,7 +84,7 @@ export const removeCardFromCollection = async (
     setIsLoading(true);
     setError(null);
     
-    const { error } = await collectionOperations.removeCardFromCollection(cardId);
+    const { error } = await collectionOperations.removeCardFromCollection(collectionId, cardId);
     
     if (error) {
       setError(error.message);

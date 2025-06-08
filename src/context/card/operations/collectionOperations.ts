@@ -15,7 +15,7 @@ export const fetchCollections = async (
     setIsLoading(true);
     setError(null);
     
-    const { data, error } = await collectionOperations.getCollections();
+    const { data, error } = await collectionOperations.getPublic();
     
     if (error) {
       setError(error.message);
