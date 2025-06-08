@@ -1,3 +1,4 @@
+
 import { supabase } from './client';
 import type { Collection } from '@/lib/types';
 import { convertDbToCollection, convertCollectionToDb } from './utils/collection-converter';
@@ -104,4 +105,34 @@ export const deleteCollection = async (collectionId: string) => {
     console.error('Error deleting collection:', error);
     return { error: error.message };
   }
+};
+
+export const checkCollectionExists = async (name: string, userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('collections')
+      .select('id')
+      .eq('title', name)
+      .eq('owner_id', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error checking collection exists:', error);
+      return { exists: false, error: error.message };
+    }
+
+    return { exists: !!data, error: null };
+  } catch (error: any) {
+    console.error('Error checking collection exists:', error);
+    return { exists: false, error: error.message };
+  }
+};
+
+export const collectionOperations = {
+  create: createCollection,
+  getUserCollections,
+  getPublic: getPublicCollections,
+  update: updateCollection,
+  delete: deleteCollection,
+  checkExists: checkCollectionExists
 };
