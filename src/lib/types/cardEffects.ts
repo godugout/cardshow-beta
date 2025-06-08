@@ -1,51 +1,24 @@
 
-import { CardEffectSettings } from './cardTypes';
-
-export interface CardEffect {
+export interface PremiumCardEffect {
   id: string;
   name: string;
-  enabled: boolean;
-  settings: CardEffectSettings;
-  className?: string;
-}
-
-export interface PremiumCardEffect extends CardEffect {
-  isPremium: boolean;
-  tier: 'basic' | 'premium' | 'exclusive';
-  unlockLevel?: number;
   description: string;
-  premium: boolean;
   category: string;
-  iconUrl?: string;
-  thumbnail?: string;
-  previewUrl?: string;
-  dependencies?: string[];
-  type?: 'shader' | 'css' | 'canvas' | 'webgl';
-  cssClass?: string;
-  supportedCardTypes?: string[];
-  defaultSettings?: any;
-  enabled: boolean; // Make this required to match CardEffect
-}
-
-export interface EffectPreset {
-  id: string;
-  name: string;
-  effects: CardEffect[];
-  thumbnail?: string;
+  isPremium: boolean;
+  tier: 'basic' | 'premium' | 'ultra';
+  cssClass: string;
+  previewImage?: string;
+  price?: number;
 }
 
 export interface CardEffectsResult {
   availableEffects: PremiumCardEffect[];
-  premiumEffects: PremiumCardEffect[];
   activeEffects: string[];
-  appliedClasses: string;
+  setActiveEffects: (effects: string[]) => void;
   toggleEffect: (effectId: string) => void;
-  updateEffectSettings: (effectId: string, settings: any) => void;
-  clearAllEffects: () => void;
-  getEffectSettings: (effectId: string) => any;
-  cssClasses: string;
-  effectData: Record<string, any>;
+  applyEffect: (effectId: string) => void;
+  removeEffect: (effectId: string) => void;
+  isEffectActive: (effectId: string) => boolean;
+  getEffectIntensity: (effectId: string) => number;
+  setEffectIntensity: (effectId: string, intensity: number) => void;
 }
-
-// Export CardEffectSettings for external use
-export type { CardEffectSettings } from './cardTypes';

@@ -1,163 +1,130 @@
 
-import React, { useEffect, useState } from 'react';
-import { Card } from '@/lib/types';
-import { useParams } from 'react-router-dom';
-import { useCardContext } from '@/context/CardContext';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Card } from '@/lib/types/unifiedCardTypes';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import { showToast } from '@/lib/utils/toastHelpers';
 
-const ImmersiveCardViewer = ({ card: initialCard }: { card: Card }) => {
+const ImmersiveCardViewer = () => {
   const { id } = useParams();
-  const { getCardById } = useCardContext();
-  const [card, setCard] = useState<Card>(initialCard);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const { toast } = useToast();
-  
-  // Fall back image for when the card image doesn't load
-  const fallbackImage = 'https://images.unsplash.com/photo-1518770660439-4636190af475';
-  
-  useEffect(() => {
-    if (id) {
-      const foundCard = getCardById(id);
-      if (foundCard) {
-        console.log("Found card in context:", foundCard);
-        setCard(foundCard);
-      } else {
-        console.warn("Card not found in context:", id);
-      }
-    }
-  }, [id, getCardById]);
+  const navigate = useNavigate();
+  const [card, setCard] = useState<Card | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (card) {
-      console.log("Current card data:", card);
-      if (!card.imageUrl) {
-        console.warn("Card has no image URL:", card.id);
-        toast({
-          title: "Image not available",
-          description: "Using a fallback image for this card"
-        });
-      }
+    if (!id) {
+      showToast.error("Invalid card", "No card ID provided");
+      navigate('/gallery');
+      return;
     }
-  }, [card, toast]);
-  
-  const handleImageError = () => {
-    console.error("Failed to load image:", card.imageUrl);
-    setImageError(true);
-    toast({
-      title: "Image failed to load",
-      description: "Using a fallback image",
-      variant: "destructive"
-    });
-  };
+
+    // Simulate loading card data
+    setTimeout(() => {
+      // Mock card data
+      const mockCard: Card = {
+        id: id,
+        title: 'Sample Card',
+        description: 'This is a sample card for demonstration purposes.',
+        imageUrl: 'https://placehold.co/600x400/orange/white?text=Sample+Card',
+        thumbnailUrl: 'https://placehold.co/600x400/orange/white?text=Sample+Card',
+        tags: ['sample', 'card'],
+        userId: 'system',
+        effects: ['Holographic', 'Refractor'],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        designMetadata: {
+          cardStyle: {
+            template: 'classic',
+            effect: 'none',
+            borderRadius: '8px',
+            borderColor: '#000000',
+            shadowColor: 'rgba(0,0,0,0.2)',
+            frameWidth: 2,
+            frameColor: '#000000'
+          },
+          textStyle: {
+            titleColor: '#000000',
+            titleAlignment: 'center',
+            titleWeight: 'bold',
+            descriptionColor: '#333333'
+          },
+          cardMetadata: {
+            category: 'general',
+            series: 'base',
+            cardType: 'standard'
+          },
+          marketMetadata: {
+            price: 0,
+            currency: 'USD',
+            availableForSale: false,
+            editionSize: 0,
+            editionNumber: 0,
+            isPrintable: false,
+            isForSale: false,
+            includeInCatalog: false
+          }
+        }
+      };
+      
+      setCard(mockCard);
+      setLoading(false);
+      showToast.info("Card loaded", "Interactive viewer ready");
+    }, 1000);
+  }, [id, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-t-transparent border-primary rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white">Loading immersive viewer...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!card) {
+    showToast.error("Card not found", "The requested card could not be loaded");
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-white mb-4">Card not found</h2>
+          <Button onClick={() => navigate('/gallery')}>
+            <ArrowLeft className="mr-2 h-5 w-5" />
+            Back to Gallery
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4 h-full flex flex-col items-center justify-center">
-      <h2 className="text-xl font-bold mb-4 text-white">{card.title}</h2>
-      <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-auto">
-        {/* Card image with fallback handling */}
-        <div className="relative aspect-[3/4] w-full mb-4 bg-gray-700 rounded overflow-hidden">
-          {!imageLoaded && !imageError && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-12 h-12 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
-            </div>
-          )}
-          
-          {imageError && (
-            <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-              <div className="text-center">
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  className="h-12 w-12 mx-auto mb-2" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
-                  />
-                </svg>
-                <p>Failed to load image</p>
-              </div>
-            </div>
-          )}
-          
-          <img 
-            src={card.imageUrl || fallbackImage} 
-            alt={card.title} 
-            className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-            onLoad={() => setImageLoaded(true)}
-            onError={(e) => {
-              // Try the fallback image if the original fails
-              if (e.currentTarget.src !== fallbackImage) {
-                e.currentTarget.src = fallbackImage;
-              } else {
-                handleImageError();
-              }
-            }}
-          />
-        </div>
-        
-        {card.description && (
-          <p className="text-gray-300 mb-4">{card.description}</p>
-        )}
-        
-        {/* Display card stats if available */}
-        {card.stats && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-            {card.stats.battingAverage && (
-              <div className="stat-item">
-                <span className="text-sm text-gray-400">Batting Average</span>
-                <span className="block text-lg font-medium text-white">{card.stats.battingAverage}</span>
-              </div>
-            )}
-            {card.stats.homeRuns && (
-              <div className="stat-item">
-                <span className="text-sm text-gray-400">Home Runs</span>
-                <span className="block text-lg font-medium text-white">{card.stats.homeRuns}</span>
-              </div>
-            )}
-            {card.stats.rbis && (
-              <div className="stat-item">
-                <span className="text-sm text-gray-400">RBIs</span>
-                <span className="block text-lg font-medium text-white">{card.stats.rbis}</span>
-              </div>
-            )}
-            {card.stats.era && (
-              <div className="stat-item">
-                <span className="text-sm text-gray-400">ERA</span>
-                <span className="block text-lg font-medium text-white">{card.stats.era}</span>
-              </div>
-            )}
-            {card.stats.wins && (
-              <div className="stat-item">
-                <span className="text-sm text-gray-400">Wins</span>
-                <span className="block text-lg font-medium text-white">{card.stats.wins}</span>
-              </div>
-            )}
-            {card.stats.strikeouts && (
-              <div className="stat-item">
-                <span className="text-sm text-gray-400">Strikeouts</span>
-                <span className="block text-lg font-medium text-white">{card.stats.strikeouts}</span>
-              </div>
-            )}
-            {card.stats.careerYears && (
-              <div className="stat-item">
-                <span className="text-sm text-gray-400">Career Years</span>
-                <span className="block text-lg font-medium text-white">{card.stats.careerYears}</span>
-              </div>
-            )}
-            {card.stats.ranking && (
-              <div className="stat-item">
-                <span className="text-sm text-gray-400">Ranking</span>
-                <span className="block text-lg font-medium text-white">{card.stats.ranking}</span>
-              </div>
+    <div className="min-h-screen bg-gray-900">
+      <div className="absolute top-4 left-4 z-10">
+        <Button variant="ghost" onClick={() => navigate(-1)} className="text-white">
+          <ArrowLeft className="mr-2 h-5 w-5" />
+          Back
+        </Button>
+      </div>
+
+      <div className="flex items-center justify-center min-h-screen p-8">
+        <div className="relative max-w-2xl max-h-[80vh] mx-4">
+          <div className="relative aspect-[2.5/3.5] w-full rounded-lg overflow-hidden shadow-2xl">
+            <img 
+              src={card.imageUrl} 
+              alt={card.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          <div className="mt-6 text-center text-white">
+            <h1 className="text-3xl font-bold">{card.title}</h1>
+            {card.description && (
+              <p className="text-gray-300 mt-2 text-lg">{card.description}</p>
             )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

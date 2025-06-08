@@ -1,5 +1,5 @@
 
-import { Card } from '@/lib/types/cardTypes';
+import { Card } from '@/lib/types/unifiedCardTypes';
 
 export interface CardViewerProps {
   card: Card;
@@ -18,9 +18,16 @@ export interface CardViewerProps {
   fullscreen?: boolean;
 }
 
+export interface FullscreenViewerProps {
+  card?: Card;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 export interface CardTextStepProps {
   cardData: Partial<Card>;
   onUpdate: (updates: Partial<Card>) => void;
+  onContinue?: () => void;
   title?: string;
   description?: string;
   tags?: string[];
@@ -33,7 +40,7 @@ export interface CardPreviewStepProps {
   cardData: Partial<Card>;
   onUpdate: (updates: Partial<Card>) => void;
   onSave: () => void;
-  onExport: (format: string) => void;
+  onExport?: (format: string) => void;
 }
 
 export interface CardEffectsStepProps {
@@ -49,4 +56,14 @@ export interface CardDesignStepProps {
 export interface CardUploadStepProps {
   imageUrl: string;
   onImageUpload: (imageUrl: string) => void;
+}
+
+export interface ImmersiveCardViewerProps {
+  cardId: string;
+  card?: Card;
+}
+
+export interface MaterialSimulatorProps {
+  material: any;
+  className?: string;
 }

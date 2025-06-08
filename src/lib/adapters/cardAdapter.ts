@@ -1,90 +1,37 @@
 
-import { Card as CardType } from '../types/cardTypes';
-import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
+import { Card, DesignMetadata } from '@/lib/types/unifiedCardTypes';
+import { DEFAULT_DESIGN_METADATA, createBlankCard } from '@/lib/utils/cardDefaults';
 
-/**
- * Adapts any card-like object to the current Card type
- */
-export function adaptToCard(card: any): CardType {
+export const adaptToCard = (data: any): Card => {
   return {
-    id: card.id || '',
-    title: card.title || '',
-    description: card.description || '',
-    imageUrl: card.imageUrl || '',
-    thumbnailUrl: card.thumbnailUrl || card.imageUrl || '',
-    tags: card.tags || [],
-    userId: card.userId || '',
-    createdAt: card.createdAt || new Date().toISOString(),
-    updatedAt: card.updatedAt || new Date().toISOString(),
-    effects: card.effects || [],
-    designMetadata: card.designMetadata || DEFAULT_DESIGN_METADATA,
-    // Include any other properties from the original card
-    ...card
+    id: data.id || '',
+    title: data.title || '',
+    description: data.description || '',
+    imageUrl: data.imageUrl || '',
+    thumbnailUrl: data.thumbnailUrl || data.imageUrl || '',
+    tags: data.tags || [],
+    userId: data.userId || '',
+    effects: data.effects || [],
+    createdAt: data.createdAt || new Date().toISOString(),
+    updatedAt: data.updatedAt || new Date().toISOString(),
+    designMetadata: data.designMetadata || DEFAULT_DESIGN_METADATA,
+    
+    // Optional fields
+    player: data.player,
+    team: data.team,
+    year: data.year,
+    cardNumber: data.cardNumber,
+    set: data.set,
+    cardType: data.cardType,
+    artist: data.artist,
+    backgroundColor: data.backgroundColor,
+    specialEffect: data.specialEffect,
+    collectionId: data.collectionId,
+    price: data.price,
+    rarity: data.rarity,
+    verification_status: data.verification_status,
+    stats: data.stats,
   };
-}
+};
 
-/**
- * Adapts legacy card data to the current Card type
- */
-export function adaptToLegacyCard(card: Partial<CardType>): any {
-  return {
-    id: card.id || '',
-    title: card.title || '',
-    description: card.description || '',
-    imageUrl: card.imageUrl || '',
-    thumbnailUrl: card.thumbnailUrl || card.imageUrl || '',
-    tags: card.tags || [],
-    userId: card.userId || '',
-    createdAt: card.createdAt || new Date().toISOString(),
-    updatedAt: card.updatedAt || new Date().toISOString(),
-    effects: card.effects || [],
-    // Ensure all required nested properties exist
-    designMetadata: {
-      cardStyle: {
-        template: 'classic',
-        effect: 'none',
-        borderRadius: '8px',
-        borderColor: '#000000',
-        frameWidth: 2,
-        frameColor: '#000000',
-        shadowColor: 'rgba(0,0,0,0.2)',
-        ...(card.designMetadata?.cardStyle || {})
-      },
-      textStyle: {
-        titleColor: '#FFFFFF',
-        titleAlignment: 'center',
-        titleWeight: 'bold',
-        descriptionColor: '#DDDDDD',
-        ...(card.designMetadata?.textStyle || {})
-      },
-      cardMetadata: {
-        ...(card.designMetadata?.cardMetadata || {})
-      },
-      marketMetadata: {
-        ...(card.designMetadata?.marketMetadata || {})
-      },
-      ...(card.designMetadata || {})
-    },
-    // Include any other properties from the original card
-    ...card
-  };
-}
-
-/**
- * Adapts a card to match a specific schema format
- */
-export function adaptCardToSchema(card: CardType): any {
-  return {
-    id: card.id,
-    title: card.title,
-    description: card.description || '',
-    imageUrl: card.imageUrl,
-    thumbnailUrl: card.thumbnailUrl || card.imageUrl,
-    tags: card.tags || [],
-    createdAt: card.createdAt,
-    updatedAt: card.updatedAt,
-    userId: card.userId,
-    effects: card.effects || [],
-    designMetadata: card.designMetadata
-  };
-}
+export { createBlankCard };

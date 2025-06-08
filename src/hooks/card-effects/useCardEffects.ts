@@ -1,118 +1,92 @@
 
-import { useState, useCallback, useEffect } from 'react';
-import { UseCardEffectsResult, CardEffectSettings } from './types';
+import { useState, useCallback } from 'react';
+import { PremiumCardEffect, CardEffectsResult } from '@/lib/types/cardEffects';
 
-const useCardEffects = (): UseCardEffectsResult => {
-  const [cardEffects, setCardEffects] = useState<Record<string, string[]>>({});
-  const [effectSettings, setEffectSettings] = useState<Record<string, Record<string, CardEffectSettings>>>({});
+const AVAILABLE_EFFECTS: PremiumCardEffect[] = [
+  {
+    id: 'holographic',
+    name: 'Holographic',
+    description: 'Creates a shimmering holographic effect',
+    category: 'Premium',
+    isPremium: true,
+    tier: 'premium',
+    cssClass: 'holographic-effect',
+    price: 5.99
+  },
+  {
+    id: 'refractor',
+    name: 'Refractor',
+    description: 'Light refraction effect with rainbow colors',
+    category: 'Premium',
+    isPremium: true,
+    tier: 'premium',
+    cssClass: 'refractor-effect',
+    price: 3.99
+  },
+  {
+    id: 'chrome',
+    name: 'Chrome',
+    description: 'Metallic chrome finish',
+    category: 'Basic',
+    isPremium: false,
+    tier: 'basic',
+    cssClass: 'chrome-effect'
+  },
+  {
+    id: 'vintage',
+    name: 'Vintage',
+    description: 'Classic vintage appearance',
+    category: 'Basic',
+    isPremium: false,
+    tier: 'basic',
+    cssClass: 'vintage-effect'
+  }
+];
+
+export const useCardEffects = (): CardEffectsResult => {
   const [activeEffects, setActiveEffects] = useState<string[]>([]);
-
-  useEffect(() => {
-    try {
-      const savedEffects = localStorage.getItem('cardEffects');
-      const savedSettings = localStorage.getItem('effectSettings');
-      
-      if (savedEffects) {
-        setCardEffects(JSON.parse(savedEffects));
-      }
-      
-      if (savedSettings) {
-        setEffectSettings(JSON.parse(savedSettings));
-      }
-    } catch (error) {
-      console.error('Failed to load saved effects:', error);
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('cardEffects', JSON.stringify(cardEffects));
-      localStorage.setItem('effectSettings', JSON.stringify(effectSettings));
-    } catch (error) {
-      console.error('Failed to save effects:', error);
-    }
-  }, [cardEffects, effectSettings]);
-
-  const addEffect = useCallback((cardId: string, effect: string) => {
-    setCardEffects(prev => {
-      const currentEffects = prev[cardId] || [];
-      if (currentEffects.includes(effect)) return prev;
-      
-      return {
-        ...prev,
-        [cardId]: [...currentEffects, effect]
-      };
-    });
-  }, []);
-
-  const removeEffect = useCallback((cardId: string, effect: string) => {
-    setCardEffects(prev => {
-      const currentEffects = prev[cardId] || [];
-      return {
-        ...prev,
-        [cardId]: currentEffects.filter(e => e !== effect)
-      };
-    });
-  }, []);
+  const [effectIntensities, setEffectIntensities] = useState<Record<string, number>>({});
 
   const toggleEffect = useCallback((effectId: string) => {
-    console.log('Toggle effect:', effectId);
+    setActiveEffects(prev => 
+      prev.includes(effectId) 
+        ? prev.filter(id => id !== effectId)
+        : [...prev, effectId]
+    );
   }, []);
 
-  const updateEffectSettings = useCallback((effectId: string, settings: any) => {
-    console.log('Update effect settings:', effectId, settings);
+  const applyEffect = useCallback((effectId: string) => {
+    setActiveEffects(prev => 
+      prev.includes(effectId) ? prev : [...prev, effectId]
+    );
   }, []);
 
-  const setCardEffectsArray = useCallback((cardId: string, effects: string[]) => {
-    setCardEffects(prev => ({
-      ...prev,
-      [cardId]: [...effects]
-    }));
+  const removeEffect = useCallback((effectId: string) => {
+    setActiveEffects(prev => prev.filter(id => id !== effectId));
   }, []);
 
-  const clearEffects = useCallback((cardId: string) => {
-    setCardEffects(prev => ({
-      ...prev,
-      [cardId]: []
-    }));
-  }, []);
+  const isEffectActive = useCallback((effectId: string) => {
+    return activeEffects.includes(effectId);
+  }, [activeEffects]);
 
-  const getEffectSettings = useCallback((effectId: string): any => {
-    // This implementation matches the CardEffectsResult interface signature
-    return {};
-  }, [effectSettings]);
+  const getEffectIntensity = useCallback((effectId: string) => {
+    return effectIntensities[effectId] || 0.5;
+  }, [effectIntensities]);
 
-  const getCardEffectSettings = useCallback((
-    cardId: string,
-    effect: string
-  ): CardEffectSettings | undefined => {
-    return effectSettings[cardId]?.[effect];
-  }, [effectSettings]);
-
-  const clearAllEffects = useCallback(() => {
-    // Clear all effects from all cards
-    setCardEffects({});
-    setEffectSettings({});
-    setActiveEffects([]);
+  const setEffectIntensity = useCallback((effectId: string, intensity: number) => {
+    setEffectIntensities(prev => ({ ...prev, [effectId]: intensity }));
   }, []);
 
   return {
-    cardEffects,
+    availableEffects: AVAILABLE_EFFECTS,
     activeEffects,
     setActiveEffects,
-    addEffect,
-    removeEffect,
     toggleEffect,
-    updateEffectSettings,
-    clearAllEffects,
-    getEffectSettings,
-    setCardEffects: setCardEffectsArray,
-    clearEffects,
-    availableEffects: [],
-    premiumEffects: [],
-    appliedClasses: '',
-    cssClasses: '',
-    effectData: {}
+    applyEffect,
+    removeEffect,
+    isEffectActive,
+    getEffectIntensity,
+    setEffectIntensity,
   };
 };
 

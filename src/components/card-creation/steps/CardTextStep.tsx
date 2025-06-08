@@ -1,107 +1,92 @@
 
 import React from 'react';
-import { Card } from '@/lib/types/cardTypes';
+import { Card } from '@/lib/types/unifiedCardTypes';
+import { CardTextStepProps } from '@/components/gallery/types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 
-export interface CardTextStepProps {
-  cardData: Partial<Card>;
-  onUpdate: (updates: Partial<Card>) => void;
-}
+const CardTextStep: React.FC<CardTextStepProps> = ({ 
+  cardData, 
+  onUpdate, 
+  onContinue 
+}) => {
+  const handleChange = (field: keyof Card, value: any) => {
+    onUpdate({ [field]: value });
+  };
 
-const CardTextStep: React.FC<CardTextStepProps> = ({ cardData, onUpdate }) => {
   return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-medium">Card Text & Details</h2>
-      <p className="text-sm text-gray-500">
-        Add text and details to personalize your card.
-      </p>
+    <div className="space-y-6">
+      <div>
+        <label htmlFor="title" className="block text-sm font-medium mb-2">
+          Card Title
+        </label>
+        <Input
+          id="title"
+          value={cardData.title || ''}
+          onChange={(e) => handleChange('title', e.target.value)}
+          placeholder="Enter card title..."
+        />
+      </div>
 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="title">Title</Label>
+      <div>
+        <label htmlFor="description" className="block text-sm font-medium mb-2">
+          Description
+        </label>
+        <Textarea
+          id="description"
+          value={cardData.description || ''}
+          onChange={(e) => handleChange('description', e.target.value)}
+          placeholder="Enter card description..."
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="player" className="block text-sm font-medium mb-2">
+          Player Name
+        </label>
+        <Input
+          id="player"
+          value={cardData.player || ''}
+          onChange={(e) => handleChange('player', e.target.value)}
+          placeholder="Enter player name..."
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="team" className="block text-sm font-medium mb-2">
+            Team
+          </label>
           <Input
-            id="title"
-            placeholder="Card Title"
-            value={cardData.title || ''}
-            onChange={(e) => onUpdate({ title: e.target.value })}
+            id="team"
+            value={cardData.team || ''}
+            onChange={(e) => handleChange('team', e.target.value)}
+            placeholder="Enter team..."
           />
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            placeholder="Card Description"
-            value={cardData.description || ''}
-            onChange={(e) => onUpdate({ description: e.target.value })}
-            className="min-h-[100px]"
+
+        <div>
+          <label htmlFor="year" className="block text-sm font-medium mb-2">
+            Year
+          </label>
+          <Input
+            id="year"
+            value={cardData.year || ''}
+            onChange={(e) => handleChange('year', e.target.value)}
+            placeholder="Enter year..."
           />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="player">Player</Label>
-            <Input
-              id="player"
-              placeholder="Player Name"
-              value={cardData.player || ''}
-              onChange={(e) => onUpdate({ player: e.target.value })}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="team">Team</Label>
-            <Input
-              id="team"
-              placeholder="Team Name"
-              value={cardData.team || ''}
-              onChange={(e) => onUpdate({ team: e.target.value })}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="year">Year</Label>
-            <Input
-              id="year"
-              placeholder="Year"
-              value={cardData.year || ''}
-              onChange={(e) => onUpdate({ year: e.target.value })}
-            />
-          </div>
-        </div>
-        
-        <div className="pt-4">
-          <Button 
-            type="button" 
-            variant="outline" 
-            className="w-full"
-            onClick={() => {
-              // Auto-generate description based on other fields
-              const player = cardData.player || '';
-              const team = cardData.team || '';
-              const year = cardData.year || '';
-              
-              let description = '';
-              if (player && team && year) {
-                description = `${player} ${team} card from ${year}.`;
-              } else if (player && team) {
-                description = `${player} ${team} card.`;
-              } else if (cardData.title) {
-                description = `${cardData.title} card.`;
-              }
-              
-              if (description) {
-                onUpdate({ description });
-              }
-            }}
-          >
-            Generate Description
-          </Button>
         </div>
       </div>
+
+      {onContinue && (
+        <div className="flex justify-end">
+          <Button onClick={onContinue}>
+            Continue
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
