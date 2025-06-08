@@ -6,12 +6,13 @@ interface CardItemProps {
   card: Card;
   onClick?: () => void;
   className?: string;
+  isActive?: boolean; // Add missing prop
 }
 
-const CardItem: React.FC<CardItemProps> = ({ card, onClick, className = '' }) => {
+const CardItem: React.FC<CardItemProps> = ({ card, onClick, className = '', isActive = false }) => {
   return (
     <div 
-      className={`bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow ${className}`}
+      className={`bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow ${isActive ? 'ring-2 ring-blue-500' : ''} ${className}`}
       onClick={onClick}
     >
       <div className="aspect-[2.5/3.5] overflow-hidden">

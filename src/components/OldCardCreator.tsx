@@ -26,8 +26,8 @@ const OldCardCreator: React.FC = () => {
       
       {view === 'collection' && (
         <CardCollection 
-          cardData={cardData} 
-          selectCard={selectCard} 
+          cards={cardData} 
+          onCardClick={selectCard} 
           setView={setView} 
         />
       )}

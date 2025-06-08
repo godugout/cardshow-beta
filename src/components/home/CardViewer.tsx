@@ -9,15 +9,35 @@ interface CardViewerProps {
   isOpen: boolean;
   onClose: () => void;
   className?: string;
+  isFlipped?: boolean; // Add missing prop
+  flipCard?: () => void; // Add missing prop
+  onBackToCollection?: () => void; // Add missing prop
+  activeEffects?: string[]; // Add missing prop
+  onSnapshot?: () => void; // Add missing prop
 }
 
 const CardViewer: React.FC<CardViewerProps> = ({ 
   card, 
   isOpen, 
   onClose, 
-  className = '' 
+  className = '',
+  isFlipped = false,
+  flipCard,
+  onBackToCollection,
+  activeEffects = [],
+  onSnapshot
 }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [internalFlipped, setInternalFlipped] = useState(false);
+  
+  const handleFlip = () => {
+    if (flipCard) {
+      flipCard();
+    } else {
+      setInternalFlipped(!internalFlipped);
+    }
+  };
+
+  const actualIsFlipped = flipCard ? isFlipped : internalFlipped;
 
   if (!isOpen || !card) {
     return null;
@@ -28,12 +48,14 @@ const CardViewer: React.FC<CardViewerProps> = ({
       <div className="relative max-w-4xl max-h-[90vh] mx-4">
         {/* Controls */}
         <div className="absolute top-4 right-4 flex space-x-2 z-10">
-          <Button variant="ghost" size="sm" onClick={() => setIsFlipped(!isFlipped)}>
+          <Button variant="ghost" size="sm" onClick={handleFlip}>
             <RotateCw className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm">
-            <Download className="h-4 w-4" />
-          </Button>
+          {onSnapshot && (
+            <Button variant="ghost" size="sm" onClick={onSnapshot}>
+              <Download className="h-4 w-4" />
+            </Button>
+          )}
           <Button variant="ghost" size="sm">
             <Share2 className="h-4 w-4" />
           </Button>
@@ -50,8 +72,8 @@ const CardViewer: React.FC<CardViewerProps> = ({
                 src={card.imageUrl} 
                 alt={card.title}
                 className={`w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-500 ${
-                  isFlipped ? 'transform rotateY-180' : ''
-                }`}
+                  actualIsFlipped ? 'transform rotateY-180' : ''
+                } ${activeEffects.join(' ')}`}
               />
             </div>
             
@@ -94,6 +116,14 @@ const CardViewer: React.FC<CardViewerProps> = ({
                       </span>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {onBackToCollection && (
+                <div className="pt-4">
+                  <Button onClick={onBackToCollection} variant="outline">
+                    Back to Collection
+                  </Button>
                 </div>
               )}
             </div>

@@ -1,37 +1,86 @@
 
-import { Card, DesignMetadata } from '@/lib/types/unifiedCardTypes';
-import { DEFAULT_DESIGN_METADATA, createBlankCard } from '@/lib/utils/cardDefaults';
+import { UnifiedCard, DEFAULT_DESIGN_METADATA } from '@/lib/types/unifiedCardTypes';
 
-export const adaptToCard = (data: any): Card => {
+export interface CardInput {
+  id: string;
+  title: string;
+  description?: string | null;
+  imageUrl: string;
+  thumbnailUrl?: string | null;
+  tags?: string[];
+  userId: string;
+  effects?: string[];
+  createdAt: string;
+  updatedAt: string;
+  collectionId?: string | null;
+  [key: string]: any;
+}
+
+export function adaptToCard(input: CardInput): UnifiedCard {
   return {
-    id: data.id || '',
-    title: data.title || '',
-    description: data.description || '',
-    imageUrl: data.imageUrl || '',
-    thumbnailUrl: data.thumbnailUrl || data.imageUrl || '',
-    tags: data.tags || [],
-    userId: data.userId || '',
-    effects: data.effects || [],
-    createdAt: data.createdAt || new Date().toISOString(),
-    updatedAt: data.updatedAt || new Date().toISOString(),
-    designMetadata: data.designMetadata || DEFAULT_DESIGN_METADATA,
+    id: input.id,
+    title: input.title,
+    description: input.description || '',
+    imageUrl: input.imageUrl,
+    thumbnailUrl: input.thumbnailUrl || input.imageUrl,
+    tags: input.tags || [],
+    userId: input.userId,
+    effects: input.effects || [],
+    createdAt: input.createdAt,
+    updatedAt: input.updatedAt,
+    designMetadata: input.designMetadata || DEFAULT_DESIGN_METADATA,
     
-    // Optional fields
-    player: data.player,
-    team: data.team,
-    year: data.year,
-    cardNumber: data.cardNumber,
-    set: data.set,
-    cardType: data.cardType,
-    artist: data.artist,
-    backgroundColor: data.backgroundColor,
-    specialEffect: data.specialEffect,
-    collectionId: data.collectionId,
-    price: data.price,
-    rarity: data.rarity,
-    verification_status: data.verification_status,
-    stats: data.stats,
+    // Extended properties
+    name: input.name,
+    player: input.player,
+    team: input.team,
+    year: input.year,
+    cardNumber: input.cardNumber,
+    set: input.set,
+    cardType: input.cardType,
+    artist: input.artist,
+    backgroundColor: input.backgroundColor,
+    specialEffect: input.specialEffect,
+    collectionId: input.collectionId,
+    price: input.price,
+    rarity: input.rarity,
+    verification_status: input.verification_status,
+    jersey: input.jersey,
+    stats: input.stats,
   };
-};
+}
 
-export { createBlankCard };
+// Legacy adapter for backwards compatibility
+export function adaptToLegacyCard(input: Partial<UnifiedCard>): UnifiedCard {
+  return {
+    id: input.id || '',
+    title: input.title || '',
+    description: input.description || '',
+    imageUrl: input.imageUrl || '',
+    thumbnailUrl: input.thumbnailUrl || input.imageUrl || '',
+    tags: input.tags || [],
+    userId: input.userId || '',
+    effects: input.effects || [],
+    createdAt: input.createdAt || new Date().toISOString(),
+    updatedAt: input.updatedAt || new Date().toISOString(),
+    designMetadata: input.designMetadata || DEFAULT_DESIGN_METADATA,
+    
+    // Extended properties with defaults
+    name: input.name,
+    player: input.player,
+    team: input.team,
+    year: input.year,
+    cardNumber: input.cardNumber,
+    set: input.set,
+    cardType: input.cardType,
+    artist: input.artist,
+    backgroundColor: input.backgroundColor,
+    specialEffect: input.specialEffect,
+    collectionId: input.collectionId,
+    price: input.price,
+    rarity: input.rarity,
+    verification_status: input.verification_status,
+    jersey: input.jersey,
+    stats: input.stats,
+  };
+}

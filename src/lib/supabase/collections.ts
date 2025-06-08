@@ -1,25 +1,97 @@
 
-import { Collection } from '@/lib/types';
+export interface Collection {
+  id: string;
+  name: string;
+  description?: string;
+  owner_id: string;
+  visibility: string;
+  allow_comments: boolean;
+  design_metadata: any;
+  created_at: string;
+  updated_at: string;
+  cover_image_url?: string;
+}
 
 export const collectionOperations = {
-  getPublic: () => Promise.resolve({ data: [], error: null }),
-  createCollection: (collection: any) => Promise.resolve({ data: collection, error: null }),
-  updateCollection: (id: string, updates: any) => Promise.resolve({ data: { id, ...updates }, error: null }),
-  deleteCollection: (id: string) => Promise.resolve({ error: null }),
-  addCardToCollection: (collectionId: string, cardId: string) => Promise.resolve({ error: null }),
-  removeCardFromCollection: (collectionId: string, cardId: string) => Promise.resolve({ error: null }),
-  getCollectionWithCards: (id: string) => Promise.resolve({ data: null, error: null }),
-};
+  async getPublic() {
+    try {
+      // Mock implementation for now
+      return { data: [], error: null };
+    } catch (error) {
+      return { data: [], error: error };
+    }
+  },
 
-export const convertDbCollectionToApp = (dbCollection: any): Collection => {
-  return {
-    id: dbCollection.id,
-    title: dbCollection.title,
-    description: dbCollection.description,
-    owner_id: dbCollection.owner_id,
-    visibility: dbCollection.visibility,
-    created_at: dbCollection.created_at,
-    updated_at: dbCollection.updated_at,
-    cards: dbCollection.cards || [],
-  };
+  async createCollection(collection: any) {
+    try {
+      // Mock implementation for now
+      return { data: collection, error: null };
+    } catch (error) {
+      return { data: null, error: error };
+    }
+  },
+
+  async updateCollection(id: string, updates: any) {
+    try {
+      // Mock implementation for now
+      return { data: { id, ...updates }, error: null };
+    } catch (error) {
+      return { data: null, error: error };
+    }
+  },
+
+  async deleteCollection(id: string) {
+    try {
+      // Mock implementation for now
+      return { data: { id }, error: null };
+    } catch (error) {
+      return { data: null, error: error };
+    }
+  },
+
+  async addCardToCollection(collectionId: string, cardId: string) {
+    try {
+      // Mock implementation for now
+      return { data: { collectionId, cardId }, error: null };
+    } catch (error) {
+      return { data: null, error: error };
+    }
+  },
+
+  async removeCardFromCollection(collectionId: string, cardId: string) {
+    try {
+      // Mock implementation for now
+      return { data: { collectionId, cardId }, error: null };
+    } catch (error) {
+      return { data: null, error: error };
+    }
+  },
+
+  // Add missing methods
+  async checkExists(name: string, userId: string) {
+    try {
+      // Mock implementation for now
+      return { exists: false, error: null };
+    } catch (error) {
+      return { exists: false, error: error };
+    }
+  },
+
+  async getCollection(id: string) {
+    try {
+      // Mock implementation for now
+      return { data: null, error: null };
+    } catch (error) {
+      return { data: null, error: error };
+    }
+  },
+
+  async create(collection: Partial<Collection>) {
+    try {
+      // Mock implementation for now
+      return { data: collection, error: null };
+    } catch (error) {
+      return { data: null, error: error };
+    }
+  }
 };

@@ -60,7 +60,7 @@ export interface UnifiedCard {
   title: string;
   description: string;
   imageUrl: string;
-  thumbnailUrl?: string;
+  thumbnailUrl: string; // Make required to match Card interface
   tags: string[];
   userId: string;
   effects: string[];
