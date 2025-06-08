@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Card } from '@/lib/types';
 import { useCards as useCardContext } from '@/context/CardContext';
-import { useAuth } from '@/context/auth';
+import { useAuth } from '@/providers/AuthProvider'; // Use the main AuthProvider
 import { toast } from 'sonner';
 
 export const useCards = () => {
