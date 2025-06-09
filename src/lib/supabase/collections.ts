@@ -20,6 +20,7 @@ export interface Collection {
   totalCards: number;
   createdAt: string;
   updatedAt: string;
+  featured?: boolean; // Add this missing property
 }
 
 export const collectionOperations = {
@@ -138,5 +139,6 @@ export const convertDbCollectionToApp = (dbCollection: any): Collection => {
     totalCards: dbCollection.totalCards || 0,
     createdAt: dbCollection.created_at,
     updatedAt: dbCollection.updated_at,
+    featured: dbCollection.featured || false,
   };
 };

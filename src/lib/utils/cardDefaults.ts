@@ -40,6 +40,17 @@ export const DEFAULT_DESIGN_METADATA = {
   }
 };
 
+export const DEFAULT_MARKET_METADATA = {
+  isPrintable: false,
+  isForSale: false,
+  includeInCatalog: false,
+  price: 0,
+  currency: 'USD',
+  availableForSale: false,
+  editionSize: 1,
+  editionNumber: 1,
+};
+
 export const createBlankCard = (userId: string): Partial<Card> => {
   return {
     title: '',
