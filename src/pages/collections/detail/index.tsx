@@ -1,4 +1,3 @@
-
 import React, { useEffect, useCallback } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import PageLayout from '@/components/navigation/PageLayout';
@@ -175,6 +174,7 @@ const CollectionDetail = () => {
   // Ensure collection has all required properties for useCollectionHeader
   const enrichedCollection = {
     ...collection,
+    description: collection.description || '', // Ensure description is always a string
     isPublic: collection.isPublic ?? (collection.visibility === 'public'),
     tags: collection.tags ?? [],
     featured: collection.featured ?? false
