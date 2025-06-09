@@ -21,6 +21,9 @@ interface Collection {
   designMetadata?: any;
   cards?: Card[];
   cardIds?: string[];
+  isPublic?: boolean;
+  tags?: string[];
+  featured?: boolean;
 }
 
 export const useCollectionDetail = (collectionId?: string) => {
@@ -62,12 +65,17 @@ export const useCollectionDetail = (collectionId?: string) => {
       }
       
       if (data?.collection) {
-        // Convert DB collection to app format
+        // Convert DB collection to app format with proper type casting
         const appCollection = convertDbCollectionToApp(data.collection);
-        // Ensure it matches our local Collection interface
+        
+        // Ensure it matches our local Collection interface with all required properties
         const localCollection: Collection = {
           ...appCollection,
-          description: appCollection.description || '' // Ensure description is defined
+          description: appCollection.description || '',
+          visibility: (appCollection.visibility || 'private') as 'public' | 'private' | 'team',
+          isPublic: appCollection.visibility === 'public',
+          tags: appCollection.tags || [],
+          featured: appCollection.featured || false
         };
         setLocalCollection(localCollection);
         
