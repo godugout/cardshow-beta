@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card } from '@/lib/types/cardTypes';
 import { DetailedViewCard, ensureDetailedViewCard } from '@/types/detailedCardTypes';
@@ -54,6 +55,11 @@ export function useCardDetail(cardId: string) {
                 isPrintable: false,
                 isForSale: false,
                 includeInCatalog: false,
+                price: 0,
+                currency: 'USD',
+                availableForSale: false,
+                editionSize: 1,
+                editionNumber: 1
               },
               cardMetadata: {
                 category: 'general',

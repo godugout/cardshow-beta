@@ -47,9 +47,45 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
       name: 'Classic Baseball',
       description: 'Traditional baseball card design with clean lines and bold text',
       thumbnail: '/templates/baseball-classic.jpg',
+      imageUrl: '/templates/baseball-classic.jpg',
       category: 'Baseball',
       isOfficial: true,
       popularity: 95,
+      designMetadata: {
+        cardStyle: {
+          template: 'baseball-classic',
+          effect: 'holographic',
+          borderRadius: '8px',
+          borderWidth: 4,
+          borderColor: '#d4af37',
+          backgroundColor: '#ffffff',
+          shadowColor: 'rgba(0,0,0,0.2)',
+          frameWidth: 2,
+          frameColor: '#d4af37',
+        },
+        textStyle: {
+          fontFamily: 'Inter',
+          titleColor: '#1a202c',
+          titleAlignment: 'center',
+          titleWeight: 'bold',
+          descriptionColor: '#333333',
+        },
+        cardMetadata: {
+          category: 'Baseball',
+          series: 'Classic',
+          cardType: 'player',
+        },
+        marketMetadata: {
+          isPrintable: false,
+          isForSale: false,
+          includeInCatalog: true,
+          price: 0,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1,
+          editionNumber: 1,
+        }
+      },
       designDefaults: {
         cardStyle: {
           template: 'baseball-classic',
@@ -72,9 +108,45 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
       name: 'Vintage Baseball',
       description: 'Aged baseball card design with a classic, nostalgic feel',
       thumbnail: '/templates/baseball-vintage.jpg',
+      imageUrl: '/templates/baseball-vintage.jpg',
       category: 'Baseball',
       isOfficial: false,
       popularity: 80,
+      designMetadata: {
+        cardStyle: {
+          template: 'baseball-vintage',
+          effect: 'vintage',
+          borderRadius: '12px',
+          borderWidth: 2,
+          borderColor: '#a52a2a',
+          backgroundColor: '#f5f5dc',
+          shadowColor: 'rgba(0,0,0,0.2)',
+          frameWidth: 2,
+          frameColor: '#a52a2a',
+        },
+        textStyle: {
+          fontFamily: 'Times New Roman',
+          titleColor: '#8b4513',
+          titleAlignment: 'left',
+          titleWeight: 'bold',
+          descriptionColor: '#333333',
+        },
+        cardMetadata: {
+          category: 'Baseball',
+          series: 'Vintage',
+          cardType: 'player',
+        },
+        marketMetadata: {
+          isPrintable: false,
+          isForSale: false,
+          includeInCatalog: true,
+          price: 0,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1,
+          editionNumber: 1,
+        }
+      },
       designDefaults: {
         cardStyle: {
           template: 'baseball-vintage',
@@ -97,9 +169,45 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
       name: 'Modern Baseball',
       description: 'Sleek, contemporary baseball card design with dynamic graphics',
       thumbnail: '/templates/baseball-modern.jpg',
+      imageUrl: '/templates/baseball-modern.jpg',
       category: 'Baseball',
       isOfficial: true,
       popularity: 70,
+      designMetadata: {
+        cardStyle: {
+          template: 'baseball-modern',
+          effect: 'chrome',
+          borderRadius: '10px',
+          borderWidth: 0,
+          borderColor: '#000000',
+          backgroundColor: '#ffffff',
+          shadowColor: 'rgba(0,0,0,0.2)',
+          frameWidth: 2,
+          frameColor: '#000000',
+        },
+        textStyle: {
+          fontFamily: 'Arial',
+          titleColor: '#000080',
+          titleAlignment: 'right',
+          titleWeight: 'bold',
+          descriptionColor: '#333333',
+        },
+        cardMetadata: {
+          category: 'Baseball',
+          series: 'Modern',
+          cardType: 'player',
+        },
+        marketMetadata: {
+          isPrintable: false,
+          isForSale: false,
+          includeInCatalog: true,
+          price: 0,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1,
+          editionNumber: 1,
+        }
+      },
       designDefaults: {
         cardStyle: {
           template: 'baseball-modern',
@@ -125,9 +233,45 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
       name: 'Classic Basketball',
       description: 'Traditional basketball card design with clean lines and bold text',
       thumbnail: '/templates/basketball-classic.jpg',
+      imageUrl: '/templates/basketball-classic.jpg',
       category: 'Basketball',
       isOfficial: true,
       popularity: 90,
+      designMetadata: {
+        cardStyle: {
+          template: 'basketball-classic',
+          effect: 'refractor',
+          borderRadius: '8px',
+          borderWidth: 4,
+          borderColor: '#ffa500',
+          backgroundColor: '#ffffff',
+          shadowColor: 'rgba(0,0,0,0.2)',
+          frameWidth: 2,
+          frameColor: '#ffa500',
+        },
+        textStyle: {
+          fontFamily: 'Inter',
+          titleColor: '#1a202c',
+          titleAlignment: 'center',
+          titleWeight: 'bold',
+          descriptionColor: '#333333',
+        },
+        cardMetadata: {
+          category: 'Basketball',
+          series: 'Classic',
+          cardType: 'player',
+        },
+        marketMetadata: {
+          isPrintable: false,
+          isForSale: false,
+          includeInCatalog: true,
+          price: 0,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1,
+          editionNumber: 1,
+        }
+      },
       designDefaults: {
         cardStyle: {
           template: 'basketball-classic',
@@ -150,9 +294,45 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
       name: 'Vintage Basketball',
       description: 'Aged basketball card design with a classic, nostalgic feel',
       thumbnail: '/templates/basketball-vintage.jpg',
+      imageUrl: '/templates/basketball-vintage.jpg',
       category: 'Basketball',
       isOfficial: false,
       popularity: 75,
+      designMetadata: {
+        cardStyle: {
+          template: 'basketball-vintage',
+          effect: 'vintage',
+          borderRadius: '12px',
+          borderWidth: 2,
+          borderColor: '#800000',
+          backgroundColor: '#f5f5dc',
+          shadowColor: 'rgba(0,0,0,0.2)',
+          frameWidth: 2,
+          frameColor: '#800000',
+        },
+        textStyle: {
+          fontFamily: 'Times New Roman',
+          titleColor: '#8b4513',
+          titleAlignment: 'left',
+          titleWeight: 'bold',
+          descriptionColor: '#333333',
+        },
+        cardMetadata: {
+          category: 'Basketball',
+          series: 'Vintage',
+          cardType: 'player',
+        },
+        marketMetadata: {
+          isPrintable: false,
+          isForSale: false,
+          includeInCatalog: true,
+          price: 0,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1,
+          editionNumber: 1,
+        }
+      },
       designDefaults: {
         cardStyle: {
           template: 'basketball-vintage',
@@ -175,9 +355,45 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
       name: 'Modern Basketball',
       description: 'Sleek, contemporary basketball card design with dynamic graphics',
       thumbnail: '/templates/basketball-modern.jpg',
+      imageUrl: '/templates/basketball-modern.jpg',
       category: 'Basketball',
       isOfficial: true,
       popularity: 65,
+      designMetadata: {
+        cardStyle: {
+          template: 'basketball-modern',
+          effect: 'chrome',
+          borderRadius: '10px',
+          borderWidth: 0,
+          borderColor: '#000000',
+          backgroundColor: '#ffffff',
+          shadowColor: 'rgba(0,0,0,0.2)',
+          frameWidth: 2,
+          frameColor: '#000000',
+        },
+        textStyle: {
+          fontFamily: 'Arial',
+          titleColor: '#000080',
+          titleAlignment: 'right',
+          titleWeight: 'bold',
+          descriptionColor: '#333333',
+        },
+        cardMetadata: {
+          category: 'Basketball',
+          series: 'Modern',
+          cardType: 'player',
+        },
+        marketMetadata: {
+          isPrintable: false,
+          isForSale: false,
+          includeInCatalog: true,
+          price: 0,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1,
+          editionNumber: 1,
+        }
+      },
       designDefaults: {
         cardStyle: {
           template: 'basketball-modern',
@@ -203,9 +419,45 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
       name: 'Classic Football',
       description: 'Traditional football card design with clean lines and bold text',
       thumbnail: '/templates/football-classic.jpg',
+      imageUrl: '/templates/football-classic.jpg',
       category: 'Football',
       isOfficial: true,
       popularity: 85,
+      designMetadata: {
+        cardStyle: {
+          template: 'football-classic',
+          effect: 'holographic',
+          borderRadius: '8px',
+          borderWidth: 4,
+          borderColor: '#008000',
+          backgroundColor: '#ffffff',
+          shadowColor: 'rgba(0,0,0,0.2)',
+          frameWidth: 2,
+          frameColor: '#008000',
+        },
+        textStyle: {
+          fontFamily: 'Inter',
+          titleColor: '#1a202c',
+          titleAlignment: 'center',
+          titleWeight: 'bold',
+          descriptionColor: '#333333',
+        },
+        cardMetadata: {
+          category: 'Football',
+          series: 'Classic',
+          cardType: 'player',
+        },
+        marketMetadata: {
+          isPrintable: false,
+          isForSale: false,
+          includeInCatalog: true,
+          price: 0,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1,
+          editionNumber: 1,
+        }
+      },
       designDefaults: {
         cardStyle: {
           template: 'football-classic',
@@ -228,9 +480,45 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
       name: 'Vintage Football',
       description: 'Aged football card design with a classic, nostalgic feel',
       thumbnail: '/templates/football-vintage.jpg',
+      imageUrl: '/templates/football-vintage.jpg',
       category: 'Football',
       isOfficial: false,
       popularity: 70,
+      designMetadata: {
+        cardStyle: {
+          template: 'football-vintage',
+          effect: 'vintage',
+          borderRadius: '12px',
+          borderWidth: 2,
+          borderColor: '#8b4513',
+          backgroundColor: '#f5f5dc',
+          shadowColor: 'rgba(0,0,0,0.2)',
+          frameWidth: 2,
+          frameColor: '#8b4513',
+        },
+        textStyle: {
+          fontFamily: 'Times New Roman',
+          titleColor: '#a0522d',
+          titleAlignment: 'left',
+          titleWeight: 'bold',
+          descriptionColor: '#333333',
+        },
+        cardMetadata: {
+          category: 'Football',
+          series: 'Vintage',
+          cardType: 'player',
+        },
+        marketMetadata: {
+          isPrintable: false,
+          isForSale: false,
+          includeInCatalog: true,
+          price: 0,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1,
+          editionNumber: 1,
+        }
+      },
       designDefaults: {
         cardStyle: {
           template: 'football-vintage',
@@ -253,9 +541,45 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
       name: 'Modern Football',
       description: 'Sleek, contemporary football card design with dynamic graphics',
       thumbnail: '/templates/football-modern.jpg',
+      imageUrl: '/templates/football-modern.jpg',
       category: 'Football',
       isOfficial: true,
       popularity: 60,
+      designMetadata: {
+        cardStyle: {
+          template: 'football-modern',
+          effect: 'chrome',
+          borderRadius: '10px',
+          borderWidth: 0,
+          borderColor: '#000000',
+          backgroundColor: '#ffffff',
+          shadowColor: 'rgba(0,0,0,0.2)',
+          frameWidth: 2,
+          frameColor: '#000000',
+        },
+        textStyle: {
+          fontFamily: 'Arial',
+          titleColor: '#006400',
+          titleAlignment: 'right',
+          titleWeight: 'bold',
+          descriptionColor: '#333333',
+        },
+        cardMetadata: {
+          category: 'Football',
+          series: 'Modern',
+          cardType: 'player',
+        },
+        marketMetadata: {
+          isPrintable: false,
+          isForSale: false,
+          includeInCatalog: true,
+          price: 0,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1,
+          editionNumber: 1,
+        }
+      },
       designDefaults: {
         cardStyle: {
           template: 'football-modern',
@@ -303,7 +627,7 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
       onClick={() => handleSelectTemplate(template)}
     >
       <img
-        src={template.thumbnail}
+        src={template.thumbnail || template.imageUrl}
         alt={template.name}
         className="w-full h-full object-cover transition-transform group-hover:scale-105"
         loading="lazy"
