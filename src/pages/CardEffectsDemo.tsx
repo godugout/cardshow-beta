@@ -1,100 +1,89 @@
-
 import React, { useState } from 'react';
-import PageLayout from '@/components/navigation/PageLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import CardEffectsGallery from '@/components/card-effects/CardEffectsGallery';
-
-const demoCard = {
-  id: 'demo-card-1',
-  title: 'Demo Card',
-  description: 'This is a demonstration of the card effects system',
-  imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475',
-  thumbnailUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=200',
-  tags: ['Demo', 'Effects', 'Interactive'],
-  userId: 'demo-user',
-  player: 'Demo Player',
-  team: 'All Stars',
-  year: '2025',
-  effects: [],
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  designMetadata: {
-    cardStyle: {
-      template: 'standard',
-      effect: 'holographic',
-      borderRadius: '12px',
-      borderColor: '#000000',
-      shadowColor: '#000000',
-      frameWidth: 10,
-      frameColor: '#FFFFFF'
-    },
-    textStyle: {
-      titleColor: '#FFFFFF',
-      titleAlignment: 'center',
-      titleWeight: 'bold',
-      descriptionColor: '#CCCCCC'
-    },
-    cardMetadata: {
-      category: 'demo',
-      series: 'tutorial',
-      cardType: 'player'
-    },
-    marketMetadata: {
-      isPrintable: true,
-      isForSale: false,
-      includeInCatalog: true
-    }
-  }
-};
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
+import type { Card as CardType } from '@/lib/types/unifiedCardTypes';
 
 const CardEffectsDemo: React.FC = () => {
+  const [selectedEffect, setSelectedEffect] = useState('holographic');
+  
+  const effects = [
+    'holographic',
+    'chrome',
+    'vintage',
+    'refractor',
+    'gold',
+    'prismatic'
+  ];
+
+  const demoCard: CardType = {
+    id: 'demo-card',
+    title: 'Demo Card',
+    description: 'A demonstration card for effects',
+    imageUrl: '/placeholder.svg',
+    thumbnailUrl: '/placeholder.svg',
+    tags: ['demo', 'effects'],
+    userId: 'demo-user',
+    player: 'Demo Player',
+    team: 'Demo Team',
+    year: '2024',
+    effects: [selectedEffect],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    designMetadata: DEFAULT_DESIGN_METADATA
+  };
+
   return (
-    <PageLayout
-      title="Card Effects Demo"
-      description="Explore various special effects for your digital cards"
-    >
-      <div className="container mx-auto px-4 py-8">
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Card Effects System</CardTitle>
-            <CardDescription>
-              Interact with the card to see how the effects respond to movement. 
-              Try enabling multiple effects to see how they combine.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="demo">
-              <TabsList className="grid w-full grid-cols-2 mb-8">
-                <TabsTrigger value="demo">Interactive Demo</TabsTrigger>
-                <TabsTrigger value="reference">Effect Reference</TabsTrigger>
-              </TabsList>
-              <TabsContent value="demo" className="mt-4">
-                <CardEffectsGallery card={demoCard} />
-              </TabsContent>
-              <TabsContent value="reference">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {['Holographic', 'Refractor', 'Vintage', 'Gold Foil', 'Prismatic'].map((effect) => (
-                    <div key={effect} className="relative aspect-[3/4]">
-                      <div className={`w-full h-full rounded-lg overflow-hidden effect-${effect.toLowerCase().replace(' ', '')}`}>
-                        <img 
-                          src={demoCard.imageUrl} 
-                          alt={effect} 
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                          <h3 className="text-white font-bold">{effect} Effect</h3>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+    <div className="container mx-auto px-4 py-8">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold mb-4">Card Effects Demo</h1>
+        <p className="text-muted-foreground">Experience the visual effects available for your cards</p>
       </div>
-    </PageLayout>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">Available Effects</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {effects.map((effect) => (
+              <Button
+                key={effect}
+                variant={selectedEffect === effect ? "default" : "outline"}
+                onClick={() => setSelectedEffect(effect)}
+                className="capitalize"
+              >
+                {effect}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-center">
+          <div className="w-64 aspect-[2.5/3.5] relative">
+            <Card className={`w-full h-full card-effect-${selectedEffect}`}>
+              <div className="relative w-full h-full overflow-hidden rounded-lg">
+                <img
+                  src={demoCard.imageUrl}
+                  alt={demoCard.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                  <h3 className="text-white font-bold">{demoCard.title}</h3>
+                  <p className="text-white/80 text-sm">{demoCard.description}</p>
+                  <div className="flex gap-1 mt-2">
+                    {demoCard.tags.map((tag, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

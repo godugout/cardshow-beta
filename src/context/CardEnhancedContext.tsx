@@ -23,6 +23,12 @@ export interface EnhancedCard {
   releaseDate: string;
   qrCodeData: string;
   hotspots: any[];
+  marketData?: {
+    price?: number;
+    currency?: string;
+    lastSoldPrice?: number;
+    availableForSale?: boolean;
+  };
 }
 
 // Mock data for series
@@ -37,6 +43,23 @@ export interface EnhancedSeries {
   isPublished: boolean;
   createdAt: string;
   updatedAt: string;
+  releaseDate: string;
+  releaseType?: 'standard' | 'limited' | 'special' | 'exclusive';
+  cards: EnhancedCard[];
+}
+
+// Deck interface
+export interface Deck {
+  id: string;
+  name: string;
+  description: string;
+  coverImageUrl?: string;
+  cards: EnhancedCard[];
+  cardIds: string[];
+  ownerId: string;
+  createdAt: string;
+  updatedAt: string;
+  isPublic: boolean;
 }
 
 const mockEnhancedCards: EnhancedCard[] = [
@@ -61,6 +84,12 @@ const mockEnhancedCards: EnhancedCard[] = [
     designMetadata: DEFAULT_DESIGN_METADATA,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    marketData: {
+      price: 299.99,
+      currency: 'USD',
+      lastSoldPrice: 250.00,
+      availableForSale: true
+    }
   }
 ];
 
@@ -76,6 +105,24 @@ const mockSeries: EnhancedSeries[] = [
     isPublished: true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    releaseDate: '2024-01-01',
+    releaseType: 'limited',
+    cards: mockEnhancedCards
+  }
+];
+
+const mockDecks: Deck[] = [
+  {
+    id: 'deck-1',
+    name: 'My First Deck',
+    description: 'A starter deck',
+    coverImageUrl: '/placeholder.svg',
+    cards: mockEnhancedCards,
+    cardIds: ['1'],
+    ownerId: 'user1',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isPublic: false
   }
 ];
 
@@ -86,6 +133,16 @@ interface CardEnhancedContextType {
   deleteEnhancedCard: (id: string) => void;
   cards: EnhancedCard[];
   series: EnhancedSeries[];
+  addSeries: (series: EnhancedSeries) => void;
+  updateSeries: (id: string, updates: Partial<EnhancedSeries>) => void;
+  decks: Deck[];
+  addDeck: (deck: Deck) => void;
+  updateDeck: (id: string, updates: Partial<Deck>) => void;
+  deleteDeck: (id: string) => void;
+  getDeck: (id: string) => Deck | undefined;
+  favorites: string[];
+  toggleFavorite: (cardId: string) => void;
+  isLoading: boolean;
 }
 
 const CardEnhancedContext = createContext<CardEnhancedContextType | undefined>(undefined);
@@ -93,6 +150,9 @@ const CardEnhancedContext = createContext<CardEnhancedContextType | undefined>(u
 export const CardEnhancedProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [enhancedCards, setEnhancedCards] = useState<EnhancedCard[]>(mockEnhancedCards);
   const [series, setSeries] = useState<EnhancedSeries[]>(mockSeries);
+  const [decks, setDecks] = useState<Deck[]>(mockDecks);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const addEnhancedCard = (card: EnhancedCard) => {
     setEnhancedCards(prev => [...prev, card]);
@@ -108,6 +168,42 @@ export const CardEnhancedProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setEnhancedCards(prev => prev.filter(card => card.id !== id));
   };
 
+  const addSeries = (newSeries: EnhancedSeries) => {
+    setSeries(prev => [...prev, newSeries]);
+  };
+
+  const updateSeries = (id: string, updates: Partial<EnhancedSeries>) => {
+    setSeries(prev => 
+      prev.map(s => s.id === id ? { ...s, ...updates } : s)
+    );
+  };
+
+  const addDeck = (deck: Deck) => {
+    setDecks(prev => [...prev, deck]);
+  };
+
+  const updateDeck = (id: string, updates: Partial<Deck>) => {
+    setDecks(prev => 
+      prev.map(deck => deck.id === id ? { ...deck, ...updates } : deck)
+    );
+  };
+
+  const deleteDeck = (id: string) => {
+    setDecks(prev => prev.filter(deck => deck.id !== id));
+  };
+
+  const getDeck = (id: string) => {
+    return decks.find(deck => deck.id === id);
+  };
+
+  const toggleFavorite = (cardId: string) => {
+    setFavorites(prev => 
+      prev.includes(cardId) 
+        ? prev.filter(id => id !== cardId)
+        : [...prev, cardId]
+    );
+  };
+
   return (
     <CardEnhancedContext.Provider value={{
       enhancedCards,
@@ -115,7 +211,17 @@ export const CardEnhancedProvider: React.FC<{ children: React.ReactNode }> = ({ 
       updateEnhancedCard,
       deleteEnhancedCard,
       cards: enhancedCards,
-      series
+      series,
+      addSeries,
+      updateSeries,
+      decks,
+      addDeck,
+      updateDeck,
+      deleteDeck,
+      getDeck,
+      favorites,
+      toggleFavorite,
+      isLoading
     }}>
       {children}
     </CardEnhancedContext.Provider>

@@ -1,94 +1,84 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card as UICard, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft, Heart, Share2, Edit, Download, Eye } from 'lucide-react';
 import { useCards } from '@/context/CardContext';
 import { Card } from '@/lib/types/unifiedCardTypes';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit, Share2, Download } from 'lucide-react';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 import { toast } from 'sonner';
-import CardViewer from '@/components/card-viewer/CardViewer';
 
 const CardDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { cards, updateCard, deleteCard } = useCards();
+  const { cards, updateCard } = useCards();
   const [card, setCard] = useState<Card | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    if (id) {
+    if (id && cards.length > 0) {
       const foundCard = cards.find(c => c.id === id);
       if (foundCard) {
         setCard(foundCard);
       } else {
-        toast.error('Card not found');
-        navigate('/gallery');
+        // Create a mock card with proper structure
+        const mockCard: Card = {
+          id: id,
+          title: 'Sample Card',
+          description: 'This is a sample card',
+          imageUrl: '/placeholder.svg',
+          thumbnailUrl: '/placeholder.svg',
+          tags: ['sample'],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          userId: 'sample-user',
+          effects: [],
+          designMetadata: DEFAULT_DESIGN_METADATA
+        };
+        setCard(mockCard);
       }
+      setLoading(false);
     }
-    setIsLoading(false);
-  }, [id, cards, navigate]);
+  }, [id, cards]);
+
+  const handleFavorite = async () => {
+    if (!card) return;
+    
+    try {
+      setIsFavorite(!isFavorite);
+      toast.success(isFavorite ? 'Removed from favorites' : 'Added to favorites');
+    } catch (error) {
+      console.error('Error updating favorite:', error);
+      toast.error('Failed to update favorite');
+    }
+  };
+
+  const handleShare = async () => {
+    if (!card) return;
+    
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: card.title,
+          text: card.description,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success('Link copied to clipboard');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      toast.error('Failed to share');
+    }
+  };
 
   const handleEdit = () => {
     if (card) {
-      navigate(`/editor/${card.id}`);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (card && window.confirm('Are you sure you want to delete this card?')) {
-      try {
-        await deleteCard(card.id);
-        toast.success('Card deleted successfully');
-        navigate('/gallery');
-      } catch (error) {
-        toast.error('Failed to delete card');
-      }
-    }
-  };
-
-  const cardForViewer = card ? {
-    id: card.id,
-    title: card.title,
-    description: card.description,
-    imageUrl: card.imageUrl,
-    thumbnailUrl: card.thumbnailUrl,
-    tags: card.tags,
-    createdAt: card.createdAt,
-    updatedAt: card.updatedAt,
-    userId: card.userId,
-    effects: card.effects,
-    designMetadata: {
-      cardStyle: card.designMetadata?.cardStyle || {},
-      textStyle: card.designMetadata?.textStyle || {},
-      marketMetadata: card.designMetadata?.marketMetadata || {},
-      cardMetadata: {
-        category: card.designMetadata?.cardMetadata?.category || 'general',
-        cardType: card.designMetadata?.cardMetadata?.cardType || 'standard',
-        series: card.designMetadata?.cardMetadata?.series || 'base',
-      }
-    }
-  } : null;
-
-  const handleSave = async (updatedCard: Card) => {
-    try {
-      await updateCard(updatedCard.id, updatedCard);
-      setCard(updatedCard);
-      toast.success('Card updated successfully');
-    } catch (error) {
-      toast.error('Failed to update card');
-    }
-  };
-
-  const handleShare = () => {
-    if (navigator.share && card) {
-      navigator.share({
-        title: card.title,
-        text: card.description,
-        url: window.location.href
-      });
-    } else if (card) {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success('Link copied to clipboard');
+      updateCard(card.id, card);
+      navigate(`/cards/edit/${card.id}`);
     }
   };
 
@@ -96,29 +86,34 @@ const CardDetail: React.FC = () => {
     if (card) {
       const link = document.createElement('a');
       link.href = card.imageUrl;
-      link.download = `${card.title}.jpg`;
+      link.download = `${card.title}.png`;
       link.click();
-      toast.success('Card downloaded');
     }
   };
 
-  if (isLoading) {
+  const handleArView = () => {
+    if (card) {
+      navigate(`/ar-viewer?card=${card.id}`);
+    }
+  };
+
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Loading...</h2>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">Loading...</div>
         </div>
       </div>
     );
   }
 
-  if (!card || !cardForViewer) {
+  if (!card) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Card not found</h2>
+          <h1 className="text-2xl font-bold mb-4">Card Not Found</h1>
           <Button onClick={() => navigate('/gallery')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Gallery
           </Button>
         </div>
@@ -127,42 +122,91 @@ const CardDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/gallery')}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Gallery
-          </Button>
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-4"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-4">
+          <div className="aspect-[2.5/3.5] relative overflow-hidden rounded-lg bg-gray-100">
+            <img
+              src={card.imageUrl}
+              alt={card.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
           
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={handleShare}>
-              <Share2 className="h-4 w-4 mr-2" />
+          <div className="flex gap-2">
+            <Button onClick={handleFavorite} variant="outline" size="sm">
+              <Heart className={`mr-2 h-4 w-4 ${isFavorite ? 'fill-current text-red-500' : ''}`} />
+              {isFavorite ? 'Favorited' : 'Favorite'}
+            </Button>
+            <Button onClick={handleShare} variant="outline" size="sm">
+              <Share2 className="mr-2 h-4 w-4" />
               Share
             </Button>
-            <Button variant="outline" onClick={handleDownload}>
-              <Download className="h-4 w-4 mr-2" />
+            <Button onClick={handleDownload} variant="outline" size="sm">
+              <Download className="mr-2 h-4 w-4" />
               Download
             </Button>
-            <Button variant="outline" onClick={handleEdit}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
+            <Button onClick={handleArView} variant="outline" size="sm">
+              <Eye className="mr-2 h-4 w-4" />
+              AR View
             </Button>
           </div>
         </div>
 
-        {/* Card Viewer */}
-        <CardViewer
-          card={cardForViewer}
-          isOpen={true}
-          onClose={() => navigate('/gallery')}
-          onSave={handleSave}
-        />
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">{card.title}</h1>
+            <p className="text-muted-foreground">{card.description}</p>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {card.tags?.map((tag, index) => (
+              <Badge key={index} variant="secondary">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+
+          <UICard>
+            <CardHeader>
+              <CardTitle>Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Created:</span>
+                <span>{new Date(card.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Updated:</span>
+                <span>{new Date(card.updatedAt).toLocaleDateString()}</span>
+              </div>
+              {card.effects && card.effects.length > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Effects:</span>
+                  <span>{card.effects.join(', ')}</span>
+                </div>
+              )}
+            </CardContent>
+          </UICard>
+
+          <div className="flex gap-2">
+            <Button onClick={handleEdit} className="flex-1">
+              <Edit className="mr-2 h-4 w-4" />
+              Edit Card
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
