@@ -10,8 +10,9 @@ const OldCardCreator: React.FC = () => {
   const [activeCard, setActiveCard] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   
-  const selectCard = (index: number) => {
-    setActiveCard(index);
+  const selectCard = (card: any) => {
+    const index = cardData.findIndex(c => c.id === card.id);
+    setActiveCard(index >= 0 ? index : 0);
   };
   
   const flipCard = () => {
@@ -28,7 +29,7 @@ const OldCardCreator: React.FC = () => {
         <CardCollection 
           cards={cardData} 
           onCardClick={selectCard} 
-          setView={setView} 
+          className=""
         />
       )}
       

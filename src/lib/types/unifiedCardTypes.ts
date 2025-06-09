@@ -60,7 +60,7 @@ export interface UnifiedCard {
   title: string;
   description: string;
   imageUrl: string;
-  thumbnailUrl: string; // Make required to match Card interface
+  thumbnailUrl: string;
   tags: string[];
   userId: string;
   effects: string[];
@@ -81,7 +81,7 @@ export interface UnifiedCard {
   specialEffect?: string;
   collectionId?: string;
   price?: number;
-  rarity?: string;
+  rarity?: string; // Changed from CardRarity to string
   verification_status?: string;
   jersey?: string;
   stats?: {

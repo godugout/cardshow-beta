@@ -6,20 +6,20 @@ import { X, RotateCw, Download, Share2 } from 'lucide-react';
 
 interface CardViewerProps {
   card?: Card;
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   className?: string;
-  isFlipped?: boolean; // Add missing prop
-  flipCard?: () => void; // Add missing prop
-  onBackToCollection?: () => void; // Add missing prop
-  activeEffects?: string[]; // Add missing prop
-  onSnapshot?: () => void; // Add missing prop
+  isFlipped?: boolean;
+  flipCard?: () => void;
+  onBackToCollection?: () => void;
+  activeEffects?: string[];
+  onSnapshot?: () => void;
 }
 
 const CardViewer: React.FC<CardViewerProps> = ({ 
   card, 
-  isOpen, 
-  onClose, 
+  isOpen = true,
+  onClose,
   className = '',
   isFlipped = false,
   flipCard,
@@ -44,7 +44,7 @@ const CardViewer: React.FC<CardViewerProps> = ({
   }
 
   return (
-    <div className={`fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 ${className}`}>
+    <div className={`${onClose ? 'fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50' : ''} ${className}`}>
       <div className="relative max-w-4xl max-h-[90vh] mx-4">
         {/* Controls */}
         <div className="absolute top-4 right-4 flex space-x-2 z-10">
@@ -59,9 +59,11 @@ const CardViewer: React.FC<CardViewerProps> = ({
           <Button variant="ghost" size="sm">
             <Share2 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
+          {onClose && (
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
 
         {/* Card Display */}

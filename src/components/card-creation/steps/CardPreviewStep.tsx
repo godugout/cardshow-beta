@@ -1,53 +1,89 @@
 
 import React from 'react';
-import { Card } from '@/lib/types/unifiedCardTypes';
-import { CardPreviewStepProps } from '@/components/gallery/types';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/lib/types/unifiedCardTypes';
 
-const CardPreviewStep: React.FC<CardPreviewStepProps> = ({ 
-  cardData, 
-  onUpdate, 
-  onSave, 
-  onExport 
+interface CardPreviewStepProps {
+  cardData: Partial<Card>;
+  onSave: () => Promise<void>;
+  onUpdate?: (updates: Partial<Card>) => void;
+  effectClasses?: string;
+}
+
+const CardPreviewStep: React.FC<CardPreviewStepProps> = ({
+  cardData,
+  onSave,
+  onUpdate,
+  effectClasses = ''
 }) => {
   return (
     <div className="space-y-6">
-      <div className="bg-gray-900 p-6 rounded-lg">
-        <h3 className="text-lg font-semibold mb-4">Card Preview</h3>
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Preview Your Card</h3>
         
-        <div className="relative mx-auto max-w-sm">
-          <div className="aspect-[2.5/3.5] w-full rounded-lg overflow-hidden border-2 border-gray-600/30 shadow-lg">
-            {cardData.imageUrl ? (
-              <img 
-                src={cardData.imageUrl} 
-                alt={cardData.title || 'Card preview'} 
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                <p className="text-gray-400">No image uploaded</p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className={`relative aspect-[2.5/3.5] max-w-sm mx-auto ${effectClasses}`}>
+              {cardData.imageUrl && (
+                <img 
+                  src={cardData.imageUrl} 
+                  alt={cardData.title || 'Card Preview'}
+                  className="w-full h-full object-cover rounded-lg shadow-lg"
+                />
+              )}
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-semibold text-lg">{cardData.title || 'Untitled Card'}</h4>
+              <p className="text-gray-600">{cardData.description || 'No description'}</p>
+            </div>
+            
+            {cardData.player && (
+              <div>
+                <h5 className="font-medium">Player</h5>
+                <p className="text-gray-700">{cardData.player}</p>
+              </div>
+            )}
+            
+            {cardData.team && (
+              <div>
+                <h5 className="font-medium">Team</h5>
+                <p className="text-gray-700">{cardData.team}</p>
+              </div>
+            )}
+            
+            {cardData.year && (
+              <div>
+                <h5 className="font-medium">Year</h5>
+                <p className="text-gray-700">{cardData.year}</p>
+              </div>
+            )}
+            
+            {cardData.tags && cardData.tags.length > 0 && (
+              <div>
+                <h5 className="font-medium">Tags</h5>
+                <div className="flex flex-wrap gap-2">
+                  {cardData.tags.map((tag, index) => (
+                    <span 
+                      key={index}
+                      className="bg-gray-200 text-gray-800 px-2 py-1 rounded text-xs"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
           </div>
         </div>
-
-        <div className="mt-4 text-center">
-          <h4 className="text-xl font-bold">{cardData.title || 'Untitled Card'}</h4>
-          {cardData.description && (
-            <p className="text-gray-300 mt-2">{cardData.description}</p>
-          )}
-        </div>
       </div>
-
-      <div className="flex gap-4 justify-center">
-        <Button onClick={onSave} className="bg-green-600 hover:bg-green-700">
+      
+      <div className="flex justify-end">
+        <Button onClick={onSave}>
           Save Card
         </Button>
-        {onExport && (
-          <Button onClick={() => onExport('png')} variant="outline">
-            Export PNG
-          </Button>
-        )}
       </div>
     </div>
   );
