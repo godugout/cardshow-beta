@@ -1,5 +1,6 @@
 
-import { UnifiedCard, DEFAULT_DESIGN_METADATA } from '@/lib/types/unifiedCardTypes';
+import { UnifiedCard } from '@/lib/types/unifiedCardTypes';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 
 export interface CardInput {
   id: string;
