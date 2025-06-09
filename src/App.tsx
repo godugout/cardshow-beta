@@ -6,7 +6,6 @@ import { CardProvider } from './context/CardContext';
 import { AuthProvider } from './providers/AuthProvider';
 import { SessionProvider } from './providers/session-provider';
 import { Toaster } from './components/ui/toaster';
-import MobileLayout from './components/layout/MobileLayout';
 import './App.css';
 
 // Create the unified router
@@ -17,9 +16,7 @@ function App() {
     <SessionProvider>
       <AuthProvider>
         <CardProvider>
-          <MobileLayout>
-            <RouterProvider router={router} />
-          </MobileLayout>
+          <RouterProvider router={router} />
           <Toaster />
         </CardProvider>
       </AuthProvider>

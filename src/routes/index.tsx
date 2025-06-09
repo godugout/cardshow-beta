@@ -1,6 +1,8 @@
 
 import React, { Suspense } from 'react';
 import { RouteObject } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
+import MobileLayout from '@/components/layout/MobileLayout';
 import UnifiedHomePage from '@/pages/UnifiedHomePage';
 import CardViewerPage from '@/pages/CardViewerPage';
 import ImmersiveCardViewerPage from '@/pages/ImmersiveCardViewerPage';
@@ -46,101 +48,113 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Layout wrapper component
+const AppLayout = () => (
+  <MobileLayout>
+    <Outlet />
+  </MobileLayout>
+);
+
 // Main application routes - unified and consolidated
-const rootRoutes: RouteObject[] = [
+const appRoutes: RouteObject[] = [
   {
     path: "/",
-    element: <UnifiedHomePage />
-  },
-  {
-    path: "/gallery",
-    element: <CardGallery />
-  },
-  {
-    path: "/cards",
-    element: <CardCollectionPage />
-  },
-  {
-    path: "/cards/create",
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <CardCreator />
-      </Suspense>
-    )
-  },
-  {
-    path: "/detector", 
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <CardDetector />
-      </Suspense>
-    )
-  },
-  {
-    path: "/cards/:id",
-    element: <CardDetail />
-  },
-  {
-    path: "/collections",
-    element: <Collections />
-  },
-  {
-    path: "/labs",
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <Labs />
-      </Suspense>
-    )
-  },
-  {
-    path: "/viewer/:id",
-    element: <CardViewerPage />
-  },
-  {
-    path: "/immersive/:id",
-    element: <ImmersiveCardViewerPage />
-  },
-  {
-    path: "/ar-viewer/:id",
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <ArCardViewerPage />
-      </Suspense>
-    )
-  },
-  {
-    path: "/profile",
-    element: <Profile />
-  },
-  {
-    path: "/auth",
-    element: <AuthPage />
-  },
-  {
-    path: "/unauthorized",
-    element: <Unauthorized />
-  },
-  {
-    path: "/community",
-    element: <TownCommunityHub />
-  },
-  {
-    path: "*",
-    element: <NotFound />
+    element: <AppLayout />,
+    children: [
+      {
+        index: true,
+        element: <UnifiedHomePage />
+      },
+      {
+        path: "gallery",
+        element: <CardGallery />
+      },
+      {
+        path: "cards",
+        element: <CardCollectionPage />
+      },
+      {
+        path: "cards/create",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <CardCreator />
+          </Suspense>
+        )
+      },
+      {
+        path: "detector", 
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <CardDetector />
+          </Suspense>
+        )
+      },
+      {
+        path: "cards/:id",
+        element: <CardDetail />
+      },
+      {
+        path: "collections",
+        element: <Collections />
+      },
+      {
+        path: "labs",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Labs />
+          </Suspense>
+        )
+      },
+      {
+        path: "viewer/:id",
+        element: <CardViewerPage />
+      },
+      {
+        path: "immersive/:id",
+        element: <ImmersiveCardViewerPage />
+      },
+      {
+        path: "ar-viewer/:id",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <ArCardViewerPage />
+          </Suspense>
+        )
+      },
+      {
+        path: "profile",
+        element: <Profile />
+      },
+      {
+        path: "auth",
+        element: <AuthPage />
+      },
+      {
+        path: "unauthorized",
+        element: <Unauthorized />
+      },
+      {
+        path: "community",
+        element: <TownCommunityHub />
+      },
+      // Add other route collections as children
+      ...teamRoutes,
+      ...townRoutes,
+      ...baseballRoutes,
+      ...featureRoutes,
+      ...cardRoutes.filter(route => 
+        route.path !== "/cards" && 
+        route.path !== "/cards/:id" && 
+        route.path !== "/cards/create"
+      ),
+      ...collectionRoutes.filter(route => route.path !== "/collections"),
+      {
+        path: "*",
+        element: <NotFound />
+      }
+    ]
   }
 ];
 
-// Export unified routes without conflicts
-export const routes: RouteObject[] = [
-  ...rootRoutes,
-  ...teamRoutes,
-  ...townRoutes,
-  ...baseballRoutes,
-  ...featureRoutes,
-  ...cardRoutes.filter(route => 
-    route.path !== "/cards" && 
-    route.path !== "/cards/:id" && 
-    route.path !== "/cards/create"
-  ),
-  ...collectionRoutes.filter(route => route.path !== "/collections"),
-];
+// Export unified routes
+export const routes: RouteObject[] = appRoutes;
