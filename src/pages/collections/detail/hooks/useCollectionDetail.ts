@@ -2,9 +2,26 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useCards } from '@/context/CardContext';
 import { toast } from 'sonner';
-import { Card, Collection } from '@/lib/types';
+import { Card } from '@/lib/types/unifiedCardTypes';
 import { supabase } from '@/integrations/supabase/client';
 import { collectionOperations, convertDbCollectionToApp } from '@/lib/supabase/collections';
+
+// Use the unified Collection type to avoid conflicts
+interface Collection {
+  id: string;
+  name: string;
+  description?: string;
+  coverImageUrl?: string;
+  userId?: string;
+  teamId?: string;
+  visibility?: 'public' | 'private' | 'team';
+  allowComments?: boolean;
+  createdAt: string;
+  updatedAt: string;
+  designMetadata?: any;
+  cards?: Card[];
+  cardIds?: string[];
+}
 
 export const useCollectionDetail = (collectionId?: string) => {
   const { collections, cards, isLoading, updateCard, updateCollection, deleteCollection, refreshCards } = useCards();
@@ -47,7 +64,12 @@ export const useCollectionDetail = (collectionId?: string) => {
       if (data?.collection) {
         // Convert DB collection to app format
         const appCollection = convertDbCollectionToApp(data.collection);
-        setLocalCollection(appCollection);
+        // Ensure it matches our local Collection interface
+        const localCollection: Collection = {
+          ...appCollection,
+          description: appCollection.description || '' // Ensure description is defined
+        };
+        setLocalCollection(localCollection);
         
         if (data.cards?.length > 0) {
           // Process cards

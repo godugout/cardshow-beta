@@ -1,67 +1,9 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
-
-export interface EnhancedCard {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  thumbnailUrl: string;
-  tags: string[];
-  userId: string;
-  effects: string[];
-  createdAt: string;
-  updatedAt: string;
-  designMetadata: typeof DEFAULT_DESIGN_METADATA;
-  rarity: string;
-  cardNumber: string;
-  seriesId: string;
-  artistId: string;
-  edition: number;
-  editionSize: number;
-  releaseDate: string;
-  qrCodeData: string;
-  hotspots: any[];
-  marketData?: {
-    price?: number;
-    currency?: string;
-    lastSoldPrice?: number;
-    availableForSale?: boolean;
-  };
-}
+import { EnhancedCard, Series as EnhancedSeries, Deck } from '@/lib/types/enhancedCardTypes';
 
 // Mock data for series
-export interface EnhancedSeries {
-  id: string;
-  title: string;
-  description: string;
-  coverImageUrl?: string;
-  artistId: string;
-  cardIds: string[];
-  totalCards: number;
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
-  releaseDate: string;
-  releaseType?: 'standard' | 'limited' | 'special' | 'exclusive';
-  cards: EnhancedCard[];
-}
-
-// Deck interface
-export interface Deck {
-  id: string;
-  name: string;
-  description: string;
-  coverImageUrl?: string;
-  cards: EnhancedCard[];
-  cardIds: string[];
-  ownerId: string;
-  createdAt: string;
-  updatedAt: string;
-  isPublic: boolean;
-}
-
 const mockEnhancedCards: EnhancedCard[] = [
   {
     id: '1',
@@ -243,3 +185,6 @@ export const useEnhancedCards = () => {
   }
   return context;
 };
+
+// Export types for use in other files
+export type { EnhancedCard, EnhancedSeries, Deck };

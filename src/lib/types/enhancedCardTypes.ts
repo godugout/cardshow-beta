@@ -5,6 +5,9 @@ import { Card } from './cardTypes';
  * Enhanced Card with additional functionality
  */
 export interface EnhancedCard extends Card {
+  // Core enhanced properties - make them optional to match context
+  rarity?: string;
+  cardNumber?: string;
   seriesId?: string; 
   deckId?: string;
   specialFeatures?: string[];
@@ -54,7 +57,7 @@ export interface Series {
   totalCards: number;
   rarity?: string;
   creator?: string;
-  artistId?: string;
+  artistId?: string; // Make optional to match EnhancedSeries
   createdAt: string;
   updatedAt: string;
   coverImageUrl?: string;

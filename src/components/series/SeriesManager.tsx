@@ -8,12 +8,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Upload, SortDesc } from 'lucide-react';
-import { Series } from '@/lib/types/enhancedCardTypes';
-import { useEnhancedCards } from '@/context/CardEnhancedContext';
+import { useEnhancedCards, type EnhancedSeries } from '@/context/CardEnhancedContext';
 import { toast } from 'sonner';
 
 interface SeriesManagerProps {
-  initialSeries?: Series;
+  initialSeries?: EnhancedSeries;
 }
 
 const SeriesManager: React.FC<SeriesManagerProps> = ({ initialSeries }) => {
@@ -21,7 +20,7 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ initialSeries }) => {
   const { addSeries, updateSeries } = useEnhancedCards();
   const [isUploading, setIsUploading] = useState(false);
   
-  const [seriesData, setSeriesData] = useState<Partial<Series>>(initialSeries || {
+  const [seriesData, setSeriesData] = useState<Partial<EnhancedSeries>>(initialSeries || {
     title: '',
     description: '',
     coverImageUrl: '',
@@ -61,15 +60,30 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ initialSeries }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const seriesWithId = initialSeries?.id 
-      ? { ...seriesData, updatedAt: new Date().toISOString() } as Series
-      : { ...seriesData, id: uuidv4(), updatedAt: new Date().toISOString() } as Series;
-      
     if (initialSeries?.id) {
-      updateSeries(initialSeries.id, seriesWithId);
+      const updates: Partial<EnhancedSeries> = {
+        ...seriesData,
+        updatedAt: new Date().toISOString()
+      };
+      updateSeries(initialSeries.id, updates);
       toast.success('Series updated successfully');
     } else {
-      addSeries(seriesWithId);
+      const newSeries: EnhancedSeries = {
+        id: uuidv4(),
+        title: seriesData.title || '',
+        description: seriesData.description || '',
+        releaseDate: seriesData.releaseDate || new Date().toISOString(),
+        cards: [],
+        totalCards: 0,
+        artistId: seriesData.artistId || '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        cardIds: [],
+        coverImageUrl: seriesData.coverImageUrl,
+        isPublished: seriesData.isPublished || false,
+        releaseType: seriesData.releaseType || 'standard'
+      };
+      addSeries(newSeries);
       toast.success('Series created successfully');
     }
     
