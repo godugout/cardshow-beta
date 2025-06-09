@@ -1,4 +1,5 @@
 import { Card } from '@/lib/types/unifiedCardTypes';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 
 // Reliable images from Unsplash
 const RELIABLE_IMAGES = {
@@ -13,30 +14,25 @@ const RELIABLE_IMAGES = {
 
 // Create a base design metadata with all required fields
 const createDesignMetadata = (borderColor: string, frameColor: string) => ({
+  ...DEFAULT_DESIGN_METADATA,
   cardStyle: {
-    template: 'classic',
-    effect: 'classic',
-    borderRadius: '8px',
+    ...DEFAULT_DESIGN_METADATA.cardStyle,
     borderColor,
     frameColor,
-    frameWidth: 3,
     shadowColor: `rgba(${parseInt(borderColor.slice(1, 3), 16)}, ${parseInt(borderColor.slice(3, 5), 16)}, ${parseInt(borderColor.slice(5, 7), 16)}, 0.5)`,
   },
   textStyle: {
+    ...DEFAULT_DESIGN_METADATA.textStyle,
     titleColor: '#FFFFFF',
     titleAlignment: 'left',
     titleWeight: 'bold',
     descriptionColor: '#FFFFFF',
   },
   cardMetadata: {
+    ...DEFAULT_DESIGN_METADATA.cardMetadata,
     category: 'sports',
     cardType: 'collectible',
     series: 'standard'
-  },
-  marketMetadata: {
-    isPrintable: false,
-    isForSale: false,
-    includeInCatalog: true
   }
 });
 
@@ -53,7 +49,9 @@ export const sampleCards: Card[] = [
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
     designMetadata: {
+      ...DEFAULT_DESIGN_METADATA,
       cardStyle: {
+        ...DEFAULT_DESIGN_METADATA.cardStyle,
         template: 'classic',
         effect: 'holographic',
         borderRadius: '8px',
@@ -63,12 +61,14 @@ export const sampleCards: Card[] = [
         shadowColor: 'rgba(212, 175, 55, 0.3)',
       },
       textStyle: {
+        ...DEFAULT_DESIGN_METADATA.textStyle,
         titleColor: '#1a202c',
         titleAlignment: 'center',
         titleWeight: 'bold',
         descriptionColor: '#4a5568',
       },
       cardMetadata: {
+        ...DEFAULT_DESIGN_METADATA.cardMetadata,
         category: 'sports',
         series: 'upper-deck-1989',
         cardType: 'rookie',
@@ -77,6 +77,7 @@ export const sampleCards: Card[] = [
         rarity: 'legendary'
       },
       marketMetadata: {
+        ...DEFAULT_DESIGN_METADATA.marketMetadata,
         isPrintable: true,
         isForSale: false,
         includeInCatalog: true,
@@ -100,7 +101,9 @@ export const sampleCards: Card[] = [
     createdAt: '2024-01-02T00:00:00Z',
     updatedAt: '2024-01-02T00:00:00Z',
     designMetadata: {
+      ...DEFAULT_DESIGN_METADATA,
       cardStyle: {
+        ...DEFAULT_DESIGN_METADATA.cardStyle,
         template: 'vintage',
         effect: 'chrome',
         borderRadius: '12px',
@@ -110,12 +113,14 @@ export const sampleCards: Card[] = [
         shadowColor: 'rgba(160, 82, 45, 0.4)',
       },
       textStyle: {
+        ...DEFAULT_DESIGN_METADATA.textStyle,
         titleColor: '#8b4513',
         titleAlignment: 'left',
         titleWeight: 'bold',
         descriptionColor: '#654321',
       },
       cardMetadata: {
+        ...DEFAULT_DESIGN_METADATA.cardMetadata,
         category: 'sports',
         series: 'donruss-1984',
         cardType: 'star',
@@ -124,6 +129,7 @@ export const sampleCards: Card[] = [
         rarity: 'rare'
       },
       marketMetadata: {
+        ...DEFAULT_DESIGN_METADATA.marketMetadata,
         isPrintable: true,
         isForSale: true,
         includeInCatalog: true,
