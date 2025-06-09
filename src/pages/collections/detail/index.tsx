@@ -176,6 +176,7 @@ const CollectionDetail = () => {
     ...collection,
     description: collection.description || '', // Ensure description is always a string
     userId: collection.userId || '', // Ensure userId is always a string
+    cardIds: collection.cardIds || [], // Ensure cardIds is always an array
     isPublic: collection.isPublic ?? (collection.visibility === 'public'),
     tags: collection.tags ?? [],
     featured: collection.featured ?? false
