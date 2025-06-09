@@ -32,6 +32,19 @@ export interface User extends BaseEntity {
   preferences?: Record<string, any>;
 }
 
+// User permission types
+export type UserPermission = 
+  | 'read:own' 
+  | 'write:own' 
+  | 'delete:own' 
+  | 'read:all' 
+  | 'write:all' 
+  | 'delete:all' 
+  | 'premium:features'
+  | 'create:premium'
+  | 'moderate:content'
+  | 'all';
+
 // Card effect types
 export interface CardEffect {
   id: string;
@@ -40,7 +53,40 @@ export interface CardEffect {
   parameters?: Record<string, any>;
 }
 
-// Design metadata for cards
+// Card style types for compatibility
+export interface CardStyle {
+  background?: string;
+  border?: string;
+  borderRadius?: string;
+  shadow?: string;
+  effect?: string;
+}
+
+export interface TextStyle {
+  color?: string;
+  fontSize?: string;
+  fontFamily?: string;
+  fontWeight?: string;
+  textAlign?: 'left' | 'center' | 'right';
+}
+
+export interface CardMetadata {
+  artist?: string;
+  year?: string;
+  set?: string;
+  player?: string;
+  team?: string;
+  rarity?: string;
+}
+
+export interface MarketMetadata {
+  price?: number;
+  currency?: string;
+  availability?: string;
+  marketplace?: string;
+}
+
+// Design metadata for cards - unified structure
 export interface DesignMetadata {
   template?: {
     id: string;
@@ -77,6 +123,11 @@ export interface DesignMetadata {
     opponent?: string;
     section?: string;
   };
+  // Additional properties for compatibility
+  cardStyle?: CardStyle;
+  textStyle?: TextStyle;
+  cardMetadata?: CardMetadata;
+  marketMetadata?: MarketMetadata;
 }
 
 // Card interface - unified and complete
@@ -97,6 +148,13 @@ export interface Card extends BaseEntity {
   price?: number;
   editionSize?: number;
   printAvailable?: boolean;
+  // Additional properties for compatibility
+  artist?: string;
+  year?: string;
+  set?: string;
+  player?: string;
+  team?: string;
+  reactions?: any[];
 }
 
 // Collection visibility and permissions
@@ -143,6 +201,20 @@ export interface Comment extends BaseEntity {
   collectionId?: string;
   teamId?: string;
   parentId?: string;
+  user?: {
+    id: string;
+    displayName?: string;
+    avatarUrl?: string;
+  };
+}
+
+// Reaction interface
+export interface Reaction extends BaseEntity {
+  userId: string;
+  cardId?: string;
+  collectionId?: string;
+  commentId?: string;
+  type: 'like' | 'heart' | 'star' | 'thumbs_up' | 'thumbs_down';
 }
 
 // JSON value types for metadata
@@ -150,21 +222,14 @@ export type JsonValue = string | number | boolean | null | JsonObject | JsonArra
 export interface JsonObject { [key: string]: JsonValue; }
 export interface JsonArray extends Array<JsonValue> {}
 
-// Export everything for easy importing
-export type {
-  BaseEntity,
-  User,
-  Card,
-  Collection,
-  Team,
-  TeamMember,
-  Comment,
-  DesignMetadata,
-  CardEffect,
-  CollectionVisibility,
-  JsonValue,
-  JsonObject,
-  JsonArray
-};
-
-export { UserRole };
+// Card template interface
+export interface CardTemplate {
+  id: string;
+  name: string;
+  category: string;
+  description?: string;
+  thumbnailUrl?: string;
+  layoutJson: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+}

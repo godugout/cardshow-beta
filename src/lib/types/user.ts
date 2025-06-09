@@ -1,62 +1,21 @@
 
-import { BaseEntity } from './index';
+import { BaseEntity } from './core';
 
-/**
- * User roles for permission management
- */
-export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-  PREMIUM = 'premium',
-  CREATOR = 'creator',
-  MODERATOR = 'moderator'
-}
+// Re-export from core to maintain compatibility
+export { UserRole, type UserPermission } from './core';
+export type { User, UserProfile } from './core';
 
-/**
- * User permission types
- */
-export type UserPermission = 
-  | 'read:own' 
-  | 'write:own' 
-  | 'delete:own' 
-  | 'read:all' 
-  | 'write:all' 
-  | 'delete:all' 
-  | 'premium:features'
-  | 'create:premium'
-  | 'moderate:content'
-  | 'all';
-
-/**
- * Role to permission mapping
- */
-export const ROLE_PERMISSIONS: Record<UserRole, UserPermission[]> = {
-  [UserRole.ADMIN]: ['all'],
-  [UserRole.USER]: ['read:own', 'write:own', 'delete:own'],
-  [UserRole.PREMIUM]: ['read:own', 'write:own', 'delete:own', 'premium:features'],
-  [UserRole.CREATOR]: ['read:own', 'write:own', 'delete:own', 'create:premium'],
-  [UserRole.MODERATOR]: ['read:own', 'write:own', 'delete:own', 'moderate:content']
-};
-
-/**
- * User interface for authentication and profiles
- */
-export interface User extends BaseEntity {
+// Extended user profile interface
+export interface UserProfile extends BaseEntity {
   email: string;
   name?: string;
   displayName?: string;
   username?: string;
   avatarUrl?: string;
   bio?: string;
-  role: UserRole;
-  permissions?: UserPermission[];
+  role: string;
+  permissions?: string[];
   preferences?: Record<string, any>;
-}
-
-/**
- * Extended user profile with additional information
- */
-export interface UserProfile extends User {
   followers?: number;
   following?: number;
   cardCount?: number;
