@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -11,6 +10,7 @@ import {
   HelpCircle 
 } from 'lucide-react';
 import { Card as CardType } from '@/lib/types/unifiedCardTypes';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 import { useUndoRedoState } from '@/hooks/useUndoRedoState';
 import { toastUtils } from '@/lib/utils/toast-utils';
 import { Card as CardUI } from '@/components/ui/card';
@@ -90,6 +90,7 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
     tags: [],
     ...initialData,
     effects: initialData.effects || [],
+    designMetadata: initialData.designMetadata || DEFAULT_DESIGN_METADATA,
     createdAt: initialData.createdAt || new Date().toISOString(),
     updatedAt: initialData.updatedAt || new Date().toISOString(),
   });
@@ -238,7 +239,7 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
     try {
       setIsSubmitting(true);
       
-      // Create a new Card instance with the collected data
+      // Create a new Card instance with the collected data and proper design metadata
       const newCard = {
         id: `card-${Date.now()}`,
         title: cardData.title || 'Untitled Card',
@@ -254,17 +255,26 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         designMetadata: {
-          cardStyle: cardData.designMetadata?.cardStyle || {},
-          textStyle: cardData.designMetadata?.textStyle || {},
-          marketMetadata: cardData.designMetadata?.marketMetadata || {},
+          ...DEFAULT_DESIGN_METADATA,
+          ...cardData.designMetadata,
+          cardStyle: {
+            ...DEFAULT_DESIGN_METADATA.cardStyle,
+            ...cardData.designMetadata?.cardStyle,
+          },
+          textStyle: {
+            ...DEFAULT_DESIGN_METADATA.textStyle,
+            ...cardData.designMetadata?.textStyle,
+          },
           cardMetadata: {
+            ...DEFAULT_DESIGN_METADATA.cardMetadata,
+            ...cardData.designMetadata?.cardMetadata,
             effects: cardData.effects || []
           }
         }
-      };
+      } as CardType;
       
       // Add the card to the context or make API call
-      onSave(newCard as CardType);
+      onSave(newCard);
       
       toastUtils.success("Card Created!", "Your card has been successfully created.");
       

@@ -77,6 +77,11 @@ export const useCardEffects = (): CardEffectsResult => {
     setEffectIntensities(prev => ({ ...prev, [effectId]: intensity }));
   }, []);
 
+  const clearEffects = useCallback(() => {
+    setActiveEffects([]);
+    setEffectIntensities({});
+  }, []);
+
   return {
     availableEffects: AVAILABLE_EFFECTS,
     activeEffects,
@@ -87,6 +92,7 @@ export const useCardEffects = (): CardEffectsResult => {
     isEffectActive,
     getEffectIntensity,
     setEffectIntensity,
+    clearEffects,
   };
 };
 

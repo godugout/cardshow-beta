@@ -10,6 +10,16 @@ export interface Collection {
   created_at: string;
   updated_at: string;
   cover_image_url?: string;
+  // Add missing properties to match the expected type
+  userId: string;
+  cardIds: string[];
+  isPublic: boolean;
+  allowComments: boolean;
+  tags: string[];
+  coverImageUrl?: string;
+  totalCards: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const collectionOperations = {
@@ -106,7 +116,7 @@ export const collectionOperations = {
 };
 
 // Add missing export
-export const convertDbCollectionToApp = (dbCollection: any) => {
+export const convertDbCollectionToApp = (dbCollection: any): Collection => {
   return {
     id: dbCollection.id,
     name: dbCollection.name || dbCollection.title,
@@ -118,5 +128,15 @@ export const convertDbCollectionToApp = (dbCollection: any) => {
     created_at: dbCollection.created_at,
     updated_at: dbCollection.updated_at,
     cover_image_url: dbCollection.cover_image_url,
+    // Map to expected properties
+    userId: dbCollection.owner_id,
+    cardIds: dbCollection.cardIds || [],
+    isPublic: dbCollection.visibility === 'public',
+    allowComments: dbCollection.allow_comments,
+    tags: dbCollection.tags || [],
+    coverImageUrl: dbCollection.cover_image_url,
+    totalCards: dbCollection.totalCards || 0,
+    createdAt: dbCollection.created_at,
+    updatedAt: dbCollection.updated_at,
   };
 };

@@ -1,56 +1,56 @@
 
-import { DesignMetadata, CardStyle, TextStyle, CardMetadata, MarketMetadata, UnifiedCard } from '@/lib/types/unifiedCardTypes';
+import { Card } from '@/lib/types/unifiedCardTypes';
 
-export const DEFAULT_CARD_STYLE: CardStyle = {
-  template: 'standard',
-  effect: 'none',
-  borderRadius: '8px',
-  borderColor: '#000000',
-  shadowColor: '#000000',
-  frameWidth: 2,
-  frameColor: '#FFFFFF'
+export const DEFAULT_DESIGN_METADATA = {
+  cardStyle: {
+    template: 'classic',
+    effect: 'none',
+    borderRadius: '8px',
+    borderWidth: 2,
+    borderColor: '#000000',
+    backgroundColor: '#FFFFFF',
+    shadowColor: 'rgba(0,0,0,0.2)',
+    frameWidth: 2,
+    frameColor: '#000000',
+  },
+  textStyle: {
+    fontFamily: 'Inter',
+    fontSize: '16px',
+    fontWeight: 'normal',
+    color: '#000000',
+    titleColor: '#000000',
+    titleAlignment: 'center',
+    titleWeight: 'bold',
+    descriptionColor: '#333333',
+  },
+  cardMetadata: {
+    category: 'general',
+    series: 'base',
+    cardType: 'standard',
+  },
+  marketMetadata: {
+    isPrintable: false,
+    isForSale: false,
+    includeInCatalog: false,
+    price: 0,
+    currency: 'USD',
+    availableForSale: false,
+    editionSize: 1,
+    editionNumber: 1,
+  }
 };
 
-export const DEFAULT_TEXT_STYLE: TextStyle = {
-  titleColor: '#FFFFFF',
-  titleAlignment: 'center',
-  titleWeight: 'bold',
-  descriptionColor: '#CCCCCC'
-};
-
-export const DEFAULT_CARD_METADATA: CardMetadata = {
-  category: 'standard',
-  series: 'base',
-  cardType: 'player',
-  rarity: 'common'
-};
-
-export const DEFAULT_MARKET_METADATA: MarketMetadata = {
-  isPrintable: false,
-  isForSale: false,
-  includeInCatalog: true
-};
-
-export const DEFAULT_DESIGN_METADATA: DesignMetadata = {
-  cardStyle: DEFAULT_CARD_STYLE,
-  textStyle: DEFAULT_TEXT_STYLE,
-  cardMetadata: DEFAULT_CARD_METADATA,
-  marketMetadata: DEFAULT_MARKET_METADATA
-};
-
-export const createDefaultCard = (overrides: Partial<UnifiedCard> = {}): UnifiedCard => {
+export const createBlankCard = (userId: string): Partial<Card> => {
   return {
-    id: '',
     title: '',
     description: '',
     imageUrl: '',
     thumbnailUrl: '',
     tags: [],
-    userId: '',
+    userId,
     effects: [],
+    designMetadata: DEFAULT_DESIGN_METADATA,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    designMetadata: DEFAULT_DESIGN_METADATA,
-    ...overrides
   };
 };

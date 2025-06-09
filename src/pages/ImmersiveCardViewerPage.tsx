@@ -4,8 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card as CardUI } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useCards } from '@/context/CardContext';
-import { useCardEffects } from '@/hooks/useCardEffects';
-import { useToast } from '@/components/ui/use-toast';
+import { useCardEffects } from '@/hooks/card-effects/useCardEffects';
+import { toast } from 'sonner';
 import { 
   ArrowLeft, 
   Download, 
@@ -19,18 +19,10 @@ import ImmersiveCardViewer from '@/components/immersive/ImmersiveCardViewer';
 import EffectsPanel from '@/components/immersive/EffectsPanel';
 import { Card } from '@/lib/types/unifiedCardTypes';
 
-interface ImmersiveCardViewerProps {
-  imageUrl?: string;
-  title?: string;
-  description?: string;
-  effects?: string[];
-}
-
 const ImmersiveCardViewerPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { cards, getCardById } = useCards();
-  const { toast } = useToast();
   
   const [card, setCard] = useState<Card | null>(null);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -59,22 +51,18 @@ const ImmersiveCardViewerPage: React.FC = () => {
           setActiveEffects(foundCard.effects);
         }
       } else {
-        toast({
-          title: "Card not found",
+        toast.error("Card not found", {
           description: "The requested card could not be found.",
-          variant: "destructive"
         });
         navigate('/gallery');
       }
     } else {
-      toast({
-        title: "Invalid card ID",
+      toast.error("Invalid card ID", {
         description: "No card ID provided.",
-        variant: "destructive"
       });
       navigate('/gallery');
     }
-  }, [id, getCardById, setActiveEffects, toast, navigate]);
+  }, [id, getCardById, setActiveEffects, navigate]);
 
   const handleRandomEffect = () => {
     if (availableEffects.length > 0) {
@@ -87,14 +75,12 @@ const ImmersiveCardViewerPage: React.FC = () => {
     if (!card) return;
     
     // In a real implementation, this would capture the card as an image
-    toast({
-      title: "Export Started",
+    toast.success("Export Started", {
       description: "Your card is being prepared for download."
     });
     
     setTimeout(() => {
-      toast({
-        title: "Export Complete",
+      toast.success("Export Complete", {
         description: "Your card has been downloaded successfully."
       });
     }, 2000);
@@ -111,8 +97,7 @@ const ImmersiveCardViewerPage: React.FC = () => {
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      toast({
-        title: "Link Copied",
+      toast.success("Link Copied", {
         description: "Card link has been copied to your clipboard."
       });
     }
