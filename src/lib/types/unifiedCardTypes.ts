@@ -4,29 +4,37 @@ export interface Card {
   title: string;
   description: string;
   imageUrl: string;
-  thumbnailUrl: string;
+  thumbnailUrl: string; // Made required to match core
   tags: string[];
   userId: string;
   createdAt: string;
   updatedAt: string;
   designMetadata: DesignMetadata;
-  effects: string[];
+  effects: CardEffect[]; // Changed from string[] to CardEffect[]
   [key: string]: any;
 }
 
 // Export UnifiedCard as an alias for Card for backward compatibility
 export type UnifiedCard = Card;
 
+// Import CardEffect from core to maintain consistency
+export interface CardEffect {
+  id: string;
+  type: 'holographic' | 'prismatic' | 'refractor' | 'sparkle' | 'foil' | 'rainbow' | 'custom';
+  intensity: number;
+  parameters?: Record<string, any>;
+}
+
 export interface CardStyle {
-  template: string;
-  effect: string;
-  borderRadius: string;
+  template?: string;
+  effect?: string;
+  borderRadius?: string;
   borderWidth?: number;
-  borderColor: string;
+  borderColor?: string;
   backgroundColor?: string;
-  shadowColor: string;
-  frameWidth: number;
-  frameColor: string;
+  shadowColor?: string;
+  frameWidth?: number;
+  frameColor?: string;
 }
 
 export interface TextStyle {
@@ -34,16 +42,16 @@ export interface TextStyle {
   fontSize?: string;
   fontWeight?: string;
   color?: string;
-  titleColor: string;
-  titleAlignment: string;
-  titleWeight: string;
-  descriptionColor: string;
+  titleColor?: string;
+  titleAlignment?: string;
+  titleWeight?: string;
+  descriptionColor?: string;
 }
 
 export interface CardMetadata {
-  category: string;
-  series: string;
-  cardType: string;
+  category?: string;
+  series?: string;
+  cardType?: string;
   cardNumber?: string;
   artist?: string;
   effects?: string[];
@@ -54,11 +62,11 @@ export interface MarketMetadata {
   isPrintable: boolean;
   isForSale: boolean;
   includeInCatalog: boolean;
-  price: number;
-  currency: string;
-  availableForSale: boolean;
-  editionSize: number;
-  editionNumber: number;
+  price?: number;
+  currency?: string;
+  availableForSale?: boolean;
+  editionSize?: number;
+  editionNumber?: number;
 }
 
 export interface DesignMetadata {
@@ -67,6 +75,8 @@ export interface DesignMetadata {
   cardMetadata: CardMetadata;
   marketMetadata: MarketMetadata;
   oaklandMemory?: {
+    title?: string;
+    description?: string;
     date?: string;
     opponent?: string;
     score?: string;
@@ -101,12 +111,12 @@ export interface CardTemplate {
   designDefaults?: {
     cardStyle: Partial<CardStyle>;
     textStyle?: Partial<TextStyle>;
-    effects?: string[];
+    effects?: CardEffect[];
   };
   cardStyle?: Partial<CardStyle>;
   textStyle?: Partial<TextStyle>;
   layers?: any[];
-  effects?: string[];
+  effects?: CardEffect[];
   backgroundColor?: string;
   [key: string]: any;
 }

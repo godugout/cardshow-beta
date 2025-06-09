@@ -1,67 +1,35 @@
 
-import { Card, DesignMetadata, MarketMetadata } from '@/lib/types/unifiedCardTypes';
+import { DesignMetadata } from '@/lib/types/core';
 
 export const DEFAULT_DESIGN_METADATA: DesignMetadata = {
   cardStyle: {
-    template: 'classic',
+    template: 'standard',
     effect: 'none',
     borderRadius: '8px',
-    borderWidth: 2,
     borderColor: '#000000',
-    backgroundColor: '#FFFFFF',
-    shadowColor: 'rgba(0,0,0,0.2)',
+    shadowColor: '#000000',
     frameWidth: 2,
-    frameColor: '#000000',
+    frameColor: '#000000'
   },
   textStyle: {
-    fontFamily: 'Inter',
-    fontSize: '16px',
-    fontWeight: 'normal',
-    color: '#000000',
     titleColor: '#000000',
     titleAlignment: 'center',
     titleWeight: 'bold',
-    descriptionColor: '#333333',
+    descriptionColor: '#333333'
   },
   cardMetadata: {
     category: 'general',
-    series: 'base',
-    cardType: 'standard',
+    series: 'default',
+    cardType: 'standard'
   },
   marketMetadata: {
     isPrintable: false,
     isForSale: false,
-    includeInCatalog: false,
+    includeInCatalog: true,
     price: 0,
     currency: 'USD',
     availableForSale: false,
     editionSize: 1,
-    editionNumber: 1,
+    editionNumber: 1
   }
-};
-
-export const DEFAULT_MARKET_METADATA: MarketMetadata = {
-  isPrintable: false,
-  isForSale: false,
-  includeInCatalog: false,
-  price: 0,
-  currency: 'USD',
-  availableForSale: false,
-  editionSize: 1,
-  editionNumber: 1,
-};
-
-export const createBlankCard = (userId: string): Partial<Card> => {
-  return {
-    title: '',
-    description: '',
-    imageUrl: '',
-    thumbnailUrl: '',
-    tags: [],
-    userId,
-    effects: [],
-    designMetadata: DEFAULT_DESIGN_METADATA,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
 };

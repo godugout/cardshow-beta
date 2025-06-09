@@ -1,7 +1,7 @@
 
 /**
  * Consolidated Card Types for Cardshow (CRD)
- * This file serves as the central source of truth for all card-related types
+ * This file consolidates all type definitions to prevent conflicts
  */
 
 import { BaseEntity, JsonValue } from './index';
@@ -16,7 +16,8 @@ export type {
   DesignMetadata,
   MarketMetadata,
   CardTemplate,
-  UnifiedCard
+  UnifiedCard,
+  CardEffect
 } from './unifiedCardTypes';
 
 /**
@@ -69,17 +70,6 @@ export interface CardEffectSettings {
   color?: string;
   animationEnabled?: boolean;
   [key: string]: JsonValue | undefined;
-}
-
-/**
- * Card effect definition for visual effects
- */
-export interface CardEffect {
-  id: string;
-  name: string;
-  enabled: boolean;
-  settings: CardEffectSettings;
-  className?: string;
 }
 
 /**
@@ -145,14 +135,14 @@ export interface OaklandMemoryData {
 export type CardRarity = string;
 
 /**
- * Reaction interface for card interactions
+ * Reaction interface for card interactions - aligned with core types
  */
 export interface Reaction {
   id: string;
   userId: string;
   targetType: 'card' | 'comment' | 'collection';
   targetId: string;
-  type: 'like' | 'love' | 'wow' | 'haha' | 'sad' | 'angry';
+  type: 'like' | 'heart' | 'star' | 'thumbs_up' | 'thumbs_down'; // Updated to match core
   createdAt: string;
   updatedAt: string;
   user?: User;

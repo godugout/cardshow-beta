@@ -20,18 +20,6 @@ export enum UserRole {
   MODERATOR = 'moderator'
 }
 
-export interface User extends BaseEntity {
-  email: string;
-  name?: string;
-  displayName?: string;
-  username?: string;
-  avatarUrl?: string;
-  bio?: string;
-  role: UserRole;
-  permissions?: string[];
-  preferences?: Record<string, any>;
-}
-
 // User permission types
 export type UserPermission = 
   | 'read:own' 
@@ -44,6 +32,27 @@ export type UserPermission =
   | 'create:premium'
   | 'moderate:content'
   | 'all';
+
+// Role permissions mapping
+export const ROLE_PERMISSIONS: Record<UserRole, UserPermission[]> = {
+  [UserRole.USER]: ['read:own', 'write:own', 'delete:own'],
+  [UserRole.PREMIUM]: ['read:own', 'write:own', 'delete:own', 'premium:features', 'create:premium'],
+  [UserRole.CREATOR]: ['read:own', 'write:own', 'delete:own', 'premium:features', 'create:premium'],
+  [UserRole.MODERATOR]: ['read:own', 'write:own', 'delete:own', 'moderate:content', 'read:all'],
+  [UserRole.ADMIN]: ['all']
+};
+
+export interface User extends BaseEntity {
+  email: string;
+  name?: string;
+  displayName?: string;
+  username?: string;
+  avatarUrl?: string;
+  bio?: string;
+  role: UserRole;
+  permissions?: string[];
+  preferences?: Record<string, any>;
+}
 
 // Card effect types
 export interface CardEffect {
@@ -60,6 +69,13 @@ export interface CardStyle {
   borderRadius?: string;
   shadow?: string;
   effect?: string;
+  template?: string;
+  borderColor?: string;
+  shadowColor?: string;
+  frameWidth?: number;
+  frameColor?: string;
+  borderWidth?: number;
+  backgroundColor?: string;
 }
 
 export interface TextStyle {
@@ -68,6 +84,10 @@ export interface TextStyle {
   fontFamily?: string;
   fontWeight?: string;
   textAlign?: 'left' | 'center' | 'right';
+  titleColor?: string;
+  titleAlignment?: string;
+  titleWeight?: string;
+  descriptionColor?: string;
 }
 
 export interface CardMetadata {
@@ -77,6 +97,10 @@ export interface CardMetadata {
   player?: string;
   team?: string;
   rarity?: string;
+  category?: string;
+  series?: string;
+  cardType?: string;
+  cardNumber?: string;
 }
 
 export interface MarketMetadata {
@@ -84,6 +108,12 @@ export interface MarketMetadata {
   currency?: string;
   availability?: string;
   marketplace?: string;
+  isPrintable?: boolean;
+  isForSale?: boolean;
+  includeInCatalog?: boolean;
+  availableForSale?: boolean;
+  editionSize?: number;
+  editionNumber?: number;
 }
 
 // Design metadata for cards - unified structure
@@ -122,6 +152,14 @@ export interface DesignMetadata {
     gameDate?: string;
     opponent?: string;
     section?: string;
+    date?: string;
+    score?: string;
+    attendees?: string[];
+    tags?: string[];
+    imageUrl?: string;
+    historicalContext?: string;
+    personalSignificance?: string;
+    template?: string;
   };
   // Additional properties for compatibility
   cardStyle?: CardStyle;
@@ -135,10 +173,10 @@ export interface Card extends BaseEntity {
   title: string;
   description: string;
   imageUrl: string;
-  thumbnailUrl?: string;
+  thumbnailUrl: string; // Required for consistency
   userId: string;
   tags: string[];
-  effects: CardEffect[];
+  effects: CardEffect[]; // Changed from string[] to CardEffect[]
   designMetadata?: DesignMetadata;
   rarity?: string;
   isPublic?: boolean;
@@ -155,6 +193,12 @@ export interface Card extends BaseEntity {
   player?: string;
   team?: string;
   reactions?: any[];
+  name?: string;
+  jersey?: string;
+  cardType?: string;
+  cardNumber?: string;
+  backgroundColor?: string;
+  specialEffect?: string;
 }
 
 // Collection visibility and permissions
@@ -203,18 +247,25 @@ export interface Comment extends BaseEntity {
   parentId?: string;
   user?: {
     id: string;
+    email: string;
     displayName?: string;
     avatarUrl?: string;
+    role: UserRole;
+    createdAt: string;
+    updatedAt: string;
   };
 }
 
-// Reaction interface
+// Reaction interface - unified types
 export interface Reaction extends BaseEntity {
   userId: string;
   cardId?: string;
   collectionId?: string;
   commentId?: string;
   type: 'like' | 'heart' | 'star' | 'thumbs_up' | 'thumbs_down';
+  targetType?: 'card' | 'comment' | 'collection';
+  targetId?: string;
+  user?: User;
 }
 
 // JSON value types for metadata

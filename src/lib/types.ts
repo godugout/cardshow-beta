@@ -18,3 +18,6 @@ export const serializeMetadata = (metadata: any): JsonObject => {
     return {};
   }
 };
+
+// Re-export the ROLE_PERMISSIONS constant
+export { ROLE_PERMISSIONS } from './types/core';
