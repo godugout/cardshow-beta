@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CardTemplate } from '@/lib/types/cardTypes';
-import { CardStyle, TextStyle } from '@/lib/types/cardTypes';
+import { CardStyle, TextStyle, CardEffect } from '@/lib/types/cardTypes';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
@@ -40,6 +40,14 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
   const handleSortBy = (sortBy: string) => {
     setSortBy(sortBy);
   };
+
+  // Helper function to create CardEffect objects
+  const createCardEffect = (type: string): CardEffect => ({
+    id: `effect-${type}-${Date.now()}`,
+    type: type as any,
+    intensity: 1,
+    parameters: {}
+  });
 
   const baseballTemplates: CardTemplate[] = [
     {
@@ -100,7 +108,7 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
           titleColor: '#1a202c',
           titleAlignment: 'center'
         },
-        effects: ['Holographic']
+        effects: [createCardEffect('holographic')]
       }
     },
     {
@@ -161,7 +169,7 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
           titleColor: '#8b4513',
           titleAlignment: 'left'
         },
-        effects: ['Vintage']
+        effects: [createCardEffect('vintage')]
       }
     },
     {
@@ -222,7 +230,7 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
           titleColor: '#000080',
           titleAlignment: 'right'
         },
-        effects: ['Chrome']
+        effects: [createCardEffect('chrome')]
       }
     }
   ];
@@ -286,7 +294,7 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
           titleColor: '#1a202c',
           titleAlignment: 'center'
         },
-        effects: ['Refractor']
+        effects: [createCardEffect('refractor')]
       }
     },
     {
@@ -347,7 +355,7 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
           titleColor: '#8b4513',
           titleAlignment: 'left'
         },
-        effects: ['Vintage']
+        effects: [createCardEffect('vintage')]
       }
     },
     {
@@ -408,7 +416,7 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
           titleColor: '#000080',
           titleAlignment: 'right'
         },
-        effects: ['Chrome']
+        effects: [createCardEffect('chrome')]
       }
     }
   ];
@@ -472,7 +480,7 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
           titleColor: '#1a202c',
           titleAlignment: 'center'
         },
-        effects: ['Holographic']
+        effects: [createCardEffect('holographic')]
       }
     },
     {
@@ -533,7 +541,7 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
           titleColor: '#a0522d',
           titleAlignment: 'left'
         },
-        effects: ['Vintage']
+        effects: [createCardEffect('vintage')]
       }
     },
     {
@@ -594,7 +602,7 @@ const TemplateSystem: React.FC<TemplateSystemProps> = ({
           titleColor: '#006400',
           titleAlignment: 'right'
         },
-        effects: ['Chrome']
+        effects: [createCardEffect('chrome')]
       }
     }
   ];

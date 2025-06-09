@@ -23,6 +23,20 @@ export function convertEffectsToCardEffects(effects: string[] | CardEffect[]): C
 }
 
 /**
+ * Converts CardEffect objects to string array for legacy compatibility
+ */
+export function convertCardEffectsToStrings(effects: CardEffect[] | string[]): string[] {
+  if (!effects) return [];
+  
+  return effects.map(effect => {
+    if (typeof effect === 'string') {
+      return effect;
+    }
+    return effect.type;
+  });
+}
+
+/**
  * Adapts any card format to the core Card interface
  */
 export function adaptToCard(card: any): CoreCard {
@@ -37,7 +51,26 @@ export function adaptToCard(card: any): CoreCard {
     effects: convertEffectsToCardEffects(card.effects || []),
     createdAt: card.createdAt || card.created_at || new Date().toISOString(),
     updatedAt: card.updatedAt || card.updated_at || new Date().toISOString(),
-    designMetadata: card.designMetadata || DEFAULT_DESIGN_METADATA,
+    designMetadata: {
+      ...DEFAULT_DESIGN_METADATA,
+      ...card.designMetadata,
+      cardStyle: {
+        ...DEFAULT_DESIGN_METADATA.cardStyle,
+        ...card.designMetadata?.cardStyle,
+      },
+      textStyle: {
+        ...DEFAULT_DESIGN_METADATA.textStyle,
+        ...card.designMetadata?.textStyle,
+      },
+      cardMetadata: {
+        ...DEFAULT_DESIGN_METADATA.cardMetadata,
+        ...card.designMetadata?.cardMetadata,
+      },
+      marketMetadata: {
+        ...DEFAULT_DESIGN_METADATA.marketMetadata,
+        ...card.designMetadata?.marketMetadata,
+      }
+    },
     rarity: card.rarity,
     isPublic: card.isPublic,
     collectionId: card.collectionId,
@@ -67,7 +100,16 @@ export function adaptToCard(card: any): CoreCard {
 export function adaptToUnifiedCard(card: CoreCard): UnifiedCard {
   return {
     ...card,
-    effects: card.effects.map(effect => effect.type) as any, // Convert back to string[] for unified format
-    designMetadata: card.designMetadata as any || DEFAULT_DESIGN_METADATA
+    effects: card.effects, // Keep as CardEffect[] for unified format
+    designMetadata: {
+      cardStyle: card.designMetadata.cardStyle,
+      textStyle: card.designMetadata.textStyle,
+      cardMetadata: {
+        ...card.designMetadata.cardMetadata,
+        effects: convertCardEffectsToStrings(card.effects)
+      },
+      marketMetadata: card.designMetadata.marketMetadata,
+      oaklandMemory: card.designMetadata.oaklandMemory
+    }
   };
 }

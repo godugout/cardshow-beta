@@ -19,7 +19,7 @@ interface ReactionButtonsProps {
   commentsCount?: number;
 }
 
-type ReactionType = 'like' | 'love' | 'wow' | 'haha' | 'sad' | 'angry';
+type ReactionType = 'like' | 'heart' | 'star' | 'thumbs_up' | 'thumbs_down' | 'love' | 'wow' | 'haha' | 'sad' | 'angry';
 
 interface ReactionCount {
   type: ReactionType;
@@ -72,7 +72,11 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
       wow: { count: 0, userReacted: false },
       haha: { count: 0, userReacted: false },
       sad: { count: 0, userReacted: false },
-      angry: { count: 0, userReacted: false }
+      angry: { count: 0, userReacted: false },
+      heart: { count: 0, userReacted: false },
+      star: { count: 0, userReacted: false },
+      thumbs_up: { count: 0, userReacted: false },
+      thumbs_down: { count: 0, userReacted: false }
     };
     
     reactions.forEach(reaction => {

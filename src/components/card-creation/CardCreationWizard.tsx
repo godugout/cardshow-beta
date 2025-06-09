@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -9,8 +10,9 @@ import {
   Redo, 
   HelpCircle 
 } from 'lucide-react';
-import { Card as CardType } from '@/lib/types/unifiedCardTypes';
+import { Card as CardType } from '@/lib/types/core';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
+import { adaptToCard } from '@/lib/adapters/cardAdapter';
 import { useUndoRedoState } from '@/hooks/useUndoRedoState';
 import { toastUtils } from '@/lib/utils/toast-utils';
 import { Card as CardUI } from '@/components/ui/card';
@@ -90,7 +92,10 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
     tags: [],
     ...initialData,
     effects: initialData.effects || [],
-    designMetadata: initialData.designMetadata || DEFAULT_DESIGN_METADATA,
+    designMetadata: {
+      ...DEFAULT_DESIGN_METADATA,
+      ...initialData.designMetadata,
+    },
     createdAt: initialData.createdAt || new Date().toISOString(),
     updatedAt: initialData.updatedAt || new Date().toISOString(),
   });
@@ -198,8 +203,8 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
         return;
       }
 
-      // Create a complete card with required properties
-      const newCard = {
+      // Create a complete card with required properties and convert to core format
+      const rawCard = {
         id: cardData.id || uuidv4(),
         title: cardData.title || '',
         description: cardData.description || '',
@@ -210,14 +215,14 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
         effects: cardData.effects || [],
         createdAt: cardData.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        designMetadata: cardData.designMetadata || {
-          cardStyle: {},
-          textStyle: {},
-          cardMetadata: {},
-          marketMetadata: {},
+        designMetadata: {
+          ...DEFAULT_DESIGN_METADATA,
+          ...cardData.designMetadata,
         },
         ...cardData,
-      } as CardType;
+      };
+
+      const newCard = adaptToCard(rawCard);
 
       toastUtils.success(
         "Success!",
@@ -240,7 +245,7 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
       setIsSubmitting(true);
       
       // Create a new Card instance with the collected data and proper design metadata
-      const newCard = {
+      const rawCard = {
         id: `card-${Date.now()}`,
         title: cardData.title || 'Untitled Card',
         description: cardData.description || '',
@@ -268,10 +273,12 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
           cardMetadata: {
             ...DEFAULT_DESIGN_METADATA.cardMetadata,
             ...cardData.designMetadata?.cardMetadata,
-            effects: cardData.effects || []
           }
         }
-      } as CardType;
+      };
+      
+      // Convert to core Card format
+      const newCard = adaptToCard(rawCard);
       
       // Add the card to the context or make API call
       onSave(newCard);

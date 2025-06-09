@@ -101,6 +101,7 @@ export interface CardMetadata {
   series?: string;
   cardType?: string;
   cardNumber?: string;
+  effects?: string[]; // Keep as string[] for compatibility
 }
 
 export interface MarketMetadata {
@@ -108,9 +109,9 @@ export interface MarketMetadata {
   currency?: string;
   availability?: string;
   marketplace?: string;
-  isPrintable?: boolean;
-  isForSale?: boolean;
-  includeInCatalog?: boolean;
+  isPrintable: boolean;
+  isForSale: boolean;
+  includeInCatalog: boolean;
   availableForSale?: boolean;
   editionSize?: number;
   editionNumber?: number;
@@ -143,8 +144,8 @@ export interface DesignMetadata {
     fontSize?: number;
   };
   oaklandMemory?: {
-    title: string;
-    description: string;
+    title?: string;
+    description?: string;
     era?: string;
     memoryType?: string;
     emotions?: string[];
@@ -161,11 +162,11 @@ export interface DesignMetadata {
     personalSignificance?: string;
     template?: string;
   };
-  // Additional properties for compatibility
-  cardStyle?: CardStyle;
-  textStyle?: TextStyle;
-  cardMetadata?: CardMetadata;
-  marketMetadata?: MarketMetadata;
+  // Required properties for compatibility
+  cardStyle: CardStyle;
+  textStyle: TextStyle;
+  cardMetadata: CardMetadata;
+  marketMetadata: MarketMetadata;
 }
 
 // Card interface - unified and complete
@@ -177,7 +178,7 @@ export interface Card extends BaseEntity {
   userId: string;
   tags: string[];
   effects: CardEffect[]; // Changed from string[] to CardEffect[]
-  designMetadata?: DesignMetadata;
+  designMetadata: DesignMetadata;
   rarity?: string;
   isPublic?: boolean;
   collectionId?: string;
@@ -256,13 +257,13 @@ export interface Comment extends BaseEntity {
   };
 }
 
-// Reaction interface - unified types
+// Reaction interface - unified types with extended reaction types
 export interface Reaction extends BaseEntity {
   userId: string;
   cardId?: string;
   collectionId?: string;
   commentId?: string;
-  type: 'like' | 'heart' | 'star' | 'thumbs_up' | 'thumbs_down';
+  type: 'like' | 'heart' | 'star' | 'thumbs_up' | 'thumbs_down' | 'love' | 'wow' | 'haha' | 'sad' | 'angry';
   targetType?: 'card' | 'comment' | 'collection';
   targetId?: string;
   user?: User;
