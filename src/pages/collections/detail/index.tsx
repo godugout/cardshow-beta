@@ -175,6 +175,7 @@ const CollectionDetail = () => {
   const enrichedCollection = {
     ...collection,
     description: collection.description || '', // Ensure description is always a string
+    userId: collection.userId || '', // Ensure userId is always a string
     isPublic: collection.isPublic ?? (collection.visibility === 'public'),
     tags: collection.tags ?? [],
     featured: collection.featured ?? false
