@@ -1,9 +1,9 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { Card } from '@/lib/types/card';
+import { Card } from '@/lib/types/unifiedCardTypes';
 import { v4 as uuidv4 } from 'uuid';
 import { adaptToLegacyCard } from '@/lib/adapters/cardAdapter';
-import { Card as CardType } from '@/lib/types/cardTypes';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 
 // Mock data for development
 const initialCards: Card[] = [
@@ -18,6 +18,7 @@ const initialCards: Card[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     effects: [],
+    designMetadata: DEFAULT_DESIGN_METADATA,
   }),
 ];
 
@@ -53,7 +54,7 @@ export const useCardOperations = () => {
     return cards.find(card => card.id === id);
   }, [cards]);
 
-  const addCard = useCallback((card: Omit<CardType, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const addCard = useCallback((card: Omit<Card, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newCard = adaptToLegacyCard({
       ...card,
       id: uuidv4(),
@@ -65,7 +66,7 @@ export const useCardOperations = () => {
     return newCard;
   }, []);
 
-  const updateCard = useCallback((id: string, updates: Partial<CardType>) => {
+  const updateCard = useCallback((id: string, updates: Partial<Card>) => {
     setCards(prevCards =>
       prevCards.map(card =>
         card.id === id

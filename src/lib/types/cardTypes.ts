@@ -7,6 +7,18 @@
 import { BaseEntity, JsonValue } from './index';
 import { User } from './user';
 
+// Re-export everything from unifiedCardTypes for backward compatibility
+export type {
+  Card,
+  CardStyle,
+  TextStyle,
+  CardMetadata,
+  DesignMetadata,
+  MarketMetadata,
+  CardTemplate,
+  UnifiedCard
+} from './unifiedCardTypes';
+
 /**
  * Hotspot data for interactive cards
  */
@@ -45,37 +57,6 @@ export interface CardStats {
   strikeouts?: string;
   careerYears?: string;
   ranking?: string;
-}
-
-/**
- * Card style definition for visual appearance
- */
-export interface CardStyle {
-  template: string;
-  effect: string;
-  borderRadius: string;
-  borderWidth?: number;
-  borderColor: string;
-  backgroundColor?: string;
-  shadowColor: string;
-  frameWidth: number;
-  frameColor: string;
-  [key: string]: JsonValue | undefined;
-}
-
-/**
- * Text style definition for card typography
- */
-export interface TextStyle {
-  fontFamily?: string;
-  fontSize?: string;
-  fontWeight?: string;
-  color?: string;
-  titleColor: string;
-  titleAlignment: string;
-  titleWeight: string;
-  descriptionColor: string;
-  [key: string]: JsonValue | undefined;
 }
 
 /**
@@ -138,43 +119,6 @@ export interface CardLayer {
 }
 
 /**
- * Market metadata for card marketplace information
- */
-export interface MarketMetadata {
-  lastSoldPrice?: number;
-  currentAskingPrice?: number;
-  estimatedMarketValue?: number;
-  isPrintable: boolean;
-  isForSale: boolean;
-  includeInCatalog: boolean;
-  price?: number;
-  currency?: string;
-  availableForSale?: boolean;
-  editionSize?: number;
-  editionNumber?: number;
-  [key: string]: JsonValue | undefined;
-}
-
-/**
- * Card metadata for additional card information
- */
-export interface CardMetadata {
-  edition?: string;
-  serialNumber?: string;
-  certification?: string;
-  gradeScore?: string;
-  category?: string;
-  series?: string;
-  cardType?: string;
-  cardStyle?: CardStyle;
-  textStyle?: TextStyle;
-  effects?: string[];
-  layers?: CardLayer[];
-  effectClasses?: string;
-  [key: string]: JsonValue | undefined;
-}
-
-/**
  * Oakland Memory Data definition
  */
 export interface OaklandMemoryData {
@@ -192,22 +136,6 @@ export interface OaklandMemoryData {
   historicalContext?: string;
   personalSignificance?: string;
   template?: string;
-  [key: string]: JsonValue | undefined;
-}
-
-/**
- * Design metadata for card design information
- */
-export interface DesignMetadata {
-  cardStyle: CardStyle;
-  textStyle: TextStyle;
-  cardMetadata: CardMetadata;
-  marketMetadata: MarketMetadata;
-  oaklandMemory?: OaklandMemoryData;
-  effects?: string[];
-  layers?: CardLayer[];
-  effectClasses?: string;
-  uploadedImages?: string[];
   [key: string]: JsonValue | undefined;
 }
 
@@ -244,78 +172,4 @@ export interface Comment {
   createdAt: string;
   updatedAt: string;
   user?: User;
-}
-
-/**
- * Main Card interface that can be extended for specific use cases
- */
-export interface Card extends BaseEntity {
-  title: string;
-  description: string;
-  imageUrl: string;
-  image?: string;
-  thumbnailUrl: string;
-  tags: string[];
-  collectionId?: string;
-  userId: string;
-  teamId?: string;
-  isPublic?: boolean;
-  metadata?: Record<string, any>;
-  effects: string[];
-  reactions?: Reaction[];
-  comments?: Comment[];
-  viewCount?: number;
-  
-  // Baseball card properties
-  player?: string;
-  team?: string;
-  year?: string;
-  jersey?: string;
-  set?: string;
-  cardNumber?: string;
-  cardType?: string;
-  artist?: string;
-  backgroundColor?: string;
-  textColor?: string;
-  specialEffect?: string;
-  fabricSwatches?: FabricSwatch[];
-  stats?: CardStats;
-  position?: string;
-  
-  // Design related
-  name?: string;
-  cardStyle?: string;
-  backTemplate?: string;
-  designMetadata: DesignMetadata;
-  
-  // Market data
-  price?: number;
-  estimatedValue?: string;
-  condition?: string;
-  rarity?: string; // Changed from CardRarity to string to match UnifiedCard
-  gradingScore?: number;
-  
-  // Additional fields needed by some components
-  creatorId?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * Card template definition for template system
- */
-export interface CardTemplate {
-  id: string;
-  name: string;
-  description?: string;
-  thumbnail: string;
-  thumbnailUrl?: string;
-  category: string;
-  isOfficial?: boolean;
-  popularity?: number;
-  designDefaults: {
-    cardStyle: Partial<CardStyle>;
-    textStyle?: Partial<TextStyle>;
-    effects?: string[];
-  };
 }

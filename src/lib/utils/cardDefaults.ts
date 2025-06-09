@@ -1,7 +1,7 @@
 
-import { Card } from '@/lib/types/unifiedCardTypes';
+import { Card, DesignMetadata, MarketMetadata } from '@/lib/types/unifiedCardTypes';
 
-export const DEFAULT_DESIGN_METADATA = {
+export const DEFAULT_DESIGN_METADATA: DesignMetadata = {
   cardStyle: {
     template: 'classic',
     effect: 'none',
@@ -40,7 +40,7 @@ export const DEFAULT_DESIGN_METADATA = {
   }
 };
 
-export const DEFAULT_MARKET_METADATA = {
+export const DEFAULT_MARKET_METADATA: MarketMetadata = {
   isPrintable: false,
   isForSale: false,
   includeInCatalog: false,
