@@ -1,7 +1,7 @@
 
 import React, { Suspense } from 'react';
 import { RouteObject } from 'react-router-dom';
-import HomePage from '@/pages/HomePage';
+import UnifiedHomePage from '@/pages/UnifiedHomePage';
 import CardViewerPage from '@/pages/CardViewerPage';
 import ImmersiveCardViewerPage from '@/pages/ImmersiveCardViewerPage';
 import CardCollectionPage from '@/pages/CardCollectionPage';
@@ -46,11 +46,11 @@ const LoadingFallback = () => (
   </div>
 );
 
-// Main application routes
+// Main application routes - unified and consolidated
 const rootRoutes: RouteObject[] = [
   {
     path: "/",
-    element: <HomePage />
+    element: <UnifiedHomePage />
   },
   {
     path: "/gallery",
@@ -65,6 +65,14 @@ const rootRoutes: RouteObject[] = [
     element: (
       <Suspense fallback={<LoadingFallback />}>
         <CardCreator />
+      </Suspense>
+    )
+  },
+  {
+    path: "/detector", 
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <CardDetector />
       </Suspense>
     )
   },
@@ -105,18 +113,34 @@ const rootRoutes: RouteObject[] = [
     element: <Profile />
   },
   {
+    path: "/auth",
+    element: <AuthPage />
+  },
+  {
+    path: "/unauthorized",
+    element: <Unauthorized />
+  },
+  {
+    path: "/community",
+    element: <TownCommunityHub />
+  },
+  {
     path: "*",
     element: <NotFound />
   }
 ];
 
+// Export unified routes without conflicts
 export const routes: RouteObject[] = [
   ...rootRoutes,
-  ...mainRoutes.filter(route => route.path !== "/" && route.path !== "*"),
   ...teamRoutes,
   ...townRoutes,
   ...baseballRoutes,
   ...featureRoutes,
-  ...cardRoutes.filter(route => route.path !== "/cards" && route.path !== "/cards/:id"),
+  ...cardRoutes.filter(route => 
+    route.path !== "/cards" && 
+    route.path !== "/cards/:id" && 
+    route.path !== "/cards/create"
+  ),
   ...collectionRoutes.filter(route => route.path !== "/collections"),
 ];

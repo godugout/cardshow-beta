@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
-import { Card, Collection, DesignMetadata } from '@/lib/types';
+import { Card, Collection, DesignMetadata } from '@/lib/types/core';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 import { v4 as uuidv4 } from 'uuid';
 import { adaptToCard } from '@/lib/adapters/cardAdapter';
@@ -45,25 +45,46 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(false);
 
   // Load cards and collections from local storage on mount
+  // TODO: Replace with Supabase integration
   useEffect(() => {
     const storedCards = localStorage.getItem('cards');
     if (storedCards) {
-      setCards(JSON.parse(storedCards).map((card: Card) => adaptToCard(card)));
+      try {
+        const parsedCards = JSON.parse(storedCards);
+        setCards(parsedCards.map((card: Card) => adaptToCard(card)));
+      } catch (error) {
+        console.error('Error loading stored cards:', error);
+        setCards([]);
+      }
     }
 
     const storedCollections = localStorage.getItem('collections');
     if (storedCollections) {
-      setCollections(JSON.parse(storedCollections));
+      try {
+        setCollections(JSON.parse(storedCollections));
+      } catch (error) {
+        console.error('Error loading stored collections:', error);
+        setCollections([]);
+      }
     }
   }, []);
 
   // Save cards and collections to local storage whenever they change
+  // TODO: Replace with Supabase integration
   useEffect(() => {
-    localStorage.setItem('cards', JSON.stringify(cards));
+    try {
+      localStorage.setItem('cards', JSON.stringify(cards));
+    } catch (error) {
+      console.error('Error saving cards to localStorage:', error);
+    }
   }, [cards]);
 
   useEffect(() => {
-    localStorage.setItem('collections', JSON.stringify(collections));
+    try {
+      localStorage.setItem('collections', JSON.stringify(collections));
+    } catch (error) {
+      console.error('Error saving collections to localStorage:', error);
+    }
   }, [collections]);
 
   const getCard = useCallback((id: string) => {
@@ -148,10 +169,9 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           name: collection.name || 'Untitled Collection',
           description: collection.description || '',
           userId: collection.userId || 'default-user',
-          cards: collection.cards || [],
+          cardIds: collection.cardIds || [],
           coverImageUrl: collection.coverImageUrl || '',
           isPublic: collection.isPublic !== undefined ? collection.isPublic : true,
-          cardIds: collection.cardIds || [],
           createdAt: now,
           updatedAt: now,
           visibility: collection.visibility || 'public',
@@ -267,6 +287,7 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
     return new Promise<void>((resolve) => {
       setTimeout(() => {
+        // TODO: Replace with actual Supabase data fetching
         setIsLoading(false);
         resolve();
       }, 300);
