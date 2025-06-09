@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -9,7 +10,7 @@ import {
   Redo, 
   HelpCircle 
 } from 'lucide-react';
-import { Card as CardType } from '@/lib/types/cardTypes';
+import { Card as CardType } from '@/lib/types/unifiedCardTypes';
 import { useUndoRedoState } from '@/hooks/useUndoRedoState';
 import { toastUtils } from '@/lib/utils/toast-utils';
 import { Card as CardUI } from '@/components/ui/card';
@@ -28,11 +29,18 @@ import WizardProgress from './components/WizardProgress';
 import CardPreview from './components/CardPreview';
 import HelpPanel from './components/HelpPanel';
 
-// Define props for CardTextStep
+// Define props for CardTextStep with all required fields
 export interface CardTextStepProps {
-  cardData: Partial<CardType>;
-  setCardData?: (data: Partial<CardType>) => void;
-  onUpdate?: (updates: Partial<CardType>) => void;
+  cardData: {
+    title: string;
+    description: string;
+    tags: string[];
+    player?: string;
+    team?: string;
+    year?: string;
+    [key: string]: any;
+  };
+  onUpdate: (updates: any) => void;
   onContinue?: () => void;
 }
 
@@ -77,9 +85,11 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
     canRedo,
     pushState: addToHistory
   } = useUndoRedoState<Partial<CardType>>({
+    title: '',
+    description: '',
+    tags: [],
     ...initialData,
     effects: initialData.effects || [],
-    tags: initialData.tags || [],
     createdAt: initialData.createdAt || new Date().toISOString(),
     updatedAt: initialData.updatedAt || new Date().toISOString(),
   });
@@ -187,12 +197,25 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
         return;
       }
 
-      // Create a complete card
+      // Create a complete card with required properties
       const newCard = {
-        ...cardData,
         id: cardData.id || uuidv4(),
+        title: cardData.title || '',
+        description: cardData.description || '',
+        imageUrl: cardData.imageUrl || '',
+        thumbnailUrl: cardData.thumbnailUrl || cardData.imageUrl || '',
+        tags: cardData.tags || [],
+        userId: cardData.userId || 'current-user',
+        effects: cardData.effects || [],
         createdAt: cardData.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        designMetadata: cardData.designMetadata || {
+          cardStyle: {},
+          textStyle: {},
+          cardMetadata: {},
+          marketMetadata: {},
+        },
+        ...cardData,
       } as CardType;
 
       toastUtils.success(
@@ -221,6 +244,7 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
         title: cardData.title || 'Untitled Card',
         description: cardData.description || '',
         imageUrl: cardData.imageUrl || '',
+        thumbnailUrl: cardData.thumbnailUrl || cardData.imageUrl || '',
         tags: cardData.tags || [],
         effects: cardData.effects || [],
         player: cardData.player || '',
@@ -232,7 +256,7 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
         designMetadata: {
           cardStyle: cardData.designMetadata?.cardStyle || {},
           textStyle: cardData.designMetadata?.textStyle || {},
-          marketMetadata: {},
+          marketMetadata: cardData.designMetadata?.marketMetadata || {},
           cardMetadata: {
             effects: cardData.effects || []
           }
@@ -254,6 +278,17 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
   
   // Render the current step content
   const renderStepContent = () => {
+    // Ensure cardData has required properties for TextStep
+    const cardDataForTextStep = {
+      title: cardData.title || '',
+      description: cardData.description || '',
+      tags: cardData.tags || [],
+      player: cardData.player,
+      team: cardData.team,
+      year: cardData.year,
+      ...cardData
+    };
+
     switch (currentStep) {
       case 0:
         return (
@@ -301,7 +336,7 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
       case 4:
         return (
           <TextDetailsStep
-            cardData={cardData}
+            cardData={cardDataForTextStep}
             onUpdate={updateCardData}
           />
         );

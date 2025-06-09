@@ -86,6 +86,15 @@ export const collectionOperations = {
     }
   },
 
+  async getCollectionWithCards(id: string) {
+    try {
+      // Mock implementation for now
+      return { data: null, error: null };
+    } catch (error) {
+      return { data: null, error: error };
+    }
+  },
+
   async create(collection: Partial<Collection>) {
     try {
       // Mock implementation for now
@@ -94,4 +103,20 @@ export const collectionOperations = {
       return { data: null, error: error };
     }
   }
+};
+
+// Add missing export
+export const convertDbCollectionToApp = (dbCollection: any) => {
+  return {
+    id: dbCollection.id,
+    name: dbCollection.name || dbCollection.title,
+    description: dbCollection.description,
+    owner_id: dbCollection.owner_id,
+    visibility: dbCollection.visibility,
+    allow_comments: dbCollection.allow_comments,
+    design_metadata: dbCollection.design_metadata,
+    created_at: dbCollection.created_at,
+    updated_at: dbCollection.updated_at,
+    cover_image_url: dbCollection.cover_image_url,
+  };
 };

@@ -212,9 +212,9 @@ export interface DesignMetadata {
 }
 
 /**
- * Card rarity types
+ * Card rarity types - now as string to match UnifiedCard
  */
-export type CardRarity = 'common' | 'uncommon' | 'rare' | 'ultra-rare' | 'legendary' | 'one-of-one';
+export type CardRarity = string;
 
 /**
  * Reaction interface for card interactions
@@ -292,7 +292,7 @@ export interface Card extends BaseEntity {
   price?: number;
   estimatedValue?: string;
   condition?: string;
-  rarity?: CardRarity;
+  rarity?: string; // Changed from CardRarity to string to match UnifiedCard
   gradingScore?: number;
   
   // Additional fields needed by some components

@@ -40,7 +40,7 @@ export interface CardEffectsResult {
   isEffectActive: (effectId: string) => boolean;
   getEffectIntensity: (effectId: string) => number;
   setEffectIntensity: (effectId: string, intensity: number) => void;
-  clearEffects?: () => void;
+  clearEffects: () => void;
   
   // Add missing properties for ImmersiveCardViewerPage
   cardEffects?: Record<string, string[]>;
