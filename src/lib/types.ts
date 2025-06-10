@@ -1,16 +1,25 @@
 
-// Re-export everything from core types
+// Main types export file - avoid duplicate exports
+
+// Re-export everything from core types as primary
 export * from './types/core';
-export * from './types/unifiedCardTypes';
-export * from './types/cardTypes';
 
-// Additional exports for backward compatibility
+// Re-export specific items from other type modules without conflicts
 export type { 
-  OaklandMemoryData, 
-  InstagramPost,
-  AuthContextType,
-  serializeMetadata
-} from './types/core';
+  Card as UnifiedCard,
+  CardTemplate as UnifiedCardTemplate
+} from './types/unifiedCardTypes';
 
-// Re-export CardEffect from core to ensure consistency
-export type { CardEffect } from './types/core';
+export type {
+  CardLayer,
+  CardStats,
+  CardEffectSettings,
+  HotspotData,
+  FabricSwatch
+} from './types/cardTypes';
+
+export type {
+  PremiumCardEffect,
+  CardEffectsResult,
+  UseCardEffectsResult
+} from './types/cardEffects';

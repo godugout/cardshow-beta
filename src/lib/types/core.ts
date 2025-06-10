@@ -343,7 +343,7 @@ export function serializeMetadata(metadata: any): string {
   return JSON.stringify(metadata);
 }
 
-// Auth context type for compatibility
+// Auth context type for compatibility - fixed property names
 export interface AuthContextType {
   user: User | null;
   signIn: (email: string, password: string) => Promise<void>;
@@ -354,6 +354,7 @@ export interface AuthContextType {
   refreshSession: () => Promise<void>;
   session: any;
   error: string | null;
-  loading: boolean;
+  loading: boolean; // Use 'loading' consistently
   isAuthenticated: boolean;
+  isLoading?: boolean; // Optional alias for compatibility
 }
