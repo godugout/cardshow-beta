@@ -20,6 +20,10 @@ export type {
 
 export type {
   PremiumCardEffect,
-  CardEffectsResult,
-  UseCardEffectsResult
+  CardEffectsResult
 } from './types/cardEffects';
+
+// Add missing serializeMetadata function
+export function serializeMetadata(metadata: any): string {
+  return JSON.stringify(metadata);
+}

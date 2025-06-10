@@ -41,9 +41,15 @@ export const CardViewerProvider: React.FC<CardViewerProviderProps> = ({
   const [isFlipped, setIsFlipped] = useState(false);
   const [isAutoRotating, setIsAutoRotating] = useState(false);
   
-  // Effect management
+  // Effect management - convert CardEffect objects to strings if needed
+  const getEffectsAsStrings = (effects: any[]): string[] => {
+    return effects.map(effect => 
+      typeof effect === 'string' ? effect : effect.type || effect.name || 'unknown'
+    );
+  };
+
   const [activeEffects, setActiveEffects] = useState<string[]>(
-    initialCard?.effects || initialEffects || []
+    initialCard?.effects ? getEffectsAsStrings(initialCard.effects) : initialEffects
   );
   const [effectIntensities, setEffectIntensities] = useState<Record<string, number>>({
     'Holographic': 0.7,

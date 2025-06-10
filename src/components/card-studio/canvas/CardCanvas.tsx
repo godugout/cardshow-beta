@@ -68,9 +68,12 @@ const CardCanvas: React.FC<CardCanvasProps> = ({ cardData, onUpdate, readOnly = 
     const classes = ['card-canvas'];
     
     if (cardData.effects) {
-      if (cardData.effects.includes('holographic')) classes.push('holographic-effect');
-      if (cardData.effects.includes('refractor')) classes.push('refractor-effect');
-      if (cardData.effects.includes('gold-foil')) classes.push('gold-foil-effect');
+      cardData.effects.forEach(effect => {
+        const effectName = typeof effect === 'string' ? effect : effect.type || effect.name;
+        if (effectName === 'holographic') classes.push('holographic-effect');
+        if (effectName === 'refractor') classes.push('refractor-effect');
+        if (effectName === 'gold-foil') classes.push('gold-foil-effect');
+      });
     }
     
     return classes.join(' ');

@@ -314,7 +314,7 @@ export interface InstagramPost {
   comments: number;
   username: string;
   avatarUrl?: string;
-  mediaType?: 'image' | 'video';
+  mediaType?: 'image' | 'video' | 'VIDEO';
   thumbnailUrl?: string;
   mediaUrl?: string;
 }
@@ -356,5 +356,4 @@ export interface AuthContextType {
   error: string | null;
   loading: boolean; // Use 'loading' consistently
   isAuthenticated: boolean;
-  isLoading?: boolean; // Optional alias for compatibility
 }

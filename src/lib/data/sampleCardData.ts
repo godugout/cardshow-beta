@@ -1,5 +1,6 @@
 import { Card } from '@/lib/types/unifiedCardTypes';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
+import { convertEffectsToCardEffects } from '@/lib/adapters/cardAdapter';
 
 // Reliable images from Unsplash
 const RELIABLE_IMAGES = {
@@ -45,7 +46,7 @@ export const sampleCards: Card[] = [
     thumbnailUrl: '/lovable-uploads/f07b9e90-98ec-4e0c-bca4-71acd9ae9924.png',
     tags: ['rookie', 'hall-of-fame', 'mariners'],
     userId: 'system',
-    effects: ['holographic'],
+    effects: convertEffectsToCardEffects(['holographic']),
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
     designMetadata: {
@@ -97,7 +98,7 @@ export const sampleCards: Card[] = [
     thumbnailUrl: '/lovable-uploads/79a099b9-c77a-491e-9755-ba25419791f5.png',
     tags: ['hall-of-fame', 'padres', 'batting-champion'],
     userId: 'system',
-    effects: ['chrome'],
+    effects: convertEffectsToCardEffects(['chrome']),
     createdAt: '2024-01-02T00:00:00Z',
     updatedAt: '2024-01-02T00:00:00Z',
     designMetadata: {
