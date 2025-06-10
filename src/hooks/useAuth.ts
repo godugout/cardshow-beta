@@ -95,7 +95,6 @@ export const useAuth = (): AuthContextType => {
     session,
     error,
     loading,
-    isAuthenticated: !!user,
-    isLoading: loading // Provide alias for compatibility
+    isAuthenticated: !!user
   };
 };

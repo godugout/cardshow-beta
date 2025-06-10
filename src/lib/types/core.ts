@@ -236,15 +236,22 @@ export interface Collection extends BaseEntity {
   teamId?: string;
 }
 
-// Team interface
+// Team interface - updated with missing properties
 export interface Team extends BaseEntity {
   name: string;
   description?: string;
   logoUrl?: string;
+  logo_url?: string; // Add for backward compatibility
   ownerId: string;
   isActive: boolean;
   visibility?: 'public' | 'private';
   banner_url?: string;
+  status?: string;
+  website?: string;
+  email?: string;
+  specialties?: string[];
+  primary_color?: string;
+  secondary_color?: string;
 }
 
 // Team member interface
@@ -343,7 +350,7 @@ export function serializeMetadata(metadata: any): string {
   return JSON.stringify(metadata);
 }
 
-// Auth context type for compatibility - fixed property names
+// Auth context type for compatibility - use consistent property names
 export interface AuthContextType {
   user: User | null;
   signIn: (email: string, password: string) => Promise<void>;

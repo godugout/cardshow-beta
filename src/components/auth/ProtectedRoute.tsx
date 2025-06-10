@@ -20,7 +20,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   adminOnly = false,
   redirectTo = '/auth'
 }) => {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const { hasPermission, isAdmin } = usePermissions();
   const location = useLocation();
 
@@ -38,7 +38,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   }, [location.pathname, user, requiredPermission, adminOnly]);
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader className="animate-spin h-8 w-8 text-primary" />

@@ -1,6 +1,8 @@
+
 import { Card } from '@/lib/types/unifiedCardTypes';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 import { convertEffectsToCardEffects } from '@/lib/adapters/cardAdapter';
+import { stringArrayToCardEffects } from '@/lib/utils/cardEffectHelpers';
 
 // Reliable images from Unsplash
 const RELIABLE_IMAGES = {
@@ -156,7 +158,7 @@ export const sampleCards: Card[] = [
     collectionId: 'collection-001',
     isPublic: true,
     designMetadata: createDesignMetadata('#f43f5e', '#f43f5e'),
-    effects: ['Holographic', 'Refractor']
+    effects: stringArrayToCardEffects(['Holographic', 'Refractor'])
   },
   {
     id: 'card-002',
@@ -172,7 +174,7 @@ export const sampleCards: Card[] = [
     collectionId: 'collection-001',
     isPublic: true,
     designMetadata: createDesignMetadata('#a855f7', '#a855f7'),
-    effects: ['Chrome', 'Shimmer']
+    effects: stringArrayToCardEffects(['Chrome', 'Shimmer'])
   },
   {
     id: 'card-003',
@@ -188,7 +190,7 @@ export const sampleCards: Card[] = [
     collectionId: 'collection-002',
     isPublic: true,
     designMetadata: createDesignMetadata('#22c55e', '#22c55e'),
-    effects: ['Vintage']
+    effects: stringArrayToCardEffects(['Vintage'])
   },
   {
     id: 'card-004',
@@ -204,7 +206,7 @@ export const sampleCards: Card[] = [
     collectionId: 'collection-002',
     isPublic: true,
     designMetadata: createDesignMetadata('#0ea5e9', '#0ea5e9'),
-    effects: ['Holographic', 'Gold']
+    effects: stringArrayToCardEffects(['Holographic', 'Gold'])
   },
   {
     id: 'card-005',
@@ -220,7 +222,7 @@ export const sampleCards: Card[] = [
     collectionId: 'collection-003',
     isPublic: true,
     designMetadata: createDesignMetadata('#fbbf24', '#fbbf24'),
-    effects: ['Refractor', 'Shimmer']
+    effects: stringArrayToCardEffects(['Refractor', 'Shimmer'])
   },
   {
     id: 'card-006',
@@ -236,7 +238,7 @@ export const sampleCards: Card[] = [
     collectionId: 'collection-003',
     isPublic: true,
     designMetadata: createDesignMetadata('#92400e', '#92400e'),
-    effects: ['Vintage', 'Gold']
+    effects: stringArrayToCardEffects(['Vintage', 'Gold'])
   }
 ];
 
