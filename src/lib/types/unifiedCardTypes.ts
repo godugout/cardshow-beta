@@ -23,6 +23,11 @@ export interface CardEffect {
   type: 'holographic' | 'prismatic' | 'refractor' | 'sparkle' | 'foil' | 'rainbow' | 'custom';
   intensity: number;
   parameters?: Record<string, any>;
+  // Additional properties for compatibility
+  name?: string;
+  enabled?: boolean;
+  settings?: Record<string, any>;
+  className?: string;
 }
 
 export interface CardStyle {
@@ -75,14 +80,17 @@ export interface DesignMetadata {
   cardMetadata: CardMetadata;
   marketMetadata: MarketMetadata;
   oaklandMemory?: {
-    title?: string;
-    description?: string;
-    date?: string;
-    opponent?: string;
-    score?: string;
-    location?: string;
-    section?: string;
+    title: string; // Made required to match core
+    description: string; // Made required to match core
+    era?: string;
     memoryType?: string;
+    emotions?: string[];
+    location?: string;
+    gameDate?: string;
+    opponent?: string;
+    section?: string;
+    date?: string;
+    score?: string;
     attendees?: string[];
     tags?: string[];
     imageUrl?: string;

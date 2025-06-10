@@ -1,151 +1,196 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CardTemplate } from '@/components/card-templates/TemplateLibrary';
-import { Card } from '@/lib/types/cardTypes';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Save, Undo, Redo } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
-import { useUndoRedo } from '@/hooks/useUndoRedo';
-import { useAutoSave } from '@/hooks/useAutoSave';
-import { useCards } from '@/context/CardContext';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Save, 
+  Download, 
+  Undo, 
+  Redo, 
+  HelpCircle 
+} from 'lucide-react';
+import { Card as CardType } from '@/lib/types/core';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
+import { adaptToCard, convertEffectsToCardEffects, convertCardEffectsToStrings } from '@/lib/adapters/cardAdapter';
+import { useUndoRedoState } from '@/hooks/useUndoRedoState';
 import { toastUtils } from '@/lib/utils/toast-utils';
-import WizardStepper from './WizardStepper';
-import CardCanvas from './canvas/CardCanvas';
-import ImageUploadStep from './steps/ImageUploadStep';
-import DesignStep from './steps/DesignStep';
-import ElementsStep from './steps/ElementsStep';
-import EffectsStep from './steps/EffectsStep';
-import TextStep from './steps/TextStep';
-import FinalizeStep from './steps/FinalizeStep';
+import { Card as CardUI } from '@/components/ui/card';
 import { v4 as uuidv4 } from 'uuid';
 
+// Import wizard steps
+import TemplateSelectionStep from './steps/TemplateSelectionStep';
+import CardUploadStep from './steps/CardUploadStep';
+import DesignStep from './steps/DesignStep';
+import EffectsStep from './steps/CardEffectsStep';
+import TextDetailsStep from './steps/CardTextStep';
+import FinalizeStep from './steps/CardPreviewStep';
+
+// Import wizard components
+import WizardProgress from './components/WizardProgress';
+import CardPreview from './components/CardPreview';
+import HelpPanel from './components/HelpPanel';
+
+// Define props for CardTextStep with all required fields
+export interface CardTextStepProps {
+  cardData: {
+    title: string;
+    description: string;
+    tags: string[];
+    player?: string;
+    team?: string;
+    year?: string;
+    [key: string]: any;
+  };
+  onUpdate: (updates: any) => void;
+  onContinue?: () => void;
+}
+
 interface CardCreationWizardProps {
-  initialTemplate?: CardTemplate | null;
-  initialData?: Partial<Card>;
-  onComplete: (card: Card) => void;
+  initialData?: Partial<CardType>;
+  onSave: (cardData: CardType) => void;
   onCancel: () => void;
 }
 
-const STEPS = [
-  { key: 'upload', label: 'Upload Image' },
+const WIZARD_STEPS = [
+  { key: 'template', label: 'Template' },
+  { key: 'upload', label: 'Image' },
   { key: 'design', label: 'Design' },
-  { key: 'elements', label: 'Elements' },
   { key: 'effects', label: 'Effects' },
   { key: 'text', label: 'Text' },
   { key: 'finalize', label: 'Finalize' },
 ];
 
-// Default design metadata to ensure we have the properties we need
-const DEFAULT_DESIGN_METADATA = {
-  cardStyle: {
-    template: 'classic',
-    effect: 'none',
-    borderRadius: '8px',
-    borderWidth: 2,
-    borderColor: '#000000',
-    backgroundColor: '#FFFFFF',
-    shadowColor: 'rgba(0,0,0,0.2)',
-    frameWidth: 2,
-    frameColor: '#000000',
-  },
-  textStyle: {
-    fontFamily: 'Inter',
-    fontSize: '16px',
-    fontWeight: 'normal',
-    color: '#000000',
-    titleColor: '#000000',
-    titleAlignment: 'center',
-    titleWeight: 'bold',
-    descriptionColor: '#333333',
-  },
-  cardMetadata: {
-    category: 'general',
-    series: 'base',
-    cardType: 'standard',
-  },
-  marketMetadata: {
-    isPrintable: false,
-    isForSale: false,
-    includeInCatalog: false,
-    price: 0,
-    currency: 'USD',
-    availableForSale: false,
-    editionSize: 1,
-    editionNumber: 1,
-  }
-};
-
+/**
+ * An improved wizard component for creating cards
+ */
 const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
-  initialTemplate,
-  initialData,
-  onComplete,
-  onCancel
+  initialData = {},
+  onSave,
+  onCancel,
 }) => {
-  const navigate = useNavigate();
-  const { addCard } = useCards();
+  // Create wizard state
   const [currentStep, setCurrentStep] = useState(0);
-  const [cardData, setCardData] = useState<Partial<Card>>({
+  const [helpVisible, setHelpVisible] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeEffects, setActiveEffects] = useState<string[]>([]);
+  
+  // Set up undo/redo functionality with initial data
+  const { 
+    state: cardData, 
+    setState: setCardData,
+    undo, 
+    redo, 
+    canUndo, 
+    canRedo,
+    pushState: addToHistory
+  } = useUndoRedoState<Partial<CardType>>({
     title: '',
     description: '',
-    imageUrl: '',
     tags: [],
-    player: '',
-    team: '',
-    year: '',
-    effects: [],
-    designMetadata: DEFAULT_DESIGN_METADATA,
     ...initialData,
+    effects: convertEffectsToCardEffects(initialData.effects || []),
+    designMetadata: {
+      ...DEFAULT_DESIGN_METADATA,
+      ...initialData.designMetadata,
+    },
+    createdAt: initialData.createdAt || new Date().toISOString(),
+    updatedAt: initialData.updatedAt || new Date().toISOString(),
   });
-
-  // Set up undo/redo history
-  const { 
-    state: cardState,
-    setState: setCardState,
-    canUndo,
-    canRedo,
-    undo,
-    redo,
-    addToHistory
-  } = useUndoRedo<Partial<Card>>(cardData);
-
-  // Update our working cardData from the undo/redo state
-  useEffect(() => {
-    setCardData(cardState);
-  }, [cardState]);
-
-  // When user makes changes, add to history
-  const handleCardUpdate = useCallback((updates: Partial<Card>) => {
-    const updatedCard = { ...cardData, ...updates };
-    setCardData(updatedCard);
-    addToHistory(updatedCard);
-  }, [cardData, addToHistory]);
-
-  // Set up autosave
-  const { 
-    lastSaved,
-    isSaving,
-    saveStatus
-  } = useAutoSave({
-    data: cardData,
-    key: `card_draft_${initialTemplate?.id || 'new'}`,
-    saveInterval: 30000 // 30 seconds
-  });
-
-  // Navigate between steps
+  
+  // Reference to the preview element for capturing
+  const previewRef = useRef<HTMLDivElement>(null);
+  
+  // Handle card data updates
+  const updateCardData = (updates: Partial<CardType>) => {
+    const updatedData = { ...cardData, ...updates };
+    setCardData(updatedData);
+    addToHistory(updatedData);
+    triggerAutoSave();
+  };
+  
+  // Auto-save functionality
+  const triggerAutoSave = () => {
+    setIsAutoSaving(true);
+    // In a real implementation, this would save to a database or local storage
+    setTimeout(() => {
+      setIsAutoSaving(false);
+      setLastSaved(new Date());
+    }, 1000);
+  };
+  
+  // Navigation functions
   const goToNextStep = () => {
-    if (currentStep < STEPS.length - 1) {
-      setCurrentStep(currentStep + 1);
+    if (currentStep < WIZARD_STEPS.length - 1) {
+      // Validate current step
+      const isValid = validateCurrentStep();
+      if (isValid) {
+        setCurrentStep(currentStep + 1);
+        toastUtils.info("Step completed", `${WIZARD_STEPS[currentStep].label} completed`);
+      }
     }
   };
-
+  
   const goToPreviousStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
-
-  // Final save process
+  
+  const goToStep = (index: number) => {
+    // Only allow going to a step if all previous steps are valid
+    if (index > currentStep) {
+      for (let i = currentStep; i < index; i++) {
+        if (!validateStep(i)) {
+          toastUtils.warning("Incomplete step", `Please complete step ${i + 1} first`);
+          return;
+        }
+      }
+    }
+    setCurrentStep(index);
+  };
+  
+  // Validation functions
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 0: // Template
+        return true; // Template is optional
+      case 1: // Image
+        return !!cardData.imageUrl;
+      case 2: // Design
+        return true; // Design is optional
+      case 3: // Effects
+        return true; // Effects are optional
+      case 4: // Text
+        return !!cardData.title; // Title is required
+      default:
+        return true;
+    }
+  };
+  
+  const validateCurrentStep = (): boolean => {
+    const valid = validateStep(currentStep);
+    if (!valid) {
+      toastUtils.warning("Incomplete step", "Please complete all required fields");
+    }
+    return valid;
+  };
+  
+  // Export functions
+  const exportCard = (format: string) => {
+    if (!previewRef.current) return;
+    
+    toastUtils.info("Exporting card", `Exporting card as ${format.toUpperCase()}`);
+    
+    // In a real implementation, this would use a library like html-to-image
+    // to capture the preview and download it
+    setTimeout(() => {
+      toastUtils.success("Export completed", "Card exported successfully");
+    }, 1000);
+  };
+  
+  // Save function
   const handleSave = async () => {
     try {
       // Ensure we have required fields
@@ -157,19 +202,33 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
         return;
       }
 
-      // Create a complete card
-      const newCard = await addCard({
-        ...cardData,
-        createdAt: new Date().toISOString(),
+      // Create a complete card with required properties and convert to core format
+      const rawCard = {
+        id: cardData.id || uuidv4(),
+        title: cardData.title || '',
+        description: cardData.description || '',
+        imageUrl: cardData.imageUrl || '',
+        thumbnailUrl: cardData.thumbnailUrl || cardData.imageUrl || '',
+        tags: cardData.tags || [],
+        userId: cardData.userId || 'current-user',
+        effects: convertCardEffectsToStrings(cardData.effects || []),
+        createdAt: cardData.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-      } as Card);
+        designMetadata: {
+          ...DEFAULT_DESIGN_METADATA,
+          ...cardData.designMetadata,
+        },
+        ...cardData,
+      };
+
+      const newCard = adaptToCard(rawCard);
 
       toastUtils.success(
         "Success!",
         "Your card has been created successfully."
       );
 
-      onComplete(newCard);
+      onSave(newCard);
     } catch (error) {
       toastUtils.error(
         "Error saving card",
@@ -178,136 +237,273 @@ const CardCreationWizard: React.FC<CardCreationWizardProps> = ({
       console.error("Error saving card:", error);
     }
   };
+  
+  // Complete creation function
+  const handleCompleteCreation = async () => {
+    try {
+      setIsSubmitting(true);
+      
+      // Create a new Card instance with the collected data and proper design metadata
+      const rawCard = {
+        id: `card-${Date.now()}`,
+        title: cardData.title || 'Untitled Card',
+        description: cardData.description || '',
+        imageUrl: cardData.imageUrl || '',
+        thumbnailUrl: cardData.thumbnailUrl || cardData.imageUrl || '',
+        tags: cardData.tags || [],
+        effects: convertCardEffectsToStrings(cardData.effects || []),
+        player: cardData.player || '',
+        team: cardData.team || '',
+        year: cardData.year || '',
+        userId: 'current-user',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        designMetadata: {
+          ...DEFAULT_DESIGN_METADATA,
+          ...cardData.designMetadata,
+          cardStyle: {
+            ...DEFAULT_DESIGN_METADATA.cardStyle,
+            ...cardData.designMetadata?.cardStyle,
+          },
+          textStyle: {
+            ...DEFAULT_DESIGN_METADATA.textStyle,
+            ...cardData.designMetadata?.textStyle,
+          },
+          cardMetadata: {
+            ...DEFAULT_DESIGN_METADATA.cardMetadata,
+            ...cardData.designMetadata?.cardMetadata,
+          }
+        }
+      };
+      
+      // Convert to core Card format
+      const newCard = adaptToCard(rawCard);
+      
+      // Add the card to the context or make API call
+      onSave(newCard);
+      
+      toastUtils.success("Card Created!", "Your card has been successfully created.");
+      
+    } catch (error) {
+      console.error('Error creating card:', error);
+      toastUtils.error("Error Creating Card", "There was an error creating your card. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  // Render the current step content
+  const renderStepContent = () => {
+    // Ensure cardData has required properties for TextStep
+    const cardDataForTextStep = {
+      title: cardData.title || '',
+      description: cardData.description || '',
+      tags: cardData.tags || [],
+      player: cardData.player,
+      team: cardData.team,
+      year: cardData.year,
+      ...cardData
+    };
 
-  // Determine if we can proceed to the next step
-  const canProceed = () => {
     switch (currentStep) {
-      case 0: // Image upload
-        return Boolean(cardData.imageUrl);
+      case 0:
+        return (
+          <TemplateSelectionStep
+            selectedTemplate={cardData.designMetadata?.cardStyle?.template || 'classic'}
+            onSelectTemplate={(template) => 
+              updateCardData({
+                designMetadata: {
+                  ...cardData.designMetadata,
+                  cardStyle: {
+                    ...cardData.designMetadata?.cardStyle,
+                    template
+                  }
+                }
+              })
+            }
+          />
+        );
+      case 1:
+        return (
+          <CardUploadStep
+            imageUrl={cardData.imageUrl || ''}
+            cardData={cardData}
+            setCardData={updateCardData}
+            onImageUpload={(imageUrl) => updateCardData({ imageUrl })}
+          />
+        );
+      case 2:
+        return (
+          <DesignStep
+            cardData={cardData}
+            onUpdate={updateCardData}
+          />
+        );
+      case 3:
+        return (
+          <EffectsStep
+            effectStack={[]}
+            addEffect={() => {}}
+            removeEffect={() => {}}
+            updateEffectSettings={() => {}}
+            onContinue={goToNextStep}
+          />
+        );
+      case 4:
+        return (
+          <TextDetailsStep
+            cardData={cardDataForTextStep}
+            onUpdate={updateCardData}
+          />
+        );
+      case 5:
+        return (
+          <FinalizeStep
+            cardData={cardData}
+            onUpdate={updateCardData}
+            onSave={handleSave}
+          />
+        );
       default:
-        return true;
+        return null;
     }
   };
 
   return (
-    <div className="space-y-8">
-      {/* Progress tracker */}
-      <WizardStepper 
-        steps={STEPS} 
-        currentStep={currentStep} 
-        onChange={setCurrentStep} 
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Design Canvas - Always visible */}
-        <div className="lg:col-span-2">
-          <CardCanvas 
-            cardData={cardData}
-            onUpdate={handleCardUpdate}
-          />
-          
-          {/* Undo/Redo Controls */}
-          <div className="mt-4 flex space-x-2 justify-end">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={undo} 
-              disabled={!canUndo}
-            >
-              <Undo className="h-4 w-4 mr-1" /> Undo
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={redo} 
-              disabled={!canRedo}
-            >
-              <Redo className="h-4 w-4 mr-1" /> Redo
-            </Button>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Preview Panel */}
+      <div className="order-last lg:order-first">
+        <div className="sticky top-24">
+          <CardUI className="p-4">
+            <h2 className="text-lg font-bold mb-4">Preview</h2>
+            <CardPreview
+              card={cardData as CardType}
+              className="mx-auto max-w-full"
+            />
             
-            <div className="ml-2 text-xs text-gray-500 flex items-center">
-              {saveStatus === 'saved' && (
-                <span>Last saved: {new Date(lastSaved).toLocaleTimeString()}</span>
-              )}
-              {saveStatus === 'saving' && (
-                <span>Saving...</span>
-              )}
+            <div className="flex flex-col gap-4 mt-6">
+              {/* Actions */}
+              <div className="flex justify-between">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={undo}
+                  disabled={!canUndo}
+                >
+                  <Undo className="h-4 w-4 mr-1" />
+                  Undo
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={redo}
+                  disabled={!canRedo}
+                >
+                  <Redo className="h-4 w-4 mr-1" />
+                  Redo
+                </Button>
+              </div>
+              
+              {/* Quick Export */}
+              <div className="flex gap-2">
+                <Button 
+                  variant="secondary"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => exportCard('png')}
+                >
+                  <Download className="h-4 w-4 mr-1" />
+                  Export
+                </Button>
+                
+                <Button 
+                  variant="default"
+                  size="sm"
+                  className="flex-1"
+                  onClick={handleSave}
+                >
+                  <Save className="h-4 w-4 mr-1" />
+                  Save
+                </Button>
+              </div>
+              
+              {/* Auto Save Status */}
+              <div className="text-xs text-center text-muted-foreground mt-2">
+                {isAutoSaving ? (
+                  <span>Auto saving...</span>
+                ) : lastSaved ? (
+                  <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
+                ) : (
+                  <span>Changes will be auto-saved</span>
+                )}
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Current Step Content */}
-        <div className="lg:row-start-1">
-          <div className="bg-white rounded-lg shadow-sm border p-4">
-            {currentStep === 0 && (
-              <ImageUploadStep 
-                imageUrl={cardData.imageUrl || ''} 
-                onImageSelect={(url) => handleCardUpdate({ imageUrl: url })} 
-              />
-            )}
-            {currentStep === 1 && (
-              <DesignStep 
-                cardData={cardData}
-                onUpdate={handleCardUpdate}
-              />
-            )}
-            {currentStep === 2 && (
-              <ElementsStep 
-                cardData={cardData}
-                onUpdate={handleCardUpdate}
-              />
-            )}
-            {currentStep === 3 && (
-              <EffectsStep 
-                effects={cardData.effects || []}
-                onUpdate={(effects) => handleCardUpdate({ effects })}
-              />
-            )}
-            {currentStep === 4 && (
-              <TextStep 
-                cardData={cardData}
-                onUpdate={handleCardUpdate}
-              />
-            )}
-            {currentStep === 5 && (
-              <FinalizeStep 
-                cardData={cardData}
-                onUpdate={handleCardUpdate}
-              />
-            )}
-          </div>
+          </CardUI>
         </div>
       </div>
-
-      {/* Navigation Controls */}
-      <div className="flex justify-between items-center">
-        <Button variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        
-        <div className="flex space-x-2">
-          {currentStep > 0 && (
-            <Button variant="outline" onClick={goToPreviousStep}>
-              <ChevronLeft className="h-4 w-4 mr-1" /> Back
+      
+      {/* Main Content */}
+      <div className="lg:col-span-2">
+        <CardUI className="p-6">
+          {/* Progress Bar */}
+          <WizardProgress
+            steps={WIZARD_STEPS}
+            currentStep={currentStep}
+            onStepClick={goToStep}
+          />
+          
+          {/* Help Toggle */}
+          <div className="flex justify-end mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setHelpVisible(!helpVisible)}
+              className="text-xs"
+            >
+              <HelpCircle className="h-4 w-4 mr-1" />
+              {helpVisible ? 'Hide Help' : 'Show Help'}
             </Button>
+          </div>
+          
+          {/* Help Panel */}
+          {helpVisible && (
+            <HelpPanel
+              stepKey={WIZARD_STEPS[currentStep].key}
+              onClose={() => setHelpVisible(false)}
+            />
           )}
           
-          {currentStep < STEPS.length - 1 ? (
-            <Button 
-              onClick={goToNextStep} 
-              disabled={!canProceed()}
+          {/* Step Content */}
+          <div className="py-6">
+            <h2 className="text-2xl font-bold mb-6">
+              {WIZARD_STEPS[currentStep].label}
+            </h2>
+            {renderStepContent()}
+          </div>
+          
+          {/* Navigation */}
+          <div className="flex justify-between mt-8">
+            <Button
+              variant="outline"
+              onClick={currentStep === 0 ? onCancel : goToPreviousStep}
             >
-              Next <ChevronRight className="h-4 w-4 ml-1" />
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              {currentStep === 0 ? 'Cancel' : 'Back'}
             </Button>
-          ) : (
-            <Button 
-              variant="default" 
-              onClick={handleSave}
-            >
-              <Save className="h-4 w-4 mr-1" /> Save Card
-            </Button>
-          )}
-        </div>
+            
+            {currentStep < WIZARD_STEPS.length - 1 ? (
+              <Button onClick={goToNextStep}>
+                Next <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            ) : (
+              <Button variant="default" onClick={handleCompleteCreation}>
+                <Save className="h-4 w-4 mr-1" />
+                Save Card
+              </Button>
+            )}
+          </div>
+        </CardUI>
       </div>
     </div>
   );

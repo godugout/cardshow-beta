@@ -4,6 +4,7 @@ import CardUpload from './home/CardUpload';
 import CardCollection from './home/CardCollection';
 import CardShowcase from './home/CardShowcase';
 import { cardData } from '@/data/cardData';
+import { adaptToCard } from '@/lib/adapters/cardAdapter';
 
 const OldCardCreator: React.FC = () => {
   const [view, setView] = useState<'showcase' | 'collection' | 'upload'>('collection');
@@ -18,6 +19,9 @@ const OldCardCreator: React.FC = () => {
   const flipCard = () => {
     setIsFlipped(!isFlipped);
   };
+
+  // Convert cardData to core Card format
+  const adaptedCardData = cardData.map(card => adaptToCard(card));
   
   return (
     <div className="bg-white rounded-lg shadow-md p-4">
@@ -27,7 +31,7 @@ const OldCardCreator: React.FC = () => {
       
       {view === 'collection' && (
         <CardCollection 
-          cards={cardData} 
+          cards={adaptedCardData} 
           onCardClick={selectCard} 
           className=""
         />
@@ -35,7 +39,7 @@ const OldCardCreator: React.FC = () => {
       
       {view === 'showcase' && (
         <CardShowcase 
-          cardData={cardData}
+          cardData={adaptedCardData}
           activeCard={activeCard}
           isFlipped={isFlipped}
           selectCard={selectCard}

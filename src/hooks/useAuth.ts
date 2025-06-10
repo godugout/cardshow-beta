@@ -95,6 +95,7 @@ export const useAuth = (): AuthContextType => {
     session,
     error,
     loading,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
+    isLoading: loading // Added missing property
   };
 };
