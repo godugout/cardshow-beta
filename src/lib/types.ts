@@ -1,23 +1,11 @@
 
-// Re-export all types from the consolidated core module
+// Re-export everything from core types
 export * from './types/core';
+export * from './types/unifiedCardTypes';
+export * from './types/cardTypes';
 
-// Legacy compatibility exports
-export type { Card as CardData } from './types/core';
-export type { Collection as CollectionData } from './types/core';
+// Additional exports for backward compatibility
+export type { OaklandMemoryData, FabricSwatch, InstagramPost } from './types/cardTypes';
 
-// Utility function for serializing metadata
-export const serializeMetadata = (metadata: any): JsonObject => {
-  if (!metadata) return {};
-  
-  try {
-    // Ensure the metadata is a valid JSON object
-    return typeof metadata === 'object' ? metadata : {};
-  } catch (error) {
-    console.warn('Failed to serialize metadata:', error);
-    return {};
-  }
-};
-
-// Re-export the ROLE_PERMISSIONS constant
-export { ROLE_PERMISSIONS } from './types/core';
+// Re-export CardEffect from core to ensure consistency
+export type { CardEffect } from './types/core';

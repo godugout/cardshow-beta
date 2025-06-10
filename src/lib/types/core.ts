@@ -200,6 +200,16 @@ export interface Card extends BaseEntity {
   cardNumber?: string;
   backgroundColor?: string;
   specialEffect?: string;
+  // Additional properties some components expect
+  fabricSwatches?: Array<{
+    type: string;
+    team: string;
+    year: string;
+    manufacturer: string;
+    position: string;
+    size: string;
+  }>;
+  viewCount?: number;
 }
 
 // Collection visibility and permissions

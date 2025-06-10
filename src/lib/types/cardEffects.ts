@@ -1,4 +1,7 @@
 
+// Use the unified CardEffect from core types
+export type { CardEffect } from './core';
+
 export interface CardEffectSettings {
   intensity?: number;
   speed?: number;
@@ -6,14 +9,6 @@ export interface CardEffectSettings {
   color?: string;
   animationEnabled?: boolean;
   [key: string]: any;
-}
-
-export interface CardEffect {
-  id: string;
-  name: string;
-  enabled: boolean;
-  settings: CardEffectSettings;
-  className?: string;
 }
 
 export interface PremiumCardEffect {

@@ -1,7 +1,7 @@
 
 import { useRef } from 'react';
 import { EffectEngine, CardEffectSettings } from '@/hooks/card-effects/types';
-import { CardEffect } from '@/lib/types/cardEffects';
+import { CardEffect } from '@/lib/types/core';
 
 /**
  * Create a default implementation of the EffectEngine

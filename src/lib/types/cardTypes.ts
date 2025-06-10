@@ -16,9 +16,25 @@ export type {
   DesignMetadata,
   MarketMetadata,
   CardTemplate,
-  UnifiedCard,
-  CardEffect
+  UnifiedCard
 } from './unifiedCardTypes';
+
+// Use the unified CardEffect from core types
+export type { CardEffect } from './core';
+
+/**
+ * Instagram Post interface
+ */
+export interface InstagramPost {
+  id: string;
+  imageUrl: string;
+  caption: string;
+  timestamp: string;
+  likes: number;
+  comments: number;
+  username: string;
+  avatarUrl?: string;
+}
 
 /**
  * Hotspot data for interactive cards
@@ -142,7 +158,7 @@ export interface Reaction {
   userId: string;
   targetType: 'card' | 'comment' | 'collection';
   targetId: string;
-  type: 'like' | 'heart' | 'star' | 'thumbs_up' | 'thumbs_down'; // Updated to match core
+  type: 'like' | 'heart' | 'star' | 'thumbs_up' | 'thumbs_down' | 'love' | 'wow' | 'haha' | 'sad' | 'angry';
   createdAt: string;
   updatedAt: string;
   user?: User;

@@ -90,7 +90,9 @@ export function adaptToCard(card: any): CoreCard {
     cardType: card.cardType,
     cardNumber: card.cardNumber,
     backgroundColor: card.backgroundColor,
-    specialEffect: card.specialEffect
+    specialEffect: card.specialEffect,
+    fabricSwatches: card.fabricSwatches || [],
+    viewCount: card.viewCount || 0
   };
 }
 

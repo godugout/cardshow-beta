@@ -119,5 +119,5 @@ export interface PreviewGenerator {
   generatePreview(card: any, effects: CardEffect[]): ReactNode;
 }
 
-// Re-export CardEffect and related types
+// Re-export CardEffect and related types from core
 export type { CardEffect, CardEffectSettings };
