@@ -1,180 +1,184 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { Card, CardEffect } from '@/lib/types';
+import { cardEffectsToStringArray } from '@/lib/utils/cardEffectHelpers';
 import PageLayout from '@/components/navigation/PageLayout';
-import { useCards } from '@/context/CardContext';
-import { Card } from '@/lib/types/cardTypes';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Share, Heart, MessageCircle, Download } from 'lucide-react';
+import { Share2, Download, Heart, Star, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useCards } from '@/context/CardContext';
+import CardViewer from '@/components/card-viewer/CardViewer';
+import CardDetails from '@/components/cards/CardDetails';
+import RelatedCards from '@/components/cards/RelatedCards';
+import { toast } from 'sonner';
 
-const CardView: React.FC = () => {
+const CardView = () => {
   const { id } = useParams<{ id: string }>();
-  const { getCardById } = useCards();
   const [card, setCard] = useState<Card | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isFavorited, setIsFavorited] = useState(false);
   const navigate = useNavigate();
+  const { getCard } = useCards();
 
   useEffect(() => {
-    if (id) {
-      try {
-        const cardData = getCardById(id);
-        setCard(cardData || null);
-      } catch (error) {
-        console.error("Error loading card:", error);
-      } finally {
-        setLoading(false);
-      }
+    if (!id) {
+      setError('No card ID provided');
+      setIsLoading(false);
+      return;
     }
-  }, [id, getCardById]);
 
-  if (loading) {
+    try {
+      const cardData = getCard(id);
+      if (cardData) {
+        setCard(cardData);
+        // Check if card is in favorites (could be from localStorage or API)
+        const favorites = JSON.parse(localStorage.getItem('favoriteCards') || '[]');
+        setIsFavorited(favorites.includes(id));
+      } else {
+        setError('Card not found');
+      }
+    } catch (err) {
+      console.error('Error fetching card:', err);
+      setError('Failed to load card');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id, getCard]);
+
+  const getEffectClasses = (effects: CardEffect[]) => {
+    return cardEffectsToStringArray(effects)
+      .map(effect => `effect-${effect.toLowerCase()}`)
+      .join(' ');
+  };
+
+  const handleShare = () => {
+    if (navigator.share && card) {
+      navigator.share({
+        title: card.title,
+        text: card.description,
+        url: window.location.href,
+      }).catch(err => {
+        console.error('Error sharing:', err);
+        toast.error('Failed to share card');
+      });
+    } else {
+      // Fallback for browsers that don't support navigator.share
+      navigator.clipboard.writeText(window.location.href);
+      toast.success('Link copied to clipboard');
+    }
+  };
+
+  const handleDownload = () => {
+    if (!card) return;
+    
+    // This is a placeholder for actual download functionality
+    toast.success('Card download started');
+    
+    // In a real app, you would generate a downloadable image or PDF here
+    setTimeout(() => {
+      toast.info('Download feature coming soon!');
+    }, 1000);
+  };
+
+  const toggleFavorite = () => {
+    if (!card) return;
+    
+    const favorites = JSON.parse(localStorage.getItem('favoriteCards') || '[]');
+    
+    if (isFavorited) {
+      const updatedFavorites = favorites.filter((favId: string) => favId !== id);
+      localStorage.setItem('favoriteCards', JSON.stringify(updatedFavorites));
+      setIsFavorited(false);
+      toast.success('Removed from favorites');
+    } else {
+      favorites.push(id);
+      localStorage.setItem('favoriteCards', JSON.stringify(favorites));
+      setIsFavorited(true);
+      toast.success('Added to favorites');
+    }
+  };
+
+  if (isLoading) {
     return (
       <PageLayout title="Loading Card" description="Please wait...">
-        <div className="container mx-auto py-8 flex items-center justify-center min-h-[60vh]">
-          <div className="animate-pulse flex flex-col items-center gap-4">
-            <div className="w-64 h-96 bg-gray-200 rounded-lg"></div>
-            <div className="h-6 w-48 bg-gray-200 rounded"></div>
-          </div>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       </PageLayout>
     );
   }
 
-  if (!card) {
+  if (error || !card) {
     return (
-      <PageLayout title="Card Not Found" description="The requested card could not be found">
-        <div className="container mx-auto py-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">Card Not Found</h2>
-            <p className="text-gray-500 mb-6">
-              The card you're looking for doesn't exist or has been removed.
-            </p>
-            <Button onClick={() => navigate('/gallery')}>
-              Return to Gallery
-            </Button>
-          </div>
+      <PageLayout title="Error" description="Could not load card">
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            {error || 'Card not found'}
+          </h2>
+          <Button onClick={() => navigate('/cards')}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Cards
+          </Button>
         </div>
       </PageLayout>
     );
   }
-
-  // Effects classes based on card's applied effects
-  const getEffectClasses = () => {
-    if (!card.effects || card.effects.length === 0) return '';
-    return card.effects.map(effect => effect.toLowerCase().replace(' ', '-')).join(' ');
-  };
 
   return (
     <PageLayout
       title={card.title}
-      description={card.description || 'Card Details'}
+      description={card.description}
+      showBackButton
+      backButtonUrl="/cards"
     >
-      <div className="container mx-auto py-8">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="mb-6"
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back
-        </Button>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Card Display */}
-          <div className="md:col-span-2 flex justify-center">
-            <div 
-              className={`relative max-w-md aspect-[2.5/3.5] rounded-lg overflow-hidden shadow-xl ${getEffectClasses()}`}
-              style={{
-                borderRadius: card.designMetadata?.cardStyle?.borderRadius || '8px',
-                borderColor: card.designMetadata?.cardStyle?.borderColor || '#000',
-                borderWidth: '2px',
-                borderStyle: 'solid',
-              }}
-            >
-              <img 
-                src={card.imageUrl} 
-                alt={card.title}
-                className="w-full h-full object-cover"
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Card Viewer */}
+          <div className="lg:col-span-2">
+            <div className="bg-gray-100 rounded-lg p-4 flex justify-center">
+              <CardViewer 
+                card={card} 
+                effectClasses={getEffectClasses(card.effects)}
               />
-              
-              {/* Overlays and effects could be added here */}
+            </div>
+            
+            {/* Action buttons */}
+            <div className="flex justify-center mt-6 space-x-4">
+              <Button variant="outline" onClick={handleShare}>
+                <Share2 className="mr-2 h-4 w-4" /> Share
+              </Button>
+              <Button variant="outline" onClick={handleDownload}>
+                <Download className="mr-2 h-4 w-4" /> Download
+              </Button>
+              <Button 
+                variant={isFavorited ? "default" : "outline"}
+                onClick={toggleFavorite}
+              >
+                {isFavorited ? (
+                  <>
+                    <Heart className="mr-2 h-4 w-4 fill-current" /> Favorited
+                  </>
+                ) : (
+                  <>
+                    <Heart className="mr-2 h-4 w-4" /> Add to Favorites
+                  </>
+                )}
+              </Button>
             </div>
           </div>
           
           {/* Card Details */}
           <div>
-            <h1 className="text-3xl font-bold mb-2">{card.title}</h1>
-            {card.description && (
-              <p className="text-gray-700 mb-4">{card.description}</p>
-            )}
-            
-            {/* Meta Information */}
-            <div className="space-y-4 mb-6">
-              {card.player && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Player</h3>
-                  <p className="text-lg">{card.player}</p>
-                </div>
-              )}
-              
-              {card.team && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Team</h3>
-                  <p className="text-lg">{card.team}</p>
-                </div>
-              )}
-              
-              {card.year && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Year</h3>
-                  <p className="text-lg">{card.year}</p>
-                </div>
-              )}
-            </div>
-            
-            {/* Tags */}
-            {card.tags && card.tags.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Tags</h3>
-                <div className="flex flex-wrap gap-2">
-                  {card.tags.map((tag, index) => (
-                    <span 
-                      key={index}
-                      className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {/* Action buttons */}
-            <div className="flex flex-wrap gap-2 mt-8">
-              <Button variant="outline" size="sm">
-                <Heart className="h-4 w-4 mr-2" />
-                Like
-              </Button>
-              <Button variant="outline" size="sm">
-                <MessageCircle className="h-4 w-4 mr-2" />
-                Comment
-              </Button>
-              <Button variant="outline" size="sm">
-                <Share className="h-4 w-4 mr-2" />
-                Share
-              </Button>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Download
-              </Button>
-            </div>
-            
-            {/* Created date */}
-            <p className="text-xs text-gray-500 mt-6">
-              Created: {new Date(card.createdAt).toLocaleDateString()}
-            </p>
+            <CardDetails card={card} />
           </div>
+        </div>
+        
+        {/* Related Cards */}
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold mb-6 flex items-center">
+            <Star className="mr-2 h-5 w-5 text-yellow-500" /> Related Cards
+          </h2>
+          <RelatedCards currentCardId={card.id} tags={card.tags} />
         </div>
       </div>
     </PageLayout>

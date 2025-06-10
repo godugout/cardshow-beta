@@ -1,6 +1,6 @@
-
 import { TeamMember } from '@/lib/types';
-import { mapTeamMemberData } from './mappers';
+import { mapTeamMember } from './mappers';
+import { supabase } from '@/integrations/supabase/client';
 
 export const teamMembersService = {
   async getTeamMembers(teamId: string): Promise<TeamMember[]> {
@@ -18,7 +18,7 @@ export const teamMembersService = {
       permissions: []
     };
     
-    return mapTeamMemberData(memberData);
+    return mapTeamMember(memberData);
   },
 
   async removeTeamMember(teamId: string, userId: string): Promise<void> {
@@ -35,7 +35,7 @@ export const teamMembersService = {
       permissions: []
     };
     
-    return mapTeamMemberData(memberData);
+    return mapTeamMember(memberData);
   }
 };
 

@@ -53,9 +53,9 @@ export const teamService = {
     const insertData = {
       name: teamData.name,
       description: teamData.description,
-      logoUrl: teamData.logoUrl,
-      ownerId: teamData.ownerId,
-      isActive: teamData.isActive,
+      logo_url: teamData.logoUrl, // Use snake_case for database
+      owner_id: teamData.ownerId, // Use snake_case for database
+      is_active: teamData.isActive,
       visibility: teamData.visibility,
       banner_url: teamData.banner_url,
     };
@@ -78,8 +78,8 @@ export const teamService = {
     const updateData: Record<string, any> = {
       name: updates.name,
       description: updates.description,
-      logoUrl: updates.logoUrl,
-      isActive: updates.isActive,
+      logo_url: updates.logoUrl, // Use snake_case for database
+      is_active: updates.isActive,
       visibility: updates.visibility,
       banner_url: updates.banner_url,
     };

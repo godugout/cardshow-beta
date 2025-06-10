@@ -28,6 +28,7 @@ export type {
 // Helper function to convert between Card and CardData types
 import { Card as CardType } from './cardTypes';
 import { DEFAULT_DESIGN_METADATA } from '../utils/cardDefaults';
+import { cardEffectsToStringArray } from '../utils/cardEffectHelpers';
 
 export interface CardData {
   id: string;
@@ -37,7 +38,7 @@ export interface CardData {
   thumbnailUrl: string;
   tags: string[];
   userId: string;
-  effects: string[];
+  effects: string[]; // Keep as string[] for backward compatibility
   createdAt: string;
   updatedAt: string;
   backgroundColor?: string;
@@ -93,7 +94,7 @@ export function adaptCardToCardData(card: CardType): CardData {
     thumbnailUrl: card.thumbnailUrl,
     tags: card.tags,
     userId: card.userId,
-    effects: card.effects,
+    effects: cardEffectsToStringArray(card.effects), // Convert CardEffect[] to string[]
     createdAt: card.createdAt,
     updatedAt: card.updatedAt,
     name: card.player || card.name,
@@ -106,6 +107,24 @@ export function adaptCardToCardData(card: CardType): CardData {
     cardNumber: card.cardNumber,
     backgroundColor: card.backgroundColor,
     specialEffect: card.specialEffect,
-    designMetadata: card.designMetadata || DEFAULT_DESIGN_METADATA
+    designMetadata: {
+      cardStyle: {
+        template: card.designMetadata.cardStyle.template || 'classic',
+        effect: card.designMetadata.cardStyle.effect || 'none',
+        borderRadius: card.designMetadata.cardStyle.borderRadius || '8px',
+        borderColor: card.designMetadata.cardStyle.borderColor || '#000000',
+        frameColor: card.designMetadata.cardStyle.frameColor || '#000000',
+        frameWidth: card.designMetadata.cardStyle.frameWidth || 2,
+        shadowColor: card.designMetadata.cardStyle.shadowColor || 'rgba(0,0,0,0.3)',
+      },
+      textStyle: {
+        titleColor: card.designMetadata.textStyle.titleColor || '#000000',
+        titleAlignment: card.designMetadata.textStyle.titleAlignment || 'center',
+        titleWeight: card.designMetadata.textStyle.titleWeight || 'bold',
+        descriptionColor: card.designMetadata.textStyle.descriptionColor || '#666666',
+      },
+      cardMetadata: card.designMetadata.cardMetadata,
+      marketMetadata: card.designMetadata.marketMetadata
+    }
   };
 }

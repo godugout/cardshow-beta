@@ -1,85 +1,159 @@
 import React from 'react';
-import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
-import type { Card } from '@/lib/types/unifiedCardTypes';
+import { Card, CardEffect } from '@/lib/types';
+import { stringToCardEffect } from '@/lib/utils/cardEffectHelpers';
 
-const showcaseCards: Card[] = [
-  {
-    id: 'showcase-1',
-    title: 'Legendary Hero',
-    description: 'A powerful warrior from ancient times',
-    imageUrl: '/placeholder.svg',
-    thumbnailUrl: '/placeholder.svg',
-    tags: ['legendary', 'warrior'],
-    userId: 'showcase-user',
-    effects: ['holographic'],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    designMetadata: DEFAULT_DESIGN_METADATA,
-    player: 'Hero Name',
-    team: 'Ancient Warriors',
-    year: '2024'
-  },
-  {
-    id: 'showcase-2',
-    title: 'Futuristic Cityscape',
-    description: 'A vibrant metropolis of the future',
-    imageUrl: '/placeholder.svg',
-    thumbnailUrl: '/placeholder.svg',
-    tags: ['futuristic', 'cityscape'],
-    userId: 'showcase-user',
-    effects: ['chrome'],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    designMetadata: DEFAULT_DESIGN_METADATA,
-    player: 'City Name',
-    team: 'Future Dwellers',
-    year: '2222'
-  },
-  {
-    id: 'showcase-3',
-    title: 'Mystical Forest',
-    description: 'An enchanted woodland with hidden secrets',
-    imageUrl: '/placeholder.svg',
-    thumbnailUrl: '/placeholder.svg',
-    tags: ['mystical', 'forest'],
-    userId: 'showcase-user',
-    effects: ['vintage'],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    designMetadata: DEFAULT_DESIGN_METADATA,
-    player: 'Forest Spirit',
-    team: 'Guardians of the Wood',
-    year: 'Ancient'
-  }
-];
+const CardShowcase = () => {
+  const sampleCards: Card[] = [
+    {
+      id: '1',
+      title: 'Holographic Baseball Card',
+      description: 'A stunning holographic effect baseball card',
+      imageUrl: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390',
+      effects: [stringToCardEffect('holographic')],
+      userId: '1',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      designMetadata: {
+        cardStyle: {
+          template: 'classic',
+          effect: 'holographic',
+          borderRadius: '8px',
+          borderColor: '#d4af37',
+          frameColor: '#d4af37',
+          frameWidth: 2,
+          shadowColor: 'rgba(212, 175, 55, 0.3)',
+        },
+        textStyle: {
+          titleColor: '#1a202c',
+          titleAlignment: 'center',
+          titleWeight: 'bold',
+          descriptionColor: '#4a5568',
+        },
+        cardMetadata: {
+          category: 'sports',
+          series: 'upper-deck-1989',
+          cardType: 'rookie',
+          cardNumber: '1',
+          artist: 'Upper Deck',
+          rarity: 'legendary'
+        },
+        marketMetadata: {
+          isPrintable: true,
+          isForSale: false,
+          includeInCatalog: true,
+          price: 299.99,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1000,
+          editionNumber: 1
+        }
+      }
+    },
+    {
+      id: '2',
+      title: 'Chrome Basketball Card',
+      description: 'Premium chrome finish basketball card',
+      imageUrl: 'https://images.unsplash.com/photo-1518063319789-7217e6706b04',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1518063319789-7217e6706b04',
+      effects: [stringToCardEffect('chrome')],
+      userId: '2',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      designMetadata: {
+        cardStyle: {
+          template: 'classic',
+          effect: 'chrome',
+          borderRadius: '8px',
+          borderColor: '#d4af37',
+          frameColor: '#d4af37',
+          frameWidth: 2,
+          shadowColor: 'rgba(212, 175, 55, 0.3)',
+        },
+        textStyle: {
+          titleColor: '#1a202c',
+          titleAlignment: 'center',
+          titleWeight: 'bold',
+          descriptionColor: '#4a5568',
+        },
+        cardMetadata: {
+          category: 'sports',
+          series: 'upper-deck-1989',
+          cardType: 'rookie',
+          cardNumber: '1',
+          artist: 'Upper Deck',
+          rarity: 'legendary'
+        },
+        marketMetadata: {
+          isPrintable: true,
+          isForSale: false,
+          includeInCatalog: true,
+          price: 299.99,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1000,
+          editionNumber: 1
+        }
+      }
+    },
+    {
+      id: '3',
+      title: 'Refractor Football Card',
+      description: 'Rare refractor football card with prismatic effects',
+      imageUrl: 'https://images.unsplash.com/photo-1508344928928-7165b67de128',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1508344928928-7165b67de128',
+      effects: [stringToCardEffect('refractor')],
+      userId: '3',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      designMetadata: {
+        cardStyle: {
+          template: 'classic',
+          effect: 'refractor',
+          borderRadius: '8px',
+          borderColor: '#d4af37',
+          frameColor: '#d4af37',
+          frameWidth: 2,
+          shadowColor: 'rgba(212, 175, 55, 0.3)',
+        },
+        textStyle: {
+          titleColor: '#1a202c',
+          titleAlignment: 'center',
+          titleWeight: 'bold',
+          descriptionColor: '#4a5568',
+        },
+        cardMetadata: {
+          category: 'sports',
+          series: 'upper-deck-1989',
+          cardType: 'rookie',
+          cardNumber: '1',
+          artist: 'Upper Deck',
+          rarity: 'legendary'
+        },
+        marketMetadata: {
+          isPrintable: true,
+          isForSale: false,
+          includeInCatalog: true,
+          price: 299.99,
+          currency: 'USD',
+          availableForSale: false,
+          editionSize: 1000,
+          editionNumber: 1
+        }
+      }
+    }
+  ];
 
-const CardShowcase: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-4">Card Showcase</h1>
-        <p className="text-muted-foreground">Discover amazing card designs and effects</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {showcaseCards.map((card) => (
-          <div key={card.id} className="group cursor-pointer">
-            <div className="aspect-[2.5/3.5] relative overflow-hidden rounded-lg bg-gray-100 transition-transform group-hover:scale-105">
-              <img
-                src={card.imageUrl}
-                alt={card.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <h3 className="font-bold text-lg">{card.title}</h3>
-                  <p className="text-sm opacity-90">{card.description}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div>
+      <h1>Card Showcase</h1>
+      {sampleCards.map(card => (
+        <div key={card.id}>
+          <h2>{card.title}</h2>
+          <p>{card.description}</p>
+          <img src={card.imageUrl} alt={card.title} style={{ width: '200px' }} />
+        </div>
+      ))}
     </div>
   );
 };

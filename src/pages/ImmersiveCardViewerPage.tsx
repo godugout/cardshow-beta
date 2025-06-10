@@ -1,239 +1,281 @@
-
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card as CardUI } from '@/components/ui/card';
+import { useParams } from 'react-router-dom';
+import { Card, CardEffect } from '@/lib/types';
+import { useCards } from '@/hooks/useCards';
+import { cardEffectsToStringArray, stringArrayToCardEffects } from '@/lib/utils/cardEffectHelpers';
+import PageLayout from '@/components/navigation/PageLayout';
+import ImmersiveCardViewer from '@/components/card-viewer/ImmersiveCardViewer';
 import { Button } from '@/components/ui/button';
-import { useCards } from '@/context/CardContext';
-import { useCardEffects } from '@/hooks/card-effects/useCardEffects';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Sparkles, Layers, Settings, Download, Share } from 'lucide-react';
 import { toast } from 'sonner';
-import { 
-  ArrowLeft, 
-  Download, 
-  Share2, 
-  RotateCw, 
-  Shuffle,
-  Play,
-  Pause
-} from 'lucide-react';
-import ImmersiveCardViewer from '@/components/immersive/ImmersiveCardViewer';
-import EffectsPanel from '@/components/immersive/EffectsPanel';
-import { Card } from '@/lib/types/unifiedCardTypes';
+import sampleCards from '@/lib/data/sampleCardData';
 
 const ImmersiveCardViewerPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { cards, getCardById } = useCards();
-  
-  const [card, setCard] = useState<Card | null>(null);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [isAutoRotating, setIsAutoRotating] = useState(false);
-  const [rotationSpeed, setRotationSpeed] = useState(2);
-  
-  const {
-    availableEffects,
-    activeEffects,
-    setActiveEffects,
-    toggleEffect,
-    applyEffect,
-    removeEffect,
-    isEffectActive,
-    getEffectIntensity,
-    setEffectIntensity,
-  } = useCardEffects();
+  const { cards, isLoading } = useCards();
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [activeEffects, setActiveEffects] = useState<string[]>(['Holographic']);
+  const [effectIntensities, setEffectIntensities] = useState<Record<string, number>>({
+    'Holographic': 0.7,
+    'Refractor': 0.6,
+    'Prismatic': 0.8,
+    'Chrome': 0.5,
+    'Vintage': 0.4
+  });
 
+  // Find card by ID from URL params or use first sample card
   useEffect(() => {
     if (id) {
-      const foundCard = getCardById(id);
+      const foundCard = cards.find(card => card.id === id) || 
+                        sampleCards.find(card => card.id === id);
+      
       if (foundCard) {
-        setCard(foundCard);
-        // Apply any existing effects from the card
+        setSelectedCard(foundCard);
+        
+        // Extract effects from card
         if (foundCard.effects && foundCard.effects.length > 0) {
-          setActiveEffects(foundCard.effects);
+          const effectStrings = cardEffectsToStringArray(foundCard.effects);
+          setActiveEffects(effectStrings);
         }
-      } else {
-        toast.error("Card not found", {
-          description: "The requested card could not be found.",
-        });
-        navigate('/gallery');
+      } else if (!isLoading) {
+        toast.error('Card not found');
       }
-    } else {
-      toast.error("Invalid card ID", {
-        description: "No card ID provided.",
-      });
-      navigate('/gallery');
+    } else if (sampleCards.length > 0) {
+      setSelectedCard(sampleCards[0]);
+      
+      // Extract effects from first sample card
+      if (sampleCards[0].effects && sampleCards[0].effects.length > 0) {
+        const effectStrings = cardEffectsToStringArray(sampleCards[0].effects);
+        setActiveEffects(effectStrings);
+      }
     }
-  }, [id, getCardById, setActiveEffects, navigate]);
+  }, [id, cards, isLoading]);
 
-  const handleRandomEffect = () => {
-    if (availableEffects.length > 0) {
-      const randomEffect = availableEffects[Math.floor(Math.random() * availableEffects.length)];
-      applyEffect(randomEffect.id);
-    }
+  const handleCardEffectsChange = (effects: CardEffect[]) => {
+    const effectStrings = cardEffectsToStringArray(effects);
+    setActiveEffects(effectStrings);
   };
 
-  const handleExportCard = () => {
-    if (!card) return;
-    
-    // In a real implementation, this would capture the card as an image
-    toast.success("Export Started", {
-      description: "Your card is being prepared for download."
-    });
-    
-    setTimeout(() => {
-      toast.success("Export Complete", {
-        description: "Your card has been downloaded successfully."
-      });
-    }, 2000);
+  const toggleEffect = (effect: string) => {
+    setActiveEffects(prev => 
+      prev.includes(effect)
+        ? prev.filter(e => e !== effect)
+        : [...prev, effect]
+    );
   };
 
-  const handleShareCard = () => {
-    if (!card) return;
-    
+  const updateEffectIntensity = (effect: string, intensity: number) => {
+    setEffectIntensities(prev => ({
+      ...prev,
+      [effect]: intensity
+    }));
+  };
+
+  const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: card.title,
-        text: card.description,
+        title: selectedCard?.title || 'Check out this card',
+        text: selectedCard?.description || 'An amazing digital card',
         url: window.location.href
+      }).catch(err => {
+        console.error('Error sharing:', err);
+        toast.error('Failed to share card');
       });
     } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success("Link Copied", {
-        description: "Card link has been copied to your clipboard."
-      });
+      navigator.clipboard.writeText(window.location.href)
+        .then(() => toast.success('Link copied to clipboard'))
+        .catch(() => toast.error('Failed to copy link'));
     }
   };
 
-  const toggleAutoRotation = () => {
-    setIsAutoRotating(!isAutoRotating);
+  const handleDownload = () => {
+    toast.info('Preparing download...');
+    // Implement actual download logic
+    setTimeout(() => {
+      toast.success('Card downloaded successfully');
+    }, 1500);
   };
 
-  const handleFlipCard = () => {
-    setIsFlipped(!isFlipped);
-  };
-
-  if (!card) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Loading card...</h2>
-          <p className="text-gray-600">Please wait while we load your card.</p>
+      <PageLayout title="Loading..." description="Loading immersive card viewer">
+        <div className="flex justify-center items-center h-[70vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
-      </div>
+      </PageLayout>
+    );
+  }
+
+  if (!selectedCard) {
+    return (
+      <PageLayout title="Card Not Found" description="The requested card could not be found">
+        <div className="flex flex-col justify-center items-center h-[50vh] gap-4">
+          <h2 className="text-2xl font-bold">Card Not Found</h2>
+          <p className="text-gray-500">The card you're looking for doesn't exist or has been removed.</p>
+          <Button onClick={() => window.history.back()}>Go Back</Button>
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
-      {/* Header */}
-      <header className="p-4 border-b border-gray-800">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/gallery')}
-            className="text-white hover:bg-gray-800"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Gallery
-          </Button>
-          
-          <h1 className="text-xl font-bold">{card.title}</h1>
-          
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleShareCard}
-              className="text-white hover:bg-gray-800"
-            >
-              <Share2 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleExportCard}
-              className="text-white hover:bg-gray-800"
-            >
-              <Download className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex flex-1">
-        {/* Main Card Viewer */}
-        <div className="flex-1 p-8">
-          <div className="max-w-4xl mx-auto">
-            {/* Card Controls */}
-            <div className="flex justify-center items-center space-x-4 mb-8">
-              <Button
-                variant="outline"
-                onClick={handleFlipCard}
-                className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
-              >
-                <RotateCw className="h-4 w-4 mr-2" />
-                Flip Card
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={toggleAutoRotation}
-                className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
-              >
-                {isAutoRotating ? (
-                  <>
-                    <Pause className="h-4 w-4 mr-2" />
-                    Stop Rotation
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4 mr-2" />
-                    Auto Rotate
-                  </>
-                )}
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={handleRandomEffect}
-                className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
-              >
-                <Shuffle className="h-4 w-4 mr-2" />
-                Random Effect
-              </Button>
-            </div>
-
-            {/* Immersive Card Display */}
-            <ImmersiveCardViewer
-              imageUrl={card.imageUrl}
-              title={card.title}
-              description={card.description}
-              effects={activeEffects}
-              isFlipped={isFlipped}
-              isAutoRotating={isAutoRotating}
+    <PageLayout
+      title={selectedCard.title}
+      description="Immersive 3D card viewing experience"
+      className="bg-gradient-to-b from-gray-900 to-gray-800 text-white"
+    >
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main viewer */}
+          <div className="lg:col-span-2 bg-black rounded-xl overflow-hidden shadow-2xl h-[70vh]">
+            <ImmersiveCardViewer 
+              card={selectedCard}
+              activeEffects={activeEffects}
+              effectIntensities={effectIntensities}
             />
           </div>
-        </div>
-
-        {/* Effects Panel */}
-        <div className="w-80 border-l border-gray-800 p-6">
-          <CardUI className="bg-gray-900 border-gray-800">
-            <div className="p-4">
-              <h3 className="text-lg font-bold mb-4 text-white">Effects Panel</h3>
+          
+          {/* Controls sidebar */}
+          <div className="bg-gray-800 rounded-xl p-6 shadow-xl">
+            <h2 className="text-2xl font-bold mb-6">{selectedCard.title}</h2>
+            
+            <Tabs defaultValue="effects" className="w-full">
+              <TabsList className="grid grid-cols-3 mb-6">
+                <TabsTrigger value="effects" className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" /> Effects
+                </TabsTrigger>
+                <TabsTrigger value="layers" className="flex items-center gap-2">
+                  <Layers className="h-4 w-4" /> Layers
+                </TabsTrigger>
+                <TabsTrigger value="settings" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" /> Settings
+                </TabsTrigger>
+              </TabsList>
               
-              <EffectsPanel
-                availableEffects={availableEffects}
-                activeEffects={activeEffects}
-                onToggleEffect={toggleEffect}
-                onRemoveEffect={removeEffect}
-                isEffectActive={isEffectActive}
-                getEffectIntensity={getEffectIntensity}
-                setEffectIntensity={setEffectIntensity}
-              />
+              <TabsContent value="effects" className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Available Effects</h3>
+                  
+                  <div className="space-y-3">
+                    {['Holographic', 'Refractor', 'Prismatic', 'Chrome', 'Vintage'].map(effect => (
+                      <div key={effect} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Switch 
+                            checked={activeEffects.includes(effect)}
+                            onCheckedChange={() => toggleEffect(effect)}
+                          />
+                          <Label>{effect}</Label>
+                        </div>
+                        
+                        {activeEffects.includes(effect) && (
+                          <div className="flex items-center gap-2 w-32">
+                            <Slider
+                              value={[effectIntensities[effect] * 100 || 70]}
+                              min={0}
+                              max={100}
+                              step={5}
+                              onValueChange={([value]) => updateEffectIntensity(effect, value / 100)}
+                            />
+                            <span className="text-xs w-8">{Math.round((effectIntensities[effect] || 0.7) * 100)}%</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="layers" className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Card Layers</h3>
+                  <p className="text-sm text-gray-400">Manage card layers and their visibility</p>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between p-2 bg-gray-700 rounded">
+                      <span>Base Card</span>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between p-2 bg-gray-700 rounded">
+                      <span>Text & Info</span>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between p-2 bg-gray-700 rounded">
+                      <span>Effects Layer</span>
+                      <Switch defaultChecked />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="settings" className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Viewer Settings</h3>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label>Auto-rotate</Label>
+                      <Switch />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label>Show stats</Label>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label>High quality</Label>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Background</Label>
+                      <div className="grid grid-cols-5 gap-2">
+                        {['#000000', '#0f172a', '#18181b', '#1e293b', '#transparent'].map(color => (
+                          <div 
+                            key={color} 
+                            className="w-full aspect-square rounded-full border border-white/20 cursor-pointer"
+                            style={{ backgroundColor: color === '#transparent' ? 'transparent' : color }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+            
+            <div className="mt-8 space-y-4">
+              <p className="text-sm text-gray-400">{selectedCard.description}</p>
+              
+              <div className="flex flex-wrap gap-2">
+                {selectedCard.tags?.map(tag => (
+                  <span key={tag} className="px-2 py-1 bg-gray-700 rounded-full text-xs">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              
+              <div className="flex gap-4 mt-6">
+                <Button 
+                  variant="outline" 
+                  className="flex-1 flex items-center justify-center gap-2"
+                  onClick={handleShare}
+                >
+                  <Share className="h-4 w-4" /> Share
+                </Button>
+                <Button 
+                  className="flex-1 flex items-center justify-center gap-2"
+                  onClick={handleDownload}
+                >
+                  <Download className="h-4 w-4" /> Download
+                </Button>
+              </div>
             </div>
-          </CardUI>
+          </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

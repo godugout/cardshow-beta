@@ -1,4 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
+import { CardEffect } from '@/lib/types';
+import { stringToCardEffect } from '@/lib/utils/cardEffectHelpers';
 import { 
   ParticleEffectType, 
   ParticleSettings, 
@@ -68,7 +70,7 @@ interface ParticleEffectsOptions {
   onPerformanceChange?: (level: 'high' | 'medium' | 'low') => void;
 }
 
-export const useParticleEffects = (options: ParticleEffectsOptions = {}) => {
+export const useParticleEffects = (canvasRef: React.RefObject<HTMLCanvasElement>, options: ParticleEffectsOptions = {}) => {
   const {
     card,
     shouldAutoDetectCardType = true,
@@ -332,6 +334,37 @@ export const useParticleEffects = (options: ParticleEffectsOptions = {}) => {
     };
   }, [state.performanceLevel, isMobile]);
 
+  const animationRef = useRef<number>();
+  const particleSystemRef = useRef<ParticleSystem>();
+  const [isActive, setIsActive] = useState(false);
+  const [currentEffects, setCurrentEffects] = useState<CardEffect[]>([]);
+
+  const addEffect = useCallback((effectType: string, settings?: Partial<ParticleSettings>) => {
+    const cardEffect = stringToCardEffect(effectType);
+    
+    if (!particleSystemRef.current) return;
+
+    const particleSettings: ParticleSettings = {
+      count: 50,
+      speed: 2,
+      size: 3,
+      color: '#FFD700',
+      opacity: 0.8,
+      lifetime: 60,
+      ...settings
+    };
+
+    particleSystemRef.current.addEffect(cardEffect, particleSettings);
+    setCurrentEffects(prev => [...prev, cardEffect]);
+  }, []);
+
+  const removeEffect = useCallback((effectId: string) => {
+    if (!particleSystemRef.current) return;
+    
+    particleSystemRef.current.removeEffect(effectId);
+    setCurrentEffects(prev => prev.filter(effect => effect.id !== effectId));
+  }, []);
+
   return {
     particleState: state,
     toggleEffect,
@@ -342,6 +375,10 @@ export const useParticleEffects = (options: ParticleEffectsOptions = {}) => {
     setPerformanceLevel,
     resetEffects,
     optimizedParams: getOptimizedParams(),
-    availablePresets: DEFAULT_PARTICLE_PRESETS
+    availablePresets: DEFAULT_PARTICLE_PRESETS,
+    isActive,
+    currentEffects,
+    addEffect,
+    removeEffect
   };
 };

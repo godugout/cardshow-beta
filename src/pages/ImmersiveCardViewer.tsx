@@ -1,16 +1,19 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/lib/types/unifiedCardTypes';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { showToast } from '@/lib/utils/toastHelpers';
+import { stringToCardEffect } from '@/lib/utils/cardEffectHelpers';
 
 const ImmersiveCardViewer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [card, setCard] = useState<Card | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeEffects, setActiveEffects] = useState<CardEffect[]>([
+    stringToCardEffect('holographic'), stringToCardEffect('refractor')
+  ]);
 
   useEffect(() => {
     if (!id) {

@@ -2,6 +2,11 @@
 import { useState, useEffect } from 'react';
 import { AuthContextType, User, UserRole } from '@/lib/types/core';
 
+interface AuthResult {
+  success: boolean;
+  error?: string;
+}
+
 export const useAuth = (): AuthContextType => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,6 +35,7 @@ export const useAuth = (): AuthContextType => {
       setSession({ user: mockUser });
     } catch (err) {
       setError('Failed to sign in');
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -52,6 +58,7 @@ export const useAuth = (): AuthContextType => {
       setSession({ user: mockUser });
     } catch (err) {
       setError('Failed to sign up');
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -70,6 +77,7 @@ export const useAuth = (): AuthContextType => {
       console.log('Password reset requested for:', email);
     } catch (err) {
       setError('Failed to reset password');
+      throw err;
     }
   };
 

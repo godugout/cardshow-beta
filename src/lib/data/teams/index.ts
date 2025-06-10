@@ -1,24 +1,24 @@
 
-import * as teamService from './teamService';
-import * as teamMembersService from './teamMembersService';
-import { mapTeamFromDb, mapTeamMemberFromDb } from './mappers';
+export * from './mappers';
+export * from './teamService';
+export * from './teamMembersService';
 
-export const teamRepository = {
-  // Team operations
-  getTeamById: teamService.getTeamById,
-  getAllTeams: teamService.getAllTeams,
-  createTeam: teamService.createTeam,
-  updateTeam: teamService.updateTeam,
-  deleteTeam: teamService.deleteTeam,
-  
-  // Team member operations
-  getTeamMembers: teamMembersService.getTeamMembers,
-  addTeamMember: teamMembersService.addTeamMember,
-  updateTeamMemberRole: teamMembersService.updateTeamMemberRole,
-  removeTeamMember: teamMembersService.removeTeamMember
-};
+// Re-export with correct names for backward compatibility
+export { 
+  mapTeam as mapTeamFromDb,
+  mapTeamMember as mapTeamMemberFromDb 
+} from './mappers';
 
-export {
-  mapTeamFromDb,
-  mapTeamMemberFromDb
-};
+export { 
+  teamService,
+  teamService as teamAPI
+} from './teamService';
+
+// Export individual service methods for convenience
+export const {
+  getTeam: getTeamById,
+  getTeams: getAllTeams,
+  createTeam,
+  updateTeam,
+  deleteTeam
+} = teamService;

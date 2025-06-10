@@ -1,170 +1,45 @@
 
-import React, { createContext, useContext, useState } from 'react';
-import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
-import { EnhancedCard, Series as EnhancedSeries, Deck } from '@/lib/types/enhancedCardTypes';
-
-// Mock data for series
-const mockEnhancedCards: EnhancedCard[] = [
-  {
-    id: '1',
-    title: 'Enhanced Card 1',
-    description: 'A premium enhanced card',
-    imageUrl: '/placeholder.svg',
-    thumbnailUrl: '/placeholder.svg',
-    tags: ['premium', 'enhanced'],
-    userId: 'user1',
-    effects: ['holographic'],
-    rarity: 'legendary',
-    cardNumber: '001',
-    seriesId: 'series-1',
-    artistId: 'artist-1',
-    edition: 1,
-    editionSize: 100,
-    releaseDate: '2024-01-01',
-    qrCodeData: 'enhanced-card-1',
-    hotspots: [],
-    designMetadata: DEFAULT_DESIGN_METADATA,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    marketData: {
-      price: 299.99,
-      currency: 'USD',
-      lastSoldPrice: 250.00,
-      availableForSale: true
-    }
-  }
-];
-
-const mockSeries: EnhancedSeries[] = [
-  {
-    id: 'series-1',
-    title: 'Premium Series',
-    description: 'A collection of premium cards',
-    coverImageUrl: '/placeholder.svg',
-    artistId: 'artist-1',
-    cardIds: ['1'],
-    totalCards: 10,
-    isPublished: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    releaseDate: '2024-01-01',
-    releaseType: 'limited',
-    cards: mockEnhancedCards
-  }
-];
-
-const mockDecks: Deck[] = [
-  {
-    id: 'deck-1',
-    name: 'My First Deck',
-    description: 'A starter deck',
-    coverImageUrl: '/placeholder.svg',
-    cards: mockEnhancedCards,
-    cardIds: ['1'],
-    ownerId: 'user1',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isPublic: false
-  }
-];
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { Card, CardEffect } from '@/lib/types';
+import { stringToCardEffect } from '@/lib/utils/cardEffectHelpers';
 
 interface CardEnhancedContextType {
-  enhancedCards: EnhancedCard[];
-  addEnhancedCard: (card: EnhancedCard) => void;
-  updateEnhancedCard: (id: string, updates: Partial<EnhancedCard>) => void;
-  deleteEnhancedCard: (id: string) => void;
-  cards: EnhancedCard[];
-  series: EnhancedSeries[];
-  addSeries: (series: EnhancedSeries) => void;
-  updateSeries: (id: string, updates: Partial<EnhancedSeries>) => void;
-  decks: Deck[];
-  addDeck: (deck: Deck) => void;
-  updateDeck: (id: string, updates: Partial<Deck>) => void;
-  deleteDeck: (id: string) => void;
-  getDeck: (id: string) => Deck | undefined;
-  favorites: string[];
-  toggleFavorite: (cardId: string) => void;
-  isLoading: boolean;
+  selectedCard: Card | null;
+  setSelectedCard: (card: Card | null) => void;
+  activeEffects: CardEffect[];
+  setActiveEffects: (effects: CardEffect[]) => void;
+  addEffect: (effect: string) => void;
+  removeEffect: (effectId: string) => void;
 }
 
 const CardEnhancedContext = createContext<CardEnhancedContextType | undefined>(undefined);
 
-export const CardEnhancedProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [enhancedCards, setEnhancedCards] = useState<EnhancedCard[]>(mockEnhancedCards);
-  const [series, setSeries] = useState<EnhancedSeries[]>(mockSeries);
-  const [decks, setDecks] = useState<Deck[]>(mockDecks);
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+export const CardEnhancedProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [activeEffects, setActiveEffects] = useState<CardEffect[]>([
+    stringToCardEffect('holographic')
+  ]);
 
-  const addEnhancedCard = (card: EnhancedCard) => {
-    setEnhancedCards(prev => [...prev, card]);
+  const addEffect = (effect: string) => {
+    const newEffect = stringToCardEffect(effect);
+    setActiveEffects(prev => [...prev, newEffect]);
   };
 
-  const updateEnhancedCard = (id: string, updates: Partial<EnhancedCard>) => {
-    setEnhancedCards(prev => 
-      prev.map(card => card.id === id ? { ...card, ...updates } : card)
-    );
-  };
-
-  const deleteEnhancedCard = (id: string) => {
-    setEnhancedCards(prev => prev.filter(card => card.id !== id));
-  };
-
-  const addSeries = (newSeries: EnhancedSeries) => {
-    setSeries(prev => [...prev, newSeries]);
-  };
-
-  const updateSeries = (id: string, updates: Partial<EnhancedSeries>) => {
-    setSeries(prev => 
-      prev.map(s => s.id === id ? { ...s, ...updates } : s)
-    );
-  };
-
-  const addDeck = (deck: Deck) => {
-    setDecks(prev => [...prev, deck]);
-  };
-
-  const updateDeck = (id: string, updates: Partial<Deck>) => {
-    setDecks(prev => 
-      prev.map(deck => deck.id === id ? { ...deck, ...updates } : deck)
-    );
-  };
-
-  const deleteDeck = (id: string) => {
-    setDecks(prev => prev.filter(deck => deck.id !== id));
-  };
-
-  const getDeck = (id: string) => {
-    return decks.find(deck => deck.id === id);
-  };
-
-  const toggleFavorite = (cardId: string) => {
-    setFavorites(prev => 
-      prev.includes(cardId) 
-        ? prev.filter(id => id !== cardId)
-        : [...prev, cardId]
-    );
+  const removeEffect = (effectId: string) => {
+    setActiveEffects(prev => prev.filter(effect => effect.id !== effectId));
   };
 
   return (
-    <CardEnhancedContext.Provider value={{
-      enhancedCards,
-      addEnhancedCard,
-      updateEnhancedCard,
-      deleteEnhancedCard,
-      cards: enhancedCards,
-      series,
-      addSeries,
-      updateSeries,
-      decks,
-      addDeck,
-      updateDeck,
-      deleteDeck,
-      getDeck,
-      favorites,
-      toggleFavorite,
-      isLoading
-    }}>
+    <CardEnhancedContext.Provider
+      value={{
+        selectedCard,
+        setSelectedCard,
+        activeEffects,
+        setActiveEffects,
+        addEffect,
+        removeEffect,
+      }}
+    >
       {children}
     </CardEnhancedContext.Provider>
   );
@@ -172,19 +47,8 @@ export const CardEnhancedProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
 export const useCardEnhanced = () => {
   const context = useContext(CardEnhancedContext);
-  if (!context) {
-    throw new Error('useCardEnhanced must be used within CardEnhancedProvider');
+  if (context === undefined) {
+    throw new Error('useCardEnhanced must be used within a CardEnhancedProvider');
   }
   return context;
 };
-
-export const useEnhancedCards = () => {
-  const context = useContext(CardEnhancedContext);
-  if (!context) {
-    throw new Error('useEnhancedCards must be used within CardEnhancedProvider');
-  }
-  return context;
-};
-
-// Export types for use in other files
-export type { EnhancedCard, EnhancedSeries, Deck };
