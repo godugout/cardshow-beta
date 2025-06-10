@@ -7,14 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CardEffect, CardEffectSettings } from '@/lib/types/cardEffects';
+import { CardEffect } from '@/lib/types/core';
 import { Save, RefreshCw, Sparkles, Download, Upload } from 'lucide-react';
 
 interface EffectsControlPanelProps {
   availableEffects: CardEffect[];
   activeEffects: CardEffect[];
   onToggleEffect: (effectId: string) => void;
-  onUpdateEffectSettings: (effectId: string, settings: Partial<CardEffectSettings>) => void;
+  onUpdateEffectSettings: (effectId: string, settings: Partial<Record<string, any>>) => void;
   onSavePreset: () => void;
   onLoadPreset: (presetId: string) => void;
   presets: { id: string; name: string }[];
@@ -55,6 +55,7 @@ const EffectsControlPanel: React.FC<EffectsControlPanelProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {availableEffects.map(effect => {
                 const isActive = activeEffects.some(e => e.id === effect.id);
+                const effectName = effect.name || effect.type || 'Unknown Effect';
                 
                 return (
                   <div 
@@ -66,7 +67,7 @@ const EffectsControlPanel: React.FC<EffectsControlPanelProps> = ({
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-medium">{effect.name}</h3>
+                        <h3 className="font-medium">{effectName}</h3>
                         <p className="text-xs text-muted-foreground">
                           {getEffectDescription(effect.id)}
                         </p>
@@ -88,133 +89,138 @@ const EffectsControlPanel: React.FC<EffectsControlPanelProps> = ({
                 </p>
               </div>
             ) : (
-              activeEffects.map(effect => (
-                <div key={effect.id} className="border rounded-lg p-4 mb-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-medium">{effect.name}</h3>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => onToggleEffect(effect.id)}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    {/* Intensity Slider */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <Label>Intensity</Label>
-                        <span className="text-xs text-muted-foreground">
-                          {effect.settings.intensity?.toFixed(1) || 1.0}
-                        </span>
-                      </div>
-                      <Slider
-                        defaultValue={[effect.settings.intensity || 1.0]}
-                        min={0.1}
-                        max={2.0}
-                        step={0.1}
-                        onValueChange={([value]) => {
-                          onUpdateEffectSettings(effect.id, { intensity: value });
-                        }}
-                      />
+              activeEffects.map(effect => {
+                const effectName = effect.name || effect.type || 'Unknown Effect';
+                const effectSettings = effect.settings || { intensity: effect.intensity || 1.0 };
+                
+                return (
+                  <div key={effect.id} className="border rounded-lg p-4 mb-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-medium">{effectName}</h3>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => onToggleEffect(effect.id)}
+                      >
+                        Remove
+                      </Button>
                     </div>
                     
-                    {/* Speed Slider */}
-                    {effect.settings.speed !== undefined && (
+                    <div className="space-y-4">
+                      {/* Intensity Slider */}
                       <div className="space-y-2">
                         <div className="flex justify-between">
-                          <Label>Speed</Label>
+                          <Label>Intensity</Label>
                           <span className="text-xs text-muted-foreground">
-                            {effect.settings.speed?.toFixed(1) || 1.0}
+                            {(effectSettings.intensity || effect.intensity || 1.0).toFixed(1)}
                           </span>
                         </div>
                         <Slider
-                          defaultValue={[effect.settings.speed || 1.0]}
+                          defaultValue={[effectSettings.intensity || effect.intensity || 1.0]}
                           min={0.1}
                           max={2.0}
                           step={0.1}
                           onValueChange={([value]) => {
-                            onUpdateEffectSettings(effect.id, { speed: value });
+                            onUpdateEffectSettings(effect.id, { ...effectSettings, intensity: value });
                           }}
                         />
                       </div>
-                    )}
-                    
-                    {/* Color Picker */}
-                    {effect.settings.color !== undefined && (
-                      <div className="space-y-2">
-                        <Label>Color</Label>
-                        <div className="flex gap-2">
-                          <Input
-                            type="color"
-                            value={effect.settings.color || '#ffffff'}
-                            className="w-12 h-8 p-1"
-                            onChange={(e) => {
-                              onUpdateEffectSettings(effect.id, { color: e.target.value });
-                            }}
-                          />
-                          <Input
-                            type="text"
-                            value={effect.settings.color || '#ffffff'}
-                            onChange={(e) => {
-                              onUpdateEffectSettings(effect.id, { color: e.target.value });
+                      
+                      {/* Speed Slider */}
+                      {effectSettings.speed !== undefined && (
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <Label>Speed</Label>
+                            <span className="text-xs text-muted-foreground">
+                              {effectSettings.speed?.toFixed(1) || 1.0}
+                            </span>
+                          </div>
+                          <Slider
+                            defaultValue={[effectSettings.speed || 1.0]}
+                            min={0.1}
+                            max={2.0}
+                            step={0.1}
+                            onValueChange={([value]) => {
+                              onUpdateEffectSettings(effect.id, { ...effectSettings, speed: value });
                             }}
                           />
                         </div>
-                      </div>
-                    )}
-                    
-                    {/* Animation Toggle */}
-                    <div className="flex items-center justify-between">
-                      <Label>Animation</Label>
-                      <Switch 
-                        checked={effect.settings.animationEnabled || false}
-                        onCheckedChange={(checked) => {
-                          onUpdateEffectSettings(effect.id, { animationEnabled: checked });
-                        }}
-                      />
-                    </div>
-                    
-                    {/* Pattern Select (if applicable) */}
-                    {effect.settings.pattern !== undefined && (
-                      <div className="space-y-2">
-                        <Label>Pattern</Label>
-                        <select
-                          className="w-full p-2 border rounded-md"
-                          value={effect.settings.pattern || 'default'}
-                          onChange={(e) => {
-                            onUpdateEffectSettings(effect.id, { pattern: e.target.value });
+                      )}
+                      
+                      {/* Color Picker */}
+                      {effectSettings.color !== undefined && (
+                        <div className="space-y-2">
+                          <Label>Color</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              type="color"
+                              value={effectSettings.color || '#ffffff'}
+                              className="w-12 h-8 p-1"
+                              onChange={(e) => {
+                                onUpdateEffectSettings(effect.id, { ...effectSettings, color: e.target.value });
+                              }}
+                            />
+                            <Input
+                              type="text"
+                              value={effectSettings.color || '#ffffff'}
+                              onChange={(e) => {
+                                onUpdateEffectSettings(effect.id, { ...effectSettings, color: e.target.value });
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Animation Toggle */}
+                      <div className="flex items-center justify-between">
+                        <Label>Animation</Label>
+                        <Switch 
+                          checked={effectSettings.animationEnabled || false}
+                          onCheckedChange={(checked) => {
+                            onUpdateEffectSettings(effect.id, { ...effectSettings, animationEnabled: checked });
                           }}
-                        >
-                          <option value="rainbow">Rainbow</option>
-                          <option value="linear">Linear</option>
-                          <option value="radial">Radial</option>
-                          <option value="angular">Angular</option>
-                        </select>
+                        />
                       </div>
-                    )}
-                    
-                    {/* Reset Button */}
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full mt-2"
-                      onClick={() => {
-                        // Reset to default settings
-                        const defaultEffect = availableEffects.find(e => e.id === effect.id);
-                        if (defaultEffect) {
-                          onUpdateEffectSettings(effect.id, defaultEffect.settings);
-                        }
-                      }}
-                    >
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Reset to Default
-                    </Button>
+                      
+                      {/* Pattern Select (if applicable) */}
+                      {effectSettings.pattern !== undefined && (
+                        <div className="space-y-2">
+                          <Label>Pattern</Label>
+                          <select
+                            className="w-full p-2 border rounded-md"
+                            value={effectSettings.pattern || 'default'}
+                            onChange={(e) => {
+                              onUpdateEffectSettings(effect.id, { ...effectSettings, pattern: e.target.value });
+                            }}
+                          >
+                            <option value="rainbow">Rainbow</option>
+                            <option value="linear">Linear</option>
+                            <option value="radial">Radial</option>
+                            <option value="angular">Angular</option>
+                          </select>
+                        </div>
+                      )}
+                      
+                      {/* Reset Button */}
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full mt-2"
+                        onClick={() => {
+                          // Reset to default settings
+                          const defaultEffect = availableEffects.find(e => e.id === effect.id);
+                          if (defaultEffect) {
+                            onUpdateEffectSettings(effect.id, defaultEffect.settings || { intensity: 1.0 });
+                          }
+                        }}
+                      >
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Reset to Default
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </TabsContent>
           

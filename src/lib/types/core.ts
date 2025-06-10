@@ -54,12 +54,17 @@ export interface User extends BaseEntity {
   preferences?: Record<string, any>;
 }
 
-// Card effect types
+// Card effect types - Enhanced to support both simple and complex effects
 export interface CardEffect {
   id: string;
   type: 'holographic' | 'prismatic' | 'refractor' | 'sparkle' | 'foil' | 'rainbow' | 'custom';
   intensity: number;
   parameters?: Record<string, any>;
+  // Additional properties for compatibility with existing components
+  name?: string;
+  enabled?: boolean;
+  settings?: Record<string, any>;
+  className?: string;
 }
 
 // Card style types for compatibility
@@ -144,8 +149,8 @@ export interface DesignMetadata {
     fontSize?: number;
   };
   oaklandMemory?: {
-    title?: string;
-    description?: string;
+    title: string;
+    description: string;
     era?: string;
     memoryType?: string;
     emotions?: string[];
@@ -238,6 +243,8 @@ export interface Team extends BaseEntity {
   logoUrl?: string;
   ownerId: string;
   isActive: boolean;
+  visibility?: 'public' | 'private';
+  banner_url?: string;
 }
 
 // Team member interface
@@ -246,6 +253,7 @@ export interface TeamMember extends BaseEntity {
   userId: string;
   role: 'owner' | 'admin' | 'member';
   joinedAt: string;
+  permissions?: string[];
 }
 
 // Comment interface
@@ -294,4 +302,58 @@ export interface CardTemplate {
   layoutJson: Record<string, any>;
   createdAt: string;
   updatedAt: string;
+}
+
+// Instagram Post interface
+export interface InstagramPost {
+  id: string;
+  imageUrl: string;
+  caption: string;
+  timestamp: string;
+  likes: number;
+  comments: number;
+  username: string;
+  avatarUrl?: string;
+  mediaType?: 'image' | 'video';
+  thumbnailUrl?: string;
+  mediaUrl?: string;
+}
+
+// Oakland Memory Data
+export interface OaklandMemoryData {
+  title: string;
+  description: string;
+  date?: string;
+  opponent?: string;
+  score?: string;
+  location?: string;
+  section?: string;
+  memoryType?: string;
+  attendees?: string[];
+  tags?: string[];
+  imageUrl?: string;
+  historicalContext?: string;
+  personalSignificance?: string;
+  template?: string;
+  [key: string]: JsonValue | undefined;
+}
+
+// Utility function for serializing metadata
+export function serializeMetadata(metadata: any): string {
+  return JSON.stringify(metadata);
+}
+
+// Auth context type for compatibility
+export interface AuthContextType {
+  user: User | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updateProfile: (data: Partial<User>) => Promise<void>;
+  refreshSession: () => Promise<void>;
+  session: any;
+  error: string | null;
+  loading: boolean;
+  isAuthenticated: boolean;
 }

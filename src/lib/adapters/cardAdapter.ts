@@ -15,7 +15,11 @@ export function convertEffectsToCardEffects(effects: string[] | CardEffect[]): C
         id: `effect-${index}-${Date.now()}`,
         type: effect as any,
         intensity: 1,
-        parameters: {}
+        parameters: {},
+        name: effect,
+        enabled: true,
+        settings: { intensity: 1 },
+        className: `effect-${effect.toLowerCase()}`
       };
     }
     return effect;
@@ -32,8 +36,18 @@ export function convertCardEffectsToStrings(effects: CardEffect[] | string[]): s
     if (typeof effect === 'string') {
       return effect;
     }
-    return effect.type;
+    return effect.type || effect.name || 'unknown';
   });
+}
+
+/**
+ * Adapts legacy card format to core Card format
+ */
+export function adaptToLegacyCard(card: any): any {
+  return {
+    ...card,
+    effects: convertCardEffectsToStrings(card.effects || [])
+  };
 }
 
 /**
