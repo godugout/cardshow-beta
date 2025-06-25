@@ -1,6 +1,5 @@
-
-import { Reaction } from '@/lib/types/cardTypes';
-import { User, UserRole } from '@/lib/types/user';
+import { Reaction } from '@/lib/types';
+import { User, UserRole } from '@/lib/types/core';
 
 // Mock reaction data storage
 let mockReactions: Reaction[] = [
@@ -16,65 +15,44 @@ let mockReactions: Reaction[] = [
 ];
 
 export const reactionRepository = {
-  async getReactionsByCardId(cardId: string): Promise<Reaction[]> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    return mockReactions
-      .filter(reaction => reaction.targetId === cardId && reaction.targetType === 'card')
-      .map(reaction => ({
-        ...reaction,
-        user: {
-          id: reaction.userId,
-          email: `user${reaction.userId}@example.com`,
-          displayName: `User ${reaction.userId}`,
-          name: `User ${reaction.userId}`,
-          username: `user${reaction.userId}`,
-          avatarUrl: `/avatars/user${reaction.userId}.jpg`,
-          role: UserRole.USER,
-          createdAt: '2023-01-01T00:00:00Z',
-          updatedAt: '2023-01-01T00:00:00Z',
-        }
-      }));
+  async getReactionsByCard(cardId: string): Promise<Reaction[]> {
+    // Mock implementation
+    return [];
   },
 
-  // Alias methods for backward compatibility
-  getAllByCardId: async function(cardId: string): Promise<Reaction[]> {
-    return this.getReactionsByCardId(cardId);
+  async getReactionsByUser(userId: string): Promise<Reaction[]> {
+    // Mock implementation
+    return [];
   },
 
-  async addReaction(userId: string, targetId: string, targetType: 'card' | 'comment' | 'collection', reactionType: string): Promise<Reaction> {
+  async addReaction(reaction: Omit<Reaction, 'id' | 'createdAt' | 'updatedAt'>): Promise<Reaction> {
     const newReaction: Reaction = {
       id: `reaction-${Date.now()}`,
-      userId,
-      targetType,
-      targetId,
-      type: reactionType as any,
+      ...reaction,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
-    
-    mockReactions.push(newReaction);
     return newReaction;
   },
 
-  // Alias for backward compatibility
-  add: async function(userId: string, targetId: string, targetType: 'card' | 'comment' | 'collection', reactionType: string): Promise<Reaction> {
-    return this.addReaction(userId, targetId, targetType, reactionType);
+  async removeReaction(reactionId: string): Promise<void> {
+    // Mock implementation
   },
 
-  async removeReaction(userId: string, targetId: string, targetType: 'card' | 'comment' | 'collection'): Promise<void> {
-    mockReactions = mockReactions.filter(
-      reaction => !(reaction.userId === userId && reaction.targetId === targetId && reaction.targetType === targetType)
-    );
-  },
-
-  // Alias for backward compatibility
-  remove: async function(userId: string, targetId: string, targetType: 'card' | 'comment' | 'collection'): Promise<void> {
-    return this.removeReaction(userId, targetId, targetType);
-  },
-
-  async getReactionsByUserId(userId: string): Promise<Reaction[]> {
-    return mockReactions.filter(reaction => reaction.userId === userId);
+  async getReactionCounts(targetId: string, targetType: 'card' | 'comment' | 'collection'): Promise<Record<string, number>> {
+    // Mock implementation
+    return {};
   }
 };
+
+// Mock user for testing
+const mockUser: User = {
+  id: 'user-1',
+  email: 'test@example.com',
+  displayName: 'Test User',
+  role: UserRole.USER,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+};
+
+export { mockUser };

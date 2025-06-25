@@ -11,5 +11,8 @@ export interface UserProfile extends BaseEntity {
   preferences?: Record<string, any>;
 }
 
+// Export User from core for backward compatibility
+export type { User } from './core';
+
 // Re-export for backward compatibility
 export type { UserRole } from './core';

@@ -5,7 +5,7 @@
  */
 
 import { BaseEntity, JsonValue } from './index';
-import { User } from './user';
+import { User } from './core';
 
 // Re-export everything from unifiedCardTypes for backward compatibility
 export type {

@@ -1,49 +1,32 @@
 
-// Base entity interface for all entities with timestamps
-export interface BaseEntity {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// Main types export file - avoid duplicate exports
 
-// JSON value types for flexible data storage
-export type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-export type JsonObject = { [key: string]: JsonValue };
-export type JsonArray = JsonValue[];
+// Re-export everything from core types as primary
+export * from './types/core';
 
-// Re-export core types to maintain compatibility
+// Re-export specific items from other type modules without conflicts
 export type { 
-  Card, 
-  Collection, 
-  Team, 
-  TeamMember, 
-  Comment, 
-  Reaction,
-  DesignMetadata,
-  CardEffect,
-  CollectionVisibility,
-  CardTemplate,
-  UserRole,
-  UserPermission
-} from './core';
-export type { User } from './user';
+  Card as UnifiedCard,
+  CardTemplate as UnifiedCardTemplate
+} from './types/unifiedCardTypes';
 
-// Instagram post type
-export interface InstagramPost {
-  id: string;
-  imageUrl: string;
-  caption: string;
-  likes: number;
-  comments: number;
-  timestamp: string;
-  userId: string;
-  mediaType?: string;
-  thumbnailUrl?: string;
-  mediaUrl?: string;
-  postId?: string;
-}
+export type {
+  CardLayer,
+  CardStats,
+  CardEffectSettings,
+  HotspotData,
+  FabricSwatch
+} from './types/cardTypes';
 
-// Serialization utility
+export type {
+  PremiumCardEffect,
+  CardEffectsResult
+} from './types/cardEffects';
+
+// Export User from core
+export type { User } from './types/core';
+
+// Add missing serializeMetadata function
 export function serializeMetadata(metadata: any): string {
   return JSON.stringify(metadata);
 }

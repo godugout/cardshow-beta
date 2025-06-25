@@ -22,3 +22,6 @@ export const {
   updateTeam,
   deleteTeam
 } = teamService;
+
+// Create a teamRepository alias for backward compatibility
+export const teamRepository = teamService;
