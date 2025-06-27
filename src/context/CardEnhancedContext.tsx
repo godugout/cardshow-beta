@@ -49,9 +49,12 @@ interface CardEnhancedContextType {
   favorites: string[];
   addDeck: (deck: Deck) => void;
   updateDeck: (id: string, updates: Partial<Deck>) => void;
+  deleteDeck: (id: string) => void;
+  getDeck: (id: string) => Deck | undefined;
   addSeries: (series: EnhancedSeries) => void;
   updateSeries: (id: string, updates: Partial<EnhancedSeries>) => void;
   toggleFavorite: (cardId: string) => void;
+  isLoading: boolean;
 }
 
 const CardEnhancedContext = createContext<CardEnhancedContextType | undefined>(undefined);
@@ -65,6 +68,7 @@ export const CardEnhancedProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [series, setSeries] = useState<EnhancedSeries[]>([]);
   const [decks, setDecks] = useState<Deck[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const addEffect = (effect: string) => {
     const newEffect = stringToCardEffect(effect);
@@ -83,6 +87,14 @@ export const CardEnhancedProvider: React.FC<{ children: ReactNode }> = ({ childr
     setDecks(prev => prev.map(deck => 
       deck.id === id ? { ...deck, ...updates } : deck
     ));
+  };
+
+  const deleteDeck = (id: string) => {
+    setDecks(prev => prev.filter(deck => deck.id !== id));
+  };
+
+  const getDeck = (id: string) => {
+    return decks.find(deck => deck.id === id);
   };
 
   const addSeries = (series: EnhancedSeries) => {
@@ -118,9 +130,12 @@ export const CardEnhancedProvider: React.FC<{ children: ReactNode }> = ({ childr
         favorites,
         addDeck,
         updateDeck,
+        deleteDeck,
+        getDeck,
         addSeries,
         updateSeries,
         toggleFavorite,
+        isLoading,
       }}
     >
       {children}

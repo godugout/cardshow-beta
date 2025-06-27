@@ -1,5 +1,5 @@
 
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, useState } from 'react';
 import { stringToCardEffect } from '@/lib/utils/cardEffectHelpers';
 
 export interface ParticleSettings {
@@ -33,6 +33,7 @@ export const useParticleEffects = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
   const particleSystemRef = useRef<ParticleSystem | null>(null);
+  const [particleState, setParticleState] = useState({ active: false, effectType: '' });
 
   const createParticle = useCallback((x: number, y: number, settings: ParticleSettings): Particle => {
     return {
@@ -135,6 +136,7 @@ export const useParticleEffects = () => {
     const finalSettings = { ...defaultSettings, ...settings };
     
     initializeParticleSystem(finalSettings);
+    setParticleState({ active: true, effectType });
     updateParticleSystem();
   }, [initializeParticleSystem, updateParticleSystem]);
 
@@ -143,7 +145,24 @@ export const useParticleEffects = () => {
       cancelAnimationFrame(animationFrameRef.current);
     }
     particleSystemRef.current = null;
+    setParticleState({ active: false, effectType: '' });
   }, []);
+
+  const toggleEffect = useCallback((effectType: string) => {
+    if (particleState.active && particleState.effectType === effectType) {
+      stopParticleEffect();
+    } else {
+      startParticleEffect(effectType);
+    }
+  }, [particleState, startParticleEffect, stopParticleEffect]);
+
+  const toggleSystem = useCallback(() => {
+    if (particleState.active) {
+      stopParticleEffect();
+    } else {
+      startParticleEffect('holographic');
+    }
+  }, [particleState, startParticleEffect, stopParticleEffect]);
 
   const applyHolographicEffect = useCallback(() => {
     startParticleEffect('holographic', {
@@ -173,6 +192,9 @@ export const useParticleEffects = () => {
     stopParticleEffect,
     applyHolographicEffect,
     applyRefractorEffect,
-    particleSystem: particleSystemRef.current
+    particleSystem: particleSystemRef.current,
+    particleState,
+    toggleEffect,
+    toggleSystem
   };
 };

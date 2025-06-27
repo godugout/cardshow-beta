@@ -20,18 +20,26 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ initialSeries }) => {
   const { addSeries, updateSeries } = useEnhancedCards();
   const [isUploading, setIsUploading] = useState(false);
   
-  const [seriesData, setSeriesData] = useState<Partial<EnhancedSeries>>(initialSeries || {
+  const [seriesData, setSeriesData] = useState<{
+    id?: string;
+    title: string;
+    description: string;
+    coverImageUrl?: string;
+    artistId?: string;
+    releaseDate?: string;
+    totalCards: number;
+    isPublished: boolean;
+    cardIds: string[];
+    releaseType: 'standard' | 'limited' | 'exclusive';
+  }>(initialSeries || {
     title: '',
     description: '',
     coverImageUrl: '',
     artistId: '',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
     releaseDate: '',
     totalCards: 0,
     isPublished: false,
     cardIds: [],
-    cards: [],
     releaseType: 'standard',
   });
   
@@ -62,7 +70,15 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ initialSeries }) => {
     
     if (initialSeries?.id) {
       const updates: Partial<EnhancedSeries> = {
-        ...seriesData,
+        title: seriesData.title,
+        description: seriesData.description,
+        coverImageUrl: seriesData.coverImageUrl,
+        artistId: seriesData.artistId,
+        releaseDate: seriesData.releaseDate,
+        totalCards: seriesData.totalCards,
+        isPublished: seriesData.isPublished,
+        cardIds: seriesData.cardIds,
+        releaseType: seriesData.releaseType,
         updatedAt: new Date().toISOString()
       };
       updateSeries(initialSeries.id, updates);
@@ -73,7 +89,6 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ initialSeries }) => {
         title: seriesData.title || '',
         description: seriesData.description || '',
         releaseDate: seriesData.releaseDate || new Date().toISOString(),
-        cards: [],
         totalCards: 0,
         artistId: seriesData.artistId || '',
         createdAt: new Date().toISOString(),

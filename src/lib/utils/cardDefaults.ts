@@ -1,5 +1,6 @@
 
-import { DesignMetadata } from '@/lib/types/core';
+import { DesignMetadata, MarketMetadata, Card } from '@/lib/types/core';
+import { stringToCardEffect } from './cardEffectHelpers';
 
 export const DEFAULT_DESIGN_METADATA: DesignMetadata = {
   cardStyle: {
@@ -39,3 +40,24 @@ export const DEFAULT_DESIGN_METADATA: DesignMetadata = {
     editionNumber: 1
   }
 };
+
+export const DEFAULT_MARKET_METADATA: MarketMetadata = {
+  isPrintable: false,
+  isForSale: false,
+  includeInCatalog: true,
+  price: 0,
+  currency: 'USD',
+  availableForSale: false,
+  editionSize: 1,
+  editionNumber: 1
+};
+
+export const createBlankCard = (): Partial<Card> => ({
+  title: '',
+  description: '',
+  imageUrl: '',
+  thumbnailUrl: '',
+  tags: [],
+  effects: [],
+  designMetadata: DEFAULT_DESIGN_METADATA
+});

@@ -54,7 +54,7 @@ const ReactionButtons: React.FC<ReactionButtonsProps> = ({
     setIsLoading(true);
     try {
       if (cardId) {
-        const result = await reactionRepository.getReactionsByCardId(cardId);
+        const result = await reactionRepository.getReactionsByCard(cardId);
         setReactions(result);
       }
       // Additional endpoints for collection and comment reactions could be added here
