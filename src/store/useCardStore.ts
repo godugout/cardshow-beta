@@ -16,5 +16,6 @@ export const useCardStore = create<CardStore>((set) => ({
   updateCurrentCard: (updates) => set((state) => ({ 
     currentCard: { ...state.currentCard, ...updates } 
   })),
-  resetCurrentCard: (userId) => set({ currentCard: createBlankCard(userId) }),
+  // Fix: createBlankCard expects no arguments
+  resetCurrentCard: (userId) => set({ currentCard: createBlankCard() }),
 }));

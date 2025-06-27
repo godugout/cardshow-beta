@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardEffect } from '@/lib/types/core';
 import { stringToCardEffect } from '@/lib/utils/cardEffectHelpers';
@@ -113,7 +112,8 @@ const ImmersiveCardViewer: React.FC<ImmersiveCardViewerProps> = ({
         </div>
       </div>
 
-      <style jsx>{`
+      <style>
+        {`
         .immersive-viewer {
           position: fixed;
           top: 0;
@@ -277,7 +277,8 @@ const ImmersiveCardViewer: React.FC<ImmersiveCardViewerProps> = ({
           width: 500px;
           height: 750px;
         }
-      `}</style>
+      `}
+      </style>
     </div>
   );
 };

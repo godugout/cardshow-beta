@@ -20,6 +20,7 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ initialSeries }) => {
   const { addSeries, updateSeries } = useEnhancedCards();
   const [isUploading, setIsUploading] = useState(false);
   
+  // Fix: Ensure state type matches expected interface
   const [seriesData, setSeriesData] = useState<{
     id?: string;
     title: string;
@@ -31,16 +32,32 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ initialSeries }) => {
     isPublished: boolean;
     cardIds: string[];
     releaseType: 'standard' | 'limited' | 'exclusive';
-  }>(initialSeries || {
-    title: '',
-    description: '',
-    coverImageUrl: '',
-    artistId: '',
-    releaseDate: '',
-    totalCards: 0,
-    isPublished: false,
-    cardIds: [],
-    releaseType: 'standard',
+  }>(() => {
+    if (initialSeries) {
+      return {
+        id: initialSeries.id,
+        title: initialSeries.title,
+        description: initialSeries.description,
+        coverImageUrl: initialSeries.coverImageUrl,
+        artistId: initialSeries.artistId,
+        releaseDate: initialSeries.releaseDate,
+        totalCards: initialSeries.totalCards,
+        isPublished: initialSeries.isPublished,
+        cardIds: initialSeries.cardIds,
+        releaseType: initialSeries.releaseType || 'standard',
+      };
+    }
+    return {
+      title: '',
+      description: '',
+      coverImageUrl: '',
+      artistId: '',
+      releaseDate: '',
+      totalCards: 0,
+      isPublished: false,
+      cardIds: [],
+      releaseType: 'standard',
+    };
   });
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

@@ -31,35 +31,16 @@ const ArCardViewerPage: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPermissionDenied, setIsPermissionDenied] = useState(false);
   const [showAddCardSheet, setShowAddCardSheet] = useState(false);
-  const { 
-    cards,
-    loading,
-    error,
-    activeCard,
-    arCards,
-    availableCards,
-    isArMode,
-    isFlipped,
-    handleLaunchAr,
-    handleExitAr,
-    handleCameraError,
-    handleTakeSnapshot,
-    handleFlip,
-    handleZoomIn,
-    handleZoomOut,
-    handleRotate,
-    handleAddCard,
-    handleRemoveCard,
-  } = useArCardViewer(id);
+  const arState = useArCardViewer();
 
   // Start camera when entering AR mode
   useEffect(() => {
-    if (isArMode) {
+    if (arState.isArMode) {
       startCamera();
     } else {
       stopCamera();
     }
-  }, [isArMode]);
+  }, [arState.isArMode]);
 
   // Start the camera feed
   const startCamera = async () => {
@@ -77,7 +58,7 @@ const ArCardViewerPage: React.FC = () => {
       if ((error as Error).name === 'NotAllowedError') {
         setIsPermissionDenied(true);
       }
-      handleCameraError((error as Error).message);
+      arState.handleCameraError((error as Error).message);
     }
   };
 
@@ -90,40 +71,31 @@ const ArCardViewerPage: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (arState.isLoading) {
     return (
-      <PageLayout title="AR Card Viewer" description="Loading AR experience...">
-        <div className="flex items-center justify-center min-h-[70vh]">
-          <div className="text-center">
-            <div className="h-12 w-12 border-4 border-t-blue-500 border-blue-300/30 rounded-full animate-spin mx-auto mb-4"></div>
-            <h3 className="text-xl font-medium mb-2">Preparing AR Experience</h3>
-            <p className="text-gray-500">Loading card data and AR components...</p>
-          </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Loading AR experience...</p>
         </div>
-      </PageLayout>
+      </div>
     );
   }
 
-  if (error) {
+  if (arState.cameraError) {
     return (
-      <PageLayout title="AR Card Viewer" description="Error loading AR experience">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center mb-6">
-            <Button variant="ghost" onClick={() => navigate(-1)} className="mr-2">
-              <ArrowLeft className="h-5 w-5 mr-2" />
-              Back
-            </Button>
-          </div>
-          
-          <div className="text-center py-16">
-            <h2 className="text-2xl font-bold mb-4">Error Loading AR Experience</h2>
-            <p className="text-red-500 mb-8">{error.message}</p>
-            <Button onClick={() => navigate('/cards')}>
-              Back to Cards
-            </Button>
-          </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center text-red-500">
+          <h2 className="text-xl font-bold mb-2">Camera Error</h2>
+          <p>{arState.cameraError}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+          >
+            Retry
+          </button>
         </div>
-      </PageLayout>
+      </div>
     );
   }
   
@@ -141,7 +113,7 @@ const ArCardViewerPage: React.FC = () => {
             variant="ghost" 
             className="text-white" 
             onClick={() => {
-              handleExitAr();
+              arState.handleExitAr();
               navigate(-1);
             }}
           >
@@ -149,11 +121,11 @@ const ArCardViewerPage: React.FC = () => {
             Back
           </Button>
           
-          {isArMode && (
+          {arState.isArMode && (
             <Button 
               variant="outline" 
               className="bg-white/20 text-white border-white/30 backdrop-blur-sm"
-              onClick={handleTakeSnapshot}
+              onClick={arState.handleTakeSnapshot}
             >
               <Camera className="h-4 w-4 mr-2" />
               Capture
@@ -162,7 +134,7 @@ const ArCardViewerPage: React.FC = () => {
         </div>
         
         {/* Camera Background */}
-        {isArMode && (
+        {arState.isArMode && (
           <div className="absolute inset-0 z-0">
             <video 
               ref={videoRef} 
@@ -175,15 +147,15 @@ const ArCardViewerPage: React.FC = () => {
         )}
         
         {/* Non-AR Background */}
-        {!isArMode && (
+        {!arState.isArMode && (
           <div className="absolute inset-0 z-0">
             <div className="w-full h-full bg-gradient-to-b from-gray-900 to-black flex items-center justify-center">
               <div className="w-3/4 max-w-md">
                 <div className="relative aspect-[3/4]">
-                  {activeCard && (
+                  {arState.activeCard && (
                     <img 
-                      src={activeCard.imageUrl} 
-                      alt={activeCard.title}
+                      src={arState.activeCard.imageUrl} 
+                      alt={arState.activeCard.title}
                       className="w-full h-full object-contain rounded-lg shadow-2xl shadow-purple-700/20"
                     />
                   )}
@@ -195,16 +167,16 @@ const ArCardViewerPage: React.FC = () => {
         
         {/* Main Content Area */}
         <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-64px)]">
-          {!isArMode && activeCard && (
+          {!arState.isArMode && arState.activeCard && (
             <div className="bg-gray-900/70 backdrop-blur-sm p-6 rounded-lg text-center max-w-sm">
-              <h2 className="text-xl font-bold mb-4">{activeCard.title}</h2>
+              <h2 className="text-xl font-bold mb-4">{arState.activeCard.title}</h2>
               
-              {activeCard.description && (
-                <p className="text-gray-300 mb-6">{activeCard.description}</p>
+              {arState.activeCard.description && (
+                <p className="text-gray-300 mb-6">{arState.activeCard.description}</p>
               )}
               
               <Button 
-                onClick={() => handleLaunchAr()}
+                onClick={() => arState.handleLaunchAr()}
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
               >
                 View in AR
@@ -214,11 +186,11 @@ const ArCardViewerPage: React.FC = () => {
         </div>
         
         {/* Bottom Controls */}
-        {isArMode && (
+        {arState.isArMode && (
           <div className="absolute bottom-0 left-0 right-0 z-20 p-4 bg-gradient-to-t from-black/80 to-transparent">
             {/* Card Selection Carousel */}
             <div className="mb-4 overflow-x-auto flex gap-2 pb-2">
-              {arCards.map((card) => (
+              {arState.arCards.map((card) => (
                 <div key={card.id} className="relative flex-shrink-0 w-20 h-28 rounded-md overflow-hidden">
                   <img 
                     src={card.thumbnailUrl || card.imageUrl} 
@@ -229,7 +201,7 @@ const ArCardViewerPage: React.FC = () => {
                     size="icon" 
                     variant="destructive" 
                     className="absolute top-1 right-1 w-5 h-5 p-0"
-                    onClick={() => handleRemoveCard(card.id)}
+                    onClick={() => arState.handleRemoveCard(card.id)}
                   >
                     <XCircle className="h-4 w-4" />
                   </Button>
@@ -253,7 +225,7 @@ const ArCardViewerPage: React.FC = () => {
                 size="icon"
                 variant="outline"
                 className="border-white/30 bg-white/10 backdrop-blur-md text-white rounded-full h-12 w-12"
-                onClick={handleZoomOut}
+                onClick={arState.handleZoomOut}
               >
                 <ZoomOut className="h-5 w-5" />
               </Button>
@@ -262,7 +234,7 @@ const ArCardViewerPage: React.FC = () => {
                 size="icon"
                 variant="outline"
                 className="border-white/30 bg-white/10 backdrop-blur-md text-white rounded-full h-12 w-12"
-                onClick={handleFlip}
+                onClick={arState.handleFlip}
               >
                 <RefreshCw className="h-5 w-5" />
               </Button>
@@ -271,7 +243,7 @@ const ArCardViewerPage: React.FC = () => {
                 size="icon"
                 variant="outline"
                 className="border-white/30 bg-white/10 backdrop-blur-md text-white rounded-full h-16 w-16"
-                onClick={handleTakeSnapshot}
+                onClick={arState.handleTakeSnapshot}
               >
                 <Camera className="h-7 w-7" />
               </Button>
@@ -280,7 +252,7 @@ const ArCardViewerPage: React.FC = () => {
                 size="icon"
                 variant="outline"
                 className="border-white/30 bg-white/10 backdrop-blur-md text-white rounded-full h-12 w-12"
-                onClick={handleRotate}
+                onClick={arState.handleRotate}
               >
                 <RotateCw className="h-5 w-5" />
               </Button>
@@ -289,7 +261,7 @@ const ArCardViewerPage: React.FC = () => {
                 size="icon"
                 variant="outline"
                 className="border-white/30 bg-white/10 backdrop-blur-md text-white rounded-full h-12 w-12"
-                onClick={handleZoomIn}
+                onClick={arState.handleZoomIn}
               >
                 <ZoomIn className="h-5 w-5" />
               </Button>
@@ -325,18 +297,18 @@ const ArCardViewerPage: React.FC = () => {
             </SheetHeader>
             
             <div className="py-6">
-              {availableCards.length === 0 ? (
+              {arState.availableCards.length === 0 ? (
                 <p className="text-center text-gray-500 py-8">
                   No more cards available to add
                 </p>
               ) : (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                  {availableCards.map(card => (
+                  {arState.availableCards.map(card => (
                     <div 
                       key={card.id}
                       className="relative cursor-pointer"
                       onClick={() => {
-                        handleAddCard(card.id);
+                        arState.handleAddCard(card.id);
                         setShowAddCardSheet(false);
                         toast.success("Card added", {
                           description: `${card.title} added to AR scene`
