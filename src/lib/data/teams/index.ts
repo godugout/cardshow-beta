@@ -11,7 +11,8 @@ export {
 
 export { 
   teamService,
-  teamService as teamAPI
+  teamService as teamAPI,
+  teamService as teamRepository
 } from './teamService';
 
 // Export individual service methods for convenience
@@ -22,6 +23,3 @@ export const {
   updateTeam,
   deleteTeam
 } = teamService;
-
-// Create a teamRepository alias for backward compatibility
-export const teamRepository = teamService;

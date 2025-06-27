@@ -11,6 +11,11 @@ export interface BaseEntity {
   updatedAt: string;
 }
 
+// JSON value types for metadata
+export type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
+export interface JsonObject { [key: string]: JsonValue; }
+export interface JsonArray extends Array<JsonValue> {}
+
 // User types
 export enum UserRole {
   ADMIN = 'admin',
@@ -51,6 +56,17 @@ export interface User extends BaseEntity {
   bio?: string;
   role: UserRole;
   permissions?: string[];
+  preferences?: Record<string, any>;
+}
+
+// User profile interface
+export interface UserProfile extends BaseEntity {
+  email: string;
+  displayName?: string;
+  username?: string;
+  avatarUrl?: string;
+  bio?: string;
+  role: UserRole;
   preferences?: Record<string, any>;
 }
 
@@ -293,11 +309,6 @@ export interface Reaction extends BaseEntity {
   targetId?: string;
   user?: User;
 }
-
-// JSON value types for metadata
-export type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-export interface JsonObject { [key: string]: JsonValue; }
-export interface JsonArray extends Array<JsonValue> {}
 
 // Card template interface
 export interface CardTemplate {

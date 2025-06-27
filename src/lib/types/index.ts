@@ -1,32 +1,8 @@
 
-// Main types export file - avoid duplicate exports
+// Main types export file - centralized exports from core
 
 // Re-export everything from core types as primary
-export * from './types/core';
+export * from './core';
 
-// Re-export specific items from other type modules without conflicts
-export type { 
-  Card as UnifiedCard,
-  CardTemplate as UnifiedCardTemplate
-} from './types/unifiedCardTypes';
-
-export type {
-  CardLayer,
-  CardStats,
-  CardEffectSettings,
-  HotspotData,
-  FabricSwatch
-} from './types/cardTypes';
-
-export type {
-  PremiumCardEffect,
-  CardEffectsResult
-} from './types/cardEffects';
-
-// Export User from core
-export type { User } from './types/core';
-
-// Add missing serializeMetadata function
-export function serializeMetadata(metadata: any): string {
-  return JSON.stringify(metadata);
-}
+// Export specific utility functions
+export { serializeMetadata } from './core';

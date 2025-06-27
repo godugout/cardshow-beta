@@ -1,5 +1,5 @@
-import { Reaction } from '@/lib/types';
-import { User, UserRole } from '@/lib/types/core';
+
+import { Reaction, User, UserRole } from '@/lib/types/core';
 
 // Mock reaction data storage
 let mockReactions: Reaction[] = [
@@ -17,31 +17,41 @@ let mockReactions: Reaction[] = [
 export const reactionRepository = {
   async getReactionsByCard(cardId: string): Promise<Reaction[]> {
     // Mock implementation
-    return [];
+    return mockReactions.filter(r => r.cardId === cardId);
   },
 
   async getReactionsByUser(userId: string): Promise<Reaction[]> {
     // Mock implementation
-    return [];
+    return mockReactions.filter(r => r.userId === userId);
   },
 
-  async addReaction(reaction: Omit<Reaction, 'id' | 'createdAt' | 'updatedAt'>): Promise<Reaction> {
+  async addReaction(userId: string, targetId: string, targetType: 'card' | 'comment' | 'collection', type: Reaction['type']): Promise<Reaction> {
     const newReaction: Reaction = {
       id: `reaction-${Date.now()}`,
-      ...reaction,
+      userId,
+      targetId,
+      targetType,
+      type,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
+    mockReactions.push(newReaction);
     return newReaction;
   },
 
-  async removeReaction(reactionId: string): Promise<void> {
-    // Mock implementation
+  async removeReaction(userId: string, targetId: string, targetType: 'card' | 'comment' | 'collection'): Promise<void> {
+    mockReactions = mockReactions.filter(r => 
+      !(r.userId === userId && r.targetId === targetId && r.targetType === targetType)
+    );
   },
 
   async getReactionCounts(targetId: string, targetType: 'card' | 'comment' | 'collection'): Promise<Record<string, number>> {
-    // Mock implementation
-    return {};
+    const reactions = mockReactions.filter(r => r.targetId === targetId && r.targetType === targetType);
+    const counts: Record<string, number> = {};
+    reactions.forEach(r => {
+      counts[r.type] = (counts[r.type] || 0) + 1;
+    });
+    return counts;
   }
 };
 

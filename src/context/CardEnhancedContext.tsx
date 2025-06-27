@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Card, CardEffect } from '@/lib/types';
+import { Card, CardEffect, BaseEntity } from '@/lib/types/core';
 import { stringToCardEffect } from '@/lib/utils/cardEffectHelpers';
 
 // Enhanced card interface with additional properties
@@ -13,22 +13,18 @@ export interface EnhancedCard extends Card {
 }
 
 // Deck interface
-export interface Deck {
-  id: string;
+export interface Deck extends BaseEntity {
   name: string;
   description: string;
   cards: EnhancedCard[];
   cardIds: string[];
   ownerId: string;
-  createdAt: string;
-  updatedAt: string;
   isPublic: boolean;
   coverImageUrl?: string;
 }
 
 // Series interface
-export interface EnhancedSeries {
-  id: string;
+export interface EnhancedSeries extends BaseEntity {
   title: string;
   description: string;
   coverImageUrl?: string;
@@ -36,6 +32,8 @@ export interface EnhancedSeries {
   totalCards: number;
   isPublished: boolean;
   artistId?: string;
+  releaseDate?: string;
+  releaseType?: 'standard' | 'limited' | 'exclusive';
 }
 
 interface CardEnhancedContextType {
@@ -48,8 +46,12 @@ interface CardEnhancedContextType {
   cards: EnhancedCard[];
   series: EnhancedSeries[];
   decks: Deck[];
+  favorites: string[];
   addDeck: (deck: Deck) => void;
   updateDeck: (id: string, updates: Partial<Deck>) => void;
+  addSeries: (series: EnhancedSeries) => void;
+  updateSeries: (id: string, updates: Partial<EnhancedSeries>) => void;
+  toggleFavorite: (cardId: string) => void;
 }
 
 const CardEnhancedContext = createContext<CardEnhancedContextType | undefined>(undefined);
@@ -62,6 +64,7 @@ export const CardEnhancedProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [cards, setCards] = useState<EnhancedCard[]>([]);
   const [series, setSeries] = useState<EnhancedSeries[]>([]);
   const [decks, setDecks] = useState<Deck[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
 
   const addEffect = (effect: string) => {
     const newEffect = stringToCardEffect(effect);
@@ -82,6 +85,24 @@ export const CardEnhancedProvider: React.FC<{ children: ReactNode }> = ({ childr
     ));
   };
 
+  const addSeries = (series: EnhancedSeries) => {
+    setSeries(prev => [...prev, series]);
+  };
+
+  const updateSeries = (id: string, updates: Partial<EnhancedSeries>) => {
+    setSeries(prev => prev.map(s => 
+      s.id === id ? { ...s, ...updates } : s
+    ));
+  };
+
+  const toggleFavorite = (cardId: string) => {
+    setFavorites(prev => 
+      prev.includes(cardId) 
+        ? prev.filter(id => id !== cardId)
+        : [...prev, cardId]
+    );
+  };
+
   return (
     <CardEnhancedContext.Provider
       value={{
@@ -94,8 +115,12 @@ export const CardEnhancedProvider: React.FC<{ children: ReactNode }> = ({ childr
         cards,
         series,
         decks,
+        favorites,
         addDeck,
         updateDeck,
+        addSeries,
+        updateSeries,
+        toggleFavorite,
       }}
     >
       {children}

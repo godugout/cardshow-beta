@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { Card, CardEffect } from '@/lib/types';
+import { Card, CardEffect } from '@/lib/types/core';
 import { stringToCardEffect } from '@/lib/utils/cardEffectHelpers';
 
 export const useArCardViewer = (cardId?: string) => {
@@ -18,6 +18,11 @@ export const useArCardViewer = (cardId?: string) => {
   // Mock data for AR cards and available cards
   const [arCards, setArCards] = useState<Card[]>([]);
   const [availableCards, setAvailableCards] = useState<Card[]>([]);
+  
+  // Additional state for missing properties
+  const [cards, setCards] = useState<Card[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleCardSelect = useCallback((card: Card) => {
     setSelectedCard(card);
@@ -112,6 +117,9 @@ export const useArCardViewer = (cardId?: string) => {
     isLoading,
     arCards,
     availableCards,
+    cards,
+    loading,
+    error,
     activeCard: selectedCard, // Alias for backward compatibility
     handleCardSelect,
     handleEffectToggle,

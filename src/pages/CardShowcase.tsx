@@ -1,159 +1,112 @@
-import React from 'react';
-import { Card, CardEffect } from '@/lib/types';
+
+import React, { useState } from 'react';
+import { Card, CardEffect } from '@/lib/types/core';
 import { stringToCardEffect } from '@/lib/utils/cardEffectHelpers';
+import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 
 const CardShowcase = () => {
-  const sampleCards: Card[] = [
+  const [selectedCard, setSelectedCard] = useState<Card>({
+    id: '1',
+    title: 'Holographic Trading Card',
+    description: 'A stunning holographic effect card',
+    imageUrl: 'https://placehold.co/300x400/png',
+    thumbnailUrl: 'https://placehold.co/150x200/png',
+    tags: ['holographic', 'premium', 'showcase'],
+    effects: [stringToCardEffect('holographic')],
+    userId: 'user1',
+    createdAt: '2023-01-01T00:00:00Z',
+    updatedAt: '2023-01-01T00:00:00Z',
+    designMetadata: DEFAULT_DESIGN_METADATA
+  });
+
+  const cardVariations: Card[] = [
     {
       id: '1',
-      title: 'Holographic Baseball Card',
-      description: 'A stunning holographic effect baseball card',
-      imageUrl: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390',
+      title: 'Holographic Trading Card',
+      description: 'A stunning holographic effect card',
+      imageUrl: 'https://placehold.co/300x400/png',
+      thumbnailUrl: 'https://placehold.co/150x200/png',
+      tags: ['holographic', 'premium'],
       effects: [stringToCardEffect('holographic')],
-      userId: '1',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      designMetadata: {
-        cardStyle: {
-          template: 'classic',
-          effect: 'holographic',
-          borderRadius: '8px',
-          borderColor: '#d4af37',
-          frameColor: '#d4af37',
-          frameWidth: 2,
-          shadowColor: 'rgba(212, 175, 55, 0.3)',
-        },
-        textStyle: {
-          titleColor: '#1a202c',
-          titleAlignment: 'center',
-          titleWeight: 'bold',
-          descriptionColor: '#4a5568',
-        },
-        cardMetadata: {
-          category: 'sports',
-          series: 'upper-deck-1989',
-          cardType: 'rookie',
-          cardNumber: '1',
-          artist: 'Upper Deck',
-          rarity: 'legendary'
-        },
-        marketMetadata: {
-          isPrintable: true,
-          isForSale: false,
-          includeInCatalog: true,
-          price: 299.99,
-          currency: 'USD',
-          availableForSale: false,
-          editionSize: 1000,
-          editionNumber: 1
-        }
-      }
+      userId: 'user1',
+      createdAt: '2023-01-01T00:00:00Z',
+      updatedAt: '2023-01-01T00:00:00Z',
+      designMetadata: DEFAULT_DESIGN_METADATA
     },
     {
       id: '2',
-      title: 'Chrome Basketball Card',
-      description: 'Premium chrome finish basketball card',
-      imageUrl: 'https://images.unsplash.com/photo-1518063319789-7217e6706b04',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1518063319789-7217e6706b04',
-      effects: [stringToCardEffect('chrome')],
-      userId: '2',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      designMetadata: {
-        cardStyle: {
-          template: 'classic',
-          effect: 'chrome',
-          borderRadius: '8px',
-          borderColor: '#d4af37',
-          frameColor: '#d4af37',
-          frameWidth: 2,
-          shadowColor: 'rgba(212, 175, 55, 0.3)',
-        },
-        textStyle: {
-          titleColor: '#1a202c',
-          titleAlignment: 'center',
-          titleWeight: 'bold',
-          descriptionColor: '#4a5568',
-        },
-        cardMetadata: {
-          category: 'sports',
-          series: 'upper-deck-1989',
-          cardType: 'rookie',
-          cardNumber: '1',
-          artist: 'Upper Deck',
-          rarity: 'legendary'
-        },
-        marketMetadata: {
-          isPrintable: true,
-          isForSale: false,
-          includeInCatalog: true,
-          price: 299.99,
-          currency: 'USD',
-          availableForSale: false,
-          editionSize: 1000,
-          editionNumber: 1
-        }
-      }
+      title: 'Prismatic Crystal Card',
+      description: 'Beautiful prismatic light effects',
+      imageUrl: 'https://placehold.co/300x400/png',
+      thumbnailUrl: 'https://placehold.co/150x200/png',
+      tags: ['prismatic', 'crystal'],
+      effects: [stringToCardEffect('prismatic')],
+      userId: 'user1',
+      createdAt: '2023-01-01T00:00:00Z',
+      updatedAt: '2023-01-01T00:00:00Z',
+      designMetadata: DEFAULT_DESIGN_METADATA
     },
     {
       id: '3',
-      title: 'Refractor Football Card',
-      description: 'Rare refractor football card with prismatic effects',
-      imageUrl: 'https://images.unsplash.com/photo-1508344928928-7165b67de128',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1508344928928-7165b67de128',
+      title: 'Refractor Sports Card',
+      description: 'Classic refractor finish',
+      imageUrl: 'https://placehold.co/300x400/png',
+      thumbnailUrl: 'https://placehold.co/150x200/png',
+      tags: ['refractor', 'sports'],
       effects: [stringToCardEffect('refractor')],
-      userId: '3',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      designMetadata: {
-        cardStyle: {
-          template: 'classic',
-          effect: 'refractor',
-          borderRadius: '8px',
-          borderColor: '#d4af37',
-          frameColor: '#d4af37',
-          frameWidth: 2,
-          shadowColor: 'rgba(212, 175, 55, 0.3)',
-        },
-        textStyle: {
-          titleColor: '#1a202c',
-          titleAlignment: 'center',
-          titleWeight: 'bold',
-          descriptionColor: '#4a5568',
-        },
-        cardMetadata: {
-          category: 'sports',
-          series: 'upper-deck-1989',
-          cardType: 'rookie',
-          cardNumber: '1',
-          artist: 'Upper Deck',
-          rarity: 'legendary'
-        },
-        marketMetadata: {
-          isPrintable: true,
-          isForSale: false,
-          includeInCatalog: true,
-          price: 299.99,
-          currency: 'USD',
-          availableForSale: false,
-          editionSize: 1000,
-          editionNumber: 1
-        }
-      }
+      userId: 'user1',
+      createdAt: '2023-01-01T00:00:00Z',
+      updatedAt: '2023-01-01T00:00:00Z',
+      designMetadata: DEFAULT_DESIGN_METADATA
     }
   ];
 
   return (
-    <div>
-      <h1>Card Showcase</h1>
-      {sampleCards.map(card => (
-        <div key={card.id}>
-          <h2>{card.title}</h2>
-          <p>{card.description}</p>
-          <img src={card.imageUrl} alt={card.title} style={{ width: '200px' }} />
+    <div className="min-h-screen bg-gray-100 py-8">
+      <div className="max-w-6xl mx-auto px-4">
+        <h1 className="text-4xl font-bold text-center mb-8">Card Effect Showcase</h1>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Card Display */}
+          <div className="bg-white rounded-lg p-6 shadow-lg">
+            <div className="aspect-[2.5/3.5] bg-gray-200 rounded-lg mb-4 overflow-hidden">
+              <img 
+                src={selectedCard.imageUrl} 
+                alt={selectedCard.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <h2 className="text-xl font-semibold mb-2">{selectedCard.title}</h2>
+            <p className="text-gray-600">{selectedCard.description}</p>
+          </div>
+
+          {/* Card Selection */}
+          <div className="space-y-4">
+            <h3 className="text-2xl font-semibold">Select a Card Effect</h3>
+            <div className="grid grid-cols-1 gap-4">
+              {cardVariations.map((card) => (
+                <button
+                  key={card.id}
+                  onClick={() => setSelectedCard(card)}
+                  className={`p-4 border rounded-lg text-left transition-colors ${
+                    selectedCard.id === card.id
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <h4 className="font-medium">{card.title}</h4>
+                  <p className="text-sm text-gray-600">{card.description}</p>
+                  <div className="mt-2">
+                    <span className="inline-block px-2 py-1 bg-gray-100 text-xs rounded">
+                      {card.effects[0]?.type || 'No effect'}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-      ))}
+      </div>
     </div>
   );
 };
