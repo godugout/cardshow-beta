@@ -24,9 +24,15 @@ const Auth = () => {
     setIsLoading(true);
     
     try {
-      await auth.signIn(email, password);
-      toast.success('Signed in successfully');
-      navigate(from, { replace: true });
+      const result = await auth.signIn(email, password);
+      if (result.success) {
+        toast.success('Signed in successfully');
+        navigate(from, { replace: true });
+      } else {
+        toast.error('Sign in failed', { 
+          description: result.error || 'Please check your credentials and try again'
+        });
+      }
     } catch (error: any) {
       console.error('Sign in error:', error);
       toast.error('Sign in failed', { 
@@ -42,9 +48,15 @@ const Auth = () => {
     setIsLoading(true);
     
     try {
-      await auth.signUp(email, password, { name });
-      toast.success('Account created successfully');
-      navigate(from, { replace: true });
+      const result = await auth.signUp(email, password, { name });
+      if (result.success) {
+        toast.success('Account created successfully');
+        navigate(from, { replace: true });
+      } else {
+        toast.error('Sign up failed', { 
+          description: result.error || 'Please try again with different credentials'
+        });
+      }
     } catch (error: any) {
       console.error('Sign up error:', error);
       toast.error('Sign up failed', { 

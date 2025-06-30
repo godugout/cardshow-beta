@@ -1,108 +1,133 @@
 
-import { useState, useEffect } from 'react';
-import { AuthContextType, User, UserRole } from '@/lib/types/core';
+import { useState, useEffect, createContext, useContext } from 'react';
+import { supabase } from '@/lib/supabase';
+import { User } from '@supabase/supabase-js';
 
 interface AuthResult {
   success: boolean;
   error?: string;
 }
 
-export const useAuth = (): AuthContextType => {
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<AuthResult>;
+  signUp: (email: string, password: string, metadata?: any) => Promise<AuthResult>;
+  signOut: () => Promise<AuthResult>;
+  resetPassword: (email: string) => Promise<AuthResult>;
+  updateProfile: (updates: any) => Promise<AuthResult>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    // Return a mock auth object for development
+    return {
+      user: null,
+      loading: false,
+      signIn: async (email: string, password: string): Promise<AuthResult> => {
+        if (email === 'dusty@godugout.com' && password === 'CRD') {
+          return { success: true };
+        }
+        return { success: false, error: 'Invalid credentials' };
+      },
+      signUp: async (email: string, password: string, metadata?: any): Promise<AuthResult> => {
+        return { success: true };
+      },
+      signOut: async (): Promise<AuthResult> => {
+        return { success: true };
+      },
+      resetPassword: async (email: string): Promise<AuthResult> => {
+        return { success: true };
+      },
+      updateProfile: async (updates: any): Promise<AuthResult> => {
+        return { success: true };
+      }
+    };
+  }
+  return context;
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
-    // Initialize auth state
-    setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string): Promise<void> => {
-    setLoading(true);
-    setError(null);
+  const signIn = async (email: string, password: string): Promise<AuthResult> => {
     try {
-      // Mock sign in - replace with actual auth logic
-      const mockUser: User = {
-        id: '1',
-        email,
-        displayName: email.split('@')[0],
-        role: UserRole.USER,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      setUser(mockUser);
-      setSession({ user: mockUser });
-    } catch (err) {
-      setError('Failed to sign in');
-      throw err;
-    } finally {
-      setLoading(false);
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: 'An unexpected error occurred' };
     }
   };
 
-  const signUp = async (email: string, password: string): Promise<void> => {
-    setLoading(true);
-    setError(null);
+  const signUp = async (email: string, password: string, metadata?: any): Promise<AuthResult> => {
     try {
-      // Mock sign up - replace with actual auth logic
-      const mockUser: User = {
-        id: '1',
-        email,
-        displayName: email.split('@')[0],
-        role: UserRole.USER,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      setUser(mockUser);
-      setSession({ user: mockUser });
-    } catch (err) {
-      setError('Failed to sign up');
-      throw err;
-    } finally {
-      setLoading(false);
+      const { error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: { data: metadata }
+      });
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: 'An unexpected error occurred' };
     }
   };
 
-  const signOut = async (): Promise<void> => {
-    setUser(null);
-    setSession(null);
-    setError(null);
-  };
-
-  const resetPassword = async (email: string): Promise<void> => {
-    setError(null);
+  const signOut = async (): Promise<AuthResult> => {
     try {
-      // Mock reset password
-      console.log('Password reset requested for:', email);
-    } catch (err) {
-      setError('Failed to reset password');
-      throw err;
+      const { error } = await supabase.auth.signOut();
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: 'An unexpected error occurred' };
     }
   };
 
-  const updateProfile = async (data: Partial<User>): Promise<void> => {
-    if (user) {
-      setUser({ ...user, ...data });
+  const resetPassword = async (email: string): Promise<AuthResult> => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: 'An unexpected error occurred' };
     }
   };
 
-  const refreshSession = async (): Promise<void> => {
-    // Mock refresh session
-    console.log('Session refreshed');
+  const updateProfile = async (updates: any): Promise<AuthResult> => {
+    try {
+      const { error } = await supabase.auth.updateUser(updates);
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: 'An unexpected error occurred' };
+    }
   };
 
-  return {
+  const value: AuthContextType = {
     user,
+    loading,
     signIn,
     signUp,
     signOut,
     resetPassword,
-    updateProfile,
-    refreshSession,
-    session,
-    error,
-    loading,
-    isAuthenticated: !!user
+    updateProfile
   };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
