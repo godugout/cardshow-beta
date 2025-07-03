@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import GroupImageUploader from '@/components/group-memory/GroupImageUploader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CommentSection from '@/components/CommentSection';
-import { useImageProcessing } from '@/hooks/useImageProcessing';
+import useImageProcessing from '@/hooks/useImageProcessing';
 import { toast } from 'sonner';
 
 const GroupMemoryCreator = () => {
@@ -20,7 +20,7 @@ const GroupMemoryCreator = () => {
       // Convert card IDs to a format we can use for display
       const newImages = cardIds.map(id => ({
         id,
-        url: `/cards/${id}/preview` // This would be replaced with actual image URLs in production
+        url: `/images/card-placeholder.png` // Fallback to placeholder image
       }));
       
       setProcessedImages([...processedImages, ...newImages]);

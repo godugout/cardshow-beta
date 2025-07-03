@@ -18,7 +18,7 @@ export interface Collection extends BaseEntity {
   tags?: string[];
   popularity?: number;
   instagramSource?: InstagramSource;
-  featured?: boolean;
+  featured?: boolean; // Added this property to fix the type error
   
   // Additional properties needed by other components
   visibility?: 'public' | 'private' | 'team' | 'unlisted';

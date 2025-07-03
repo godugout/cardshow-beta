@@ -10,7 +10,7 @@ import { Card } from '@/lib/types';
 
 const CardGallery = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const { cards, isLoading } = useCards();
+  const { cards, loading } = useCards();
   
   console.log('CardGallery page received cards:', cards);
   console.log('Sample cards available:', sampleCards.length);
@@ -44,7 +44,7 @@ const CardGallery = () => {
         <CardGalleryComponent 
           searchQuery={searchQuery}
           cards={cardsToDisplay as Card[]} 
-          isLoading={isLoading && cardsToDisplay.length === 0}
+          isLoading={loading && cardsToDisplay.length === 0}
         />
       </div>
     </PageLayout>

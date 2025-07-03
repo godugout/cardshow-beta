@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/lib/types';
 import { useAdvancedGestures } from '@/hooks/useAdvancedGestures';
@@ -50,7 +51,10 @@ const CardDisplay: React.FC<CardDisplayProps> = ({
     particleState,
     toggleEffect,
     toggleSystem
-  } = useParticleEffects();
+  } = useParticleEffects({
+    card,
+    shouldAutoDetectCardType: true
+  });
 
   // Initialize advanced gesture handling
   const {
@@ -305,14 +309,7 @@ const CardDisplay: React.FC<CardDisplayProps> = ({
         {/* Render particle effects */}
         <CardParticleSystem
           containerRef={cardRef}
-          particleState={{
-            isActive: particleState.active,
-            effects: {},
-            isTransitioning: false,
-            isPerformanceRestricted: false,
-            performanceLevel: 'high',
-            lastUpdateTime: Date.now()
-          }}
+          particleState={particleState}
           cardRotation={combinedRotation}
           isFlipped={isFlipped}
           isMoving={isDragging || isGesturing || isAutoRotating || totalMovement > 20}

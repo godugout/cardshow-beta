@@ -1,81 +1,61 @@
 
-import React from "react";
-import { cn } from "@/lib/utils";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-export interface ColorPickerProps {
-  id?: string;
-  color: string;
-  value?: string;
-  onChange: (value: string) => void;
-  label?: string;
-  className?: string;
-  // Add support for colors array
+interface ColorPickerProps {
+  value: string;
+  onChange: (color: string) => void;
   colors?: string[];
+  className?: string;
 }
 
 export const ColorPicker: React.FC<ColorPickerProps> = ({
-  id,
-  color,
-  value = color, // Use color as default value if value is not provided
+  value,
   onChange,
-  label,
+  colors = ['#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'],
   className,
-  colors = [],
 }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
-  };
-
-  const handlePresetClick = (presetColor: string) => {
-    onChange(presetColor);
-  };
-
-  // Ensure we have valid values
-  const safeValue = value || color || "#000000";
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className={cn("flex flex-col gap-1.5", className)}>
-      {label && (
-        <label
-          htmlFor={id}
-          className="text-sm font-medium text-gray-900 dark:text-gray-100"
-        >
-          {label}
-        </label>
-      )}
-      <div className="flex items-center gap-2">
+    <div className={cn('relative', className)}>
+      <div className="flex gap-2 items-center">
         <div
-          className="h-6 w-6 rounded-full border border-gray-200 dark:border-gray-800"
-          style={{ backgroundColor: safeValue }}
+          className="w-10 h-10 rounded-md border border-gray-200 cursor-pointer"
+          style={{ backgroundColor: value }}
+          onClick={() => setIsOpen(!isOpen)}
         />
-        <input
-          id={id}
-          type="color"
-          value={safeValue}
-          onChange={handleChange}
-          className="h-9 w-9 appearance-none rounded-md bg-transparent"
-        />
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          {safeValue}
-        </span>
+        
+        <div className="flex-1">
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="w-full border border-gray-200 rounded-md px-3 py-1 text-sm"
+          />
+        </div>
       </div>
-
-      {colors && colors.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-1">
-          {colors.map((presetColor, index) => (
-            <button
-              key={index}
-              type="button"
-              className="h-5 w-5 rounded-full border border-gray-200 dark:border-gray-800"
-              style={{ backgroundColor: presetColor }}
-              onClick={() => handlePresetClick(presetColor)}
-              aria-label={`Select color ${presetColor}`}
-            />
-          ))}
+      
+      {isOpen && (
+        <div className="absolute z-10 mt-2 p-2 bg-white rounded-md shadow-md border border-gray-100">
+          <div className="grid grid-cols-4 gap-2">
+            {colors.map((color) => (
+              <Button
+                key={color}
+                type="button"
+                className="w-8 h-8 rounded-md p-0 m-0 border border-gray-200"
+                style={{ backgroundColor: color }}
+                onClick={() => {
+                  onChange(color);
+                  setIsOpen(false);
+                }}
+                variant="ghost"
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
   );
 };
-
-export default ColorPicker;

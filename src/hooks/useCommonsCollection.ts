@@ -1,176 +1,164 @@
-
 import { useState, useEffect } from 'react';
-import { Collection } from '@/lib/types';
-import { collectionOperations } from '@/lib/supabase/collections';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { checkCollectionExists } from '@/lib/supabase/collections';
+import { collectionOperations } from '@/lib/supabase/collections';
 
-export const useCommonsCollection = () => {
-  const [collection, setCollection] = useState<Collection | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [collectionExists, setCollectionExists] = useState(false);
+export const useCommonsCollection = (collectionId: string) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingExistence, setIsCheckingExistence] = useState(false);
+  const [collectionExists, setCollectionExists] = useState<boolean | null>(null);
+  const [collectionData, setCollectionData] = useState<any>(null);
+  const [result, setResult] = useState<{
+    success?: boolean;
+    message?: string;
+    collectionId?: string;
+    error?: string;
+  } | null>(null);
 
-  useEffect(() => {
-    const fetchCollection = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const checkCollection = async () => {
+    setIsCheckingExistence(true);
+    try {
+      const { data, error } = await collectionOperations.getCollection(collectionId);
+      
+      if (error) {
+        console.log(`Error checking collection ${collectionId}:`, error);
         
-        // Check if Commons collection exists
-        const { exists, error: checkError } = await collectionOperations.checkExists('Commons', 'system');
-        
-        if (checkError) {
-          setError(checkError);
-          setCollectionExists(false);
-          return;
-        }
-
-        setCollectionExists(exists);
-
-        // If exists, fetch the collection
-        if (exists) {
-          const { data, error: fetchError } = await collectionOperations.getCollection('commons-collection-id');
+        try {
+          const exists = await checkCollectionExists(collectionId);
+          console.log(`Collection ${collectionId} exists check result:`, exists);
+          setCollectionExists(exists);
           
-          if (fetchError) {
-            setError(fetchError);
-            return;
+          if (exists) {
+            setResult({
+              success: true,
+              collectionId: collectionId,
+              message: "Commons Cards collection is available but couldn't load details"
+            });
+          } else {
+            setResult({
+              success: false,
+              message: "Commons Cards collection does not exist"
+            });
           }
-          
-          setCollection(data);
+        } catch (fallbackErr) {
+          console.error("Error in fallback existence check:", fallbackErr);
+          setCollectionExists(false);
+          setResult({
+            success: false,
+            error: "Unable to connect to database. Please check your connection."
+          });
         }
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch collection');
-        console.error('Error in useCommonsCollection:', err);
-      } finally {
-        setLoading(false);
+      } else if (data) {
+        setCollectionData(data);
+        setCollectionExists(true);
+        setResult({
+          success: true,
+          collectionId: collectionId,
+          message: "Commons Cards collection is already available"
+        });
+      } else {
+        setCollectionExists(false);
+        setResult({
+          success: false,
+          message: "Commons Cards collection does not exist"
+        });
       }
-    };
-
-    fetchCollection();
-  }, []);
-
-  const createCommonsCollection = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const commonsData: Partial<Collection> = {
-        name: 'Commons',
-        description: 'Community shared collection of cards',
-        visibility: 'public',
-        allowComments: true,
-        userId: 'system',
-        tags: ['community', 'shared'],
-        featured: true,
-        cards: [],
-        cardIds: [],
-        designMetadata: {},
-        isPublic: true
-      };
-
-      const { data, error: createError } = await collectionOperations.create(commonsData);
-      
-      if (createError) {
-        setError(createError);
-        toast.error('Failed to create Commons collection');
-        return;
-      }
-
-      setCollection(data);
-      setCollectionExists(true);
-      toast.success('Commons collection created successfully');
     } catch (err: any) {
-      const errorMessage = err.message || 'Failed to create Commons collection';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      console.error('Error creating Commons collection:', err);
+      console.error("Error checking collection existence:", err);
+      setCollectionExists(false);
+      setResult({
+        success: false,
+        error: err.message || "Unable to connect to database"
+      });
     } finally {
-      setLoading(false);
+      setIsCheckingExistence(false);
     }
   };
 
-  const addCardToCommons = async (cardId: string) => {
-    if (!collection) {
-      toast.error('Commons collection not found');
-      return;
-    }
-
-    try {
-      const { error } = await collectionOperations.addCardToCollection(collection.id, cardId);
-      
-      if (error) {
-        toast.error('Failed to add card to Commons');
-        return;
-      }
-
-      // Update local collection state
-      const updatedCollection = {
-        ...collection,
-        cardIds: [...collection.cardIds, cardId]
-      };
-      setCollection(updatedCollection);
-      
-      toast.success('Card added to Commons collection');
-    } catch (err: any) {
-      toast.error('Failed to add card to Commons');
-      console.error('Error adding card to Commons:', err);
-    }
-  };
-
-  const removeCardFromCommons = async (cardId: string) => {
-    if (!collection) {
-      toast.error('Commons collection not found');
-      return;
-    }
-
-    try {
-      const { error } = await collectionOperations.removeCardFromCollection(collection.id, cardId);
-      
-      if (error) {
-        toast.error('Failed to remove card from Commons');
-        return;
-      }
-
-      // Update local collection state
-      const updatedCollection = {
-        ...collection,
-        cardIds: collection.cardIds.filter(id => id !== cardId)
-      };
-      setCollection(updatedCollection);
-      
-      toast.success('Card removed from Commons collection');
-    } catch (err: any) {
-      toast.error('Failed to remove card from Commons');
-      console.error('Error removing card from Commons:', err);
-    }
-  };
-
-  const refreshCollection = async () => {
-    if (!collection) return;
+  const generateCommonsCards = async () => {
+    setIsLoading(true);
+    setResult(null);
     
     try {
-      const { data, error } = await collectionOperations.getCollection(collection.id);
+      console.log("Starting Commons Cards generation request...");
+      
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timed out after 15 seconds')), 15000);
+      });
+      
+      const fetchPromise = supabase.functions.invoke('populate-cards', {
+        body: { 
+          timestamp: new Date().toISOString(),
+          collectionId: collectionId
+        }
+      });
+      
+      const response = await Promise.race([fetchPromise, timeoutPromise]);
+      const { data, error } = response as any;
       
       if (error) {
-        setError(error);
+        console.error('Error generating Commons Cards:', error);
+        toast.error(`Failed to generate Commons Cards: ${error.message}`);
+        setResult({ success: false, error: error.message });
         return;
       }
       
-      setCollection(data);
+      if (!data || !data.collectionId) {
+        console.error('Invalid response from function:', data);
+        toast.error('Received invalid response from server');
+        setResult({ 
+          success: false, 
+          error: 'The server returned an invalid response. Cards may not have been created correctly.' 
+        });
+        return;
+      }
+      
+      console.log('Commons Cards generated successfully:', data);
+      toast.success(data.message || 'Commons Cards collection created/updated successfully');
+      
+      setResult({ 
+        success: true, 
+        message: data.message || 'Commons Cards created successfully!',
+        collectionId: data.collectionId || collectionId
+      });
+      
+      setTimeout(async () => {
+        try {
+          const { data: collectionData } = await collectionOperations.getCollection(collectionId);
+          if (collectionData) {
+            setCollectionData(collectionData);
+            setCollectionExists(true);
+          }
+        } catch (refreshErr) {
+          console.error('Error refreshing collection data:', refreshErr);
+        }
+      }, 1000);
     } catch (err: any) {
-      setError(err.message || 'Failed to refresh collection');
-      console.error('Error refreshing collection:', err);
+      console.error('Unexpected error:', err);
+      toast.error(err.message || 'An unexpected error occurred');
+      setResult({ 
+        success: false, 
+        error: err.message || 'Connection error or timeout occurred' 
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (collectionId) {
+      checkCollection();
+    }
+  }, [collectionId]);
+
   return {
-    collection,
-    loading,
-    error,
+    isLoading,
+    isCheckingExistence,
     collectionExists,
-    createCommonsCollection,
-    addCardToCommons,
-    removeCardFromCommons,
-    refreshCollection
+    collectionData,
+    result,
+    generateCommonsCards,
+    checkCollection
   };
 };

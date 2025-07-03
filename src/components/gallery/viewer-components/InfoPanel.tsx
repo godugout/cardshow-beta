@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card } from '@/lib/types/unifiedCardTypes';
+import { Card } from '@/lib/types';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 
 interface InfoPanelProps {

@@ -1,40 +1,62 @@
+import { TeamMember, User, UserRole } from '@/lib/types';
+import { Team } from '@/lib/types/teamTypes';
 
-import { TeamMember, Team } from '@/lib/types';
-
-export const mapTeamMember = (data: any): TeamMember => ({
-  id: data.id,
-  userId: data.userId,
-  teamId: data.teamId,
-  role: data.role,
-  joinedAt: data.joinedAt,
-  permissions: data.permissions,
-  createdAt: data.createdAt || new Date().toISOString(),
-  updatedAt: data.updatedAt || new Date().toISOString(),
+/**
+ * Maps a team record from the database to the Team interface
+ */
+export const mapTeamFromDb = (team: any): Team => ({
+  id: team.id,
+  name: team.name,
+  description: team.description,
+  logoUrl: team.logo_url,
+  logo_url: team.logo_url,
+  banner_url: team.banner_url,
+  ownerId: team.owner_id, // Keep only ownerId
+  status: team.status,
+  website: team.website,
+  email: team.email,
+  specialties: team.specialties,
+  createdAt: team.created_at,
+  updatedAt: team.updated_at,
+  visibility: team.visibility || 'public', // Default visibility
+  
+  // Team fields
+  team_code: team.team_code,
+  primary_color: team.primary_color,
+  secondary_color: team.secondary_color,
+  tertiary_color: team.tertiary_color,
+  founded_year: team.founded_year,
+  city: team.city,
+  state: team.state,
+  country: team.country,
+  stadium: team.stadium,
+  mascot: team.mascot,
+  league: team.league,
+  division: team.division,
+  is_active: team.is_active
 });
 
-export const mapTeamMembers = (data: any[]): TeamMember[] => {
-  return data.map(mapTeamMember);
-};
+/**
+ * Maps a team member record from the database to the TeamMember interface
+ */
+export const mapTeamMemberFromDb = (member: any): TeamMember => {
+  const user: User = {
+    id: member.user_id,
+    email: member.users?.email,
+    displayName: member.users?.display_name,
+    name: member.users?.full_name,
+    avatarUrl: member.users?.avatar_url,
+    role: UserRole.USER,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
 
-export const mapTeam = (data: any): Team => ({
-  id: data.id,
-  name: data.name,
-  description: data.description,
-  logoUrl: data.logoUrl || data.logo_url,
-  ownerId: data.ownerId,
-  isActive: data.isActive,
-  visibility: data.visibility,
-  banner_url: data.banner_url,
-  status: data.status,
-  website: data.website,
-  email: data.email,
-  specialties: data.specialties,
-  primary_color: data.primary_color,
-  secondary_color: data.secondary_color,
-  createdAt: data.createdAt || new Date().toISOString(),
-  updatedAt: data.updatedAt || new Date().toISOString(),
-});
-
-export const mapTeams = (data: any[]): Team[] => {
-  return data.map(mapTeam);
+  return {
+    id: member.id,
+    teamId: member.team_id,
+    userId: member.user_id,
+    role: member.role,
+    joinedAt: member.joined_at,
+    user
+  };
 };

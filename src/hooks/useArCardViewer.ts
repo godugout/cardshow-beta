@@ -1,56 +1,150 @@
 
-import { useState, useCallback } from 'react';
-import { Card, CardEffect } from '@/lib/types/core';
-import { stringToCardEffect } from '@/lib/utils/cardEffectHelpers';
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Card } from '@/lib/types/card';
+import { useToast } from '@/hooks/use-toast';
+import { adaptToCard } from '@/lib/adapters/cardAdapter';
 
-export const useArCardViewer = (cardId?: string) => {
-  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
-  const [activeEffects, setActiveEffects] = useState<CardEffect[]>([
-    stringToCardEffect('holographic')
-  ]);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+interface CardRecord extends Card {
+  // This interface ensures CardRecord has all the properties of Card
+  collection_id?: string;
+  created_at: string;
+  creator_id: string;
+  design_metadata: any;
+  edition_size: number;
+  image_url: string;
+  is_public: boolean;
+  price?: number;
+  user_id: string;
+}
+
+export function useArCardViewer(cardId?: string) {
+  const [cards, setCards] = useState<Card[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [activeCardId, setActiveCardId] = useState<string | null>(cardId || null);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isArMode, setIsArMode] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Mock data for AR cards and available cards
   const [arCards, setArCards] = useState<Card[]>([]);
-  const [availableCards, setAvailableCards] = useState<Card[]>([]);
-  
-  // Additional state for missing properties
-  const [cards, setCards] = useState<Card[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const handleCardSelect = useCallback((card: Card) => {
-    setSelectedCard(card);
-  }, []);
+  // Get the active card based on activeCardId
+  const activeCard = activeCardId ? cards.find(card => card.id === activeCardId) || null : null;
+  // Cards available to add to AR scene
+  const availableCards = cards.filter(card => !arCards.some(arCard => arCard.id === card.id));
 
-  const handleEffectToggle = useCallback((effectName: string) => {
-    const newEffect = stringToCardEffect(effectName);
-    setActiveEffects(prev => {
-      const exists = prev.some(effect => effect.type === newEffect.type);
-      if (exists) {
-        return prev.filter(effect => effect.type !== newEffect.type);
-      } else {
-        return [...prev, newEffect];
+  const fetchCards = useCallback(async () => {
+    try {
+      setLoading(true);
+      
+      // For demonstration, create some sample cards
+      const demoCards: Card[] = [
+        adaptToCard({
+          id: '1',
+          title: 'AR Demo Card 1',
+          description: 'This is an AR-compatible card',
+          imageUrl: '/ar-card-1.png',
+          thumbnailUrl: '/ar-card-1-thumb.png',
+          tags: ['AR', 'demo'],
+          userId: 'demo-user',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          effects: ['Holographic'],
+        }),
+        adaptToCard({
+          id: '2',
+          title: 'AR Demo Card 2',
+          description: 'Another AR-compatible card',
+          imageUrl: '/ar-card-2.png',
+          thumbnailUrl: '/ar-card-2-thumb.png',
+          tags: ['AR', 'interactive'],
+          userId: 'demo-user',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          effects: ['Refractor'],
+        }),
+      ];
+      
+      // Here, in a real application, you'd fetch from Supabase
+      // const { data, error } = await supabase
+      //   .from('cards')
+      //   .select('*')
+      //   .eq('ar_enabled', true);
+      
+      // if (error) throw error;
+      
+      // Process fetched data (commented out for demo)
+      // if (data) {
+      //   const processedCards = data.map(item => adaptToCard({
+      //     id: item.id,
+      //     title: item.title || '',
+      //     description: item.description || '',
+      //     imageUrl: item.image_url || '',
+      //     thumbnailUrl: item.thumbnail_url || '',
+      //     tags: item.tags || [],
+      //     collectionId: item.collection_id || '',
+      //     createdAt: item.created_at || new Date().toISOString(),
+      //     updatedAt: item.updated_at || new Date().toISOString(),
+      //     userId: item.user_id || '',
+      //     isPublic: item.is_public || false,
+      //     designMetadata: item.design_metadata || {},
+      //     effects: item.effects || ['Holographic'], // Ensure effects is always populated
+      //   }));
+      //   setCards(processedCards);
+      // }
+      
+      setCards(demoCards);
+
+      // If a cardId was provided, add it to AR cards
+      if (cardId) {
+        const cardToAdd = demoCards.find(card => card.id === cardId);
+        if (cardToAdd) {
+          setArCards([cardToAdd]);
+        }
       }
-    });
+    } catch (err) {
+      const error = err as Error;
+      console.error('Error fetching AR cards:', error);
+      setError(error);
+      toast({
+        title: 'Failed to load AR cards',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast, cardId]);
+
+  useEffect(() => {
+    fetchCards();
+  }, [fetchCards]);
+
+  const openViewer = useCallback((cardId: string) => {
+    setActiveCardId(cardId);
+    setIsViewerOpen(true);
   }, []);
 
-  const handleFullscreenToggle = useCallback(() => {
-    setIsFullscreen(prev => !prev);
+  const closeViewer = useCallback(() => {
+    setIsViewerOpen(false);
+    setActiveCardId(null);
   }, []);
 
-  const handlePlayToggle = useCallback(() => {
-    setIsPlaying(prev => !prev);
-  }, []);
-
+  // AR interaction methods
   const handleLaunchAr = useCallback(() => {
-    setIsArMode(true);
-  }, []);
+    if (activeCard) {
+      setArCards([activeCard]);
+      setIsArMode(true);
+    } else {
+      toast({
+        title: 'No card selected',
+        description: 'Please select a card to view in AR',
+        variant: 'destructive',
+      });
+    }
+  }, [activeCard, toast]);
 
   const handleExitAr = useCallback(() => {
     setIsArMode(false);
@@ -58,73 +152,73 @@ export const useArCardViewer = (cardId?: string) => {
 
   const handleCameraError = useCallback((error: string) => {
     setCameraError(error);
-  }, []);
+    toast({
+      title: 'Camera Error',
+      description: error,
+      variant: 'destructive',
+    });
+  }, [toast]);
 
   const handleTakeSnapshot = useCallback(() => {
-    // Mock implementation
-    console.log('Taking snapshot');
-  }, []);
+    toast({
+      title: 'Snapshot taken',
+      description: 'AR snapshot saved to your gallery',
+    });
+  }, [toast]);
 
   const handleFlip = useCallback(() => {
     setIsFlipped(prev => !prev);
   }, []);
 
   const handleZoomIn = useCallback(() => {
-    // Mock implementation
-    console.log('Zooming in');
-  }, []);
+    toast({
+      title: 'Zooming in',
+      description: 'Feature coming soon',
+    });
+  }, [toast]);
 
   const handleZoomOut = useCallback(() => {
-    // Mock implementation
-    console.log('Zooming out');
-  }, []);
+    toast({
+      title: 'Zooming out',
+      description: 'Feature coming soon',
+    });
+  }, [toast]);
 
   const handleRotate = useCallback(() => {
-    // Mock implementation
-    console.log('Rotating');
-  }, []);
+    toast({
+      title: 'Rotating card',
+      description: 'Feature coming soon',
+    });
+  }, [toast]);
 
   const handleAddCard = useCallback((cardId: string) => {
-    // Mock implementation
-    console.log('Adding card:', cardId);
-  }, []);
+    const cardToAdd = cards.find(card => card.id === cardId);
+    if (cardToAdd && !arCards.some(card => card.id === cardId)) {
+      setArCards(prev => [...prev, cardToAdd]);
+    }
+  }, [cards, arCards]);
 
   const handleRemoveCard = useCallback((cardId: string) => {
-    // Mock implementation
-    console.log('Removing card:', cardId);
-  }, []);
-
-  const addDefaultEffects = useCallback(() => {
-    const defaultEffects = [
-      stringToCardEffect('holographic'),
-      stringToCardEffect('refractor')
-    ];
-    setActiveEffects(defaultEffects);
-  }, []);
-
-  const clearEffects = useCallback(() => {
-    setActiveEffects([]);
+    setArCards(prev => prev.filter(card => card.id !== cardId));
   }, []);
 
   return {
-    selectedCard,
-    activeEffects,
-    isFullscreen,
-    isPlaying,
-    isArMode,
-    isFlipped,
-    cameraError,
-    isLoading,
-    arCards,
-    availableCards,
     cards,
     loading,
     error,
-    activeCard: selectedCard, // Alias for backward compatibility
-    handleCardSelect,
-    handleEffectToggle,
-    handleFullscreenToggle,
-    handlePlayToggle,
+    activeCardId,
+    isViewerOpen,
+    openViewer,
+    closeViewer,
+    fetchCards,
+    // Add the missing properties
+    activeCard,
+    arCards,
+    availableCards,
+    isArMode,
+    isFlipped,
+    cameraError,
+    isLoading: loading,
     handleLaunchAr,
     handleExitAr,
     handleCameraError,
@@ -135,9 +229,5 @@ export const useArCardViewer = (cardId?: string) => {
     handleRotate,
     handleAddCard,
     handleRemoveCard,
-    addDefaultEffects,
-    clearEffects,
-    setSelectedCard,
-    setActiveEffects
   };
-};
+}

@@ -1,35 +1,30 @@
 
 import React from 'react';
-import { Card } from '@/lib/types/unifiedCardTypes';
+import { CardData } from '@/types/card';
 
 interface CardItemProps {
-  card: Card;
-  onClick?: () => void;
-  className?: string;
-  isActive?: boolean; // Add missing prop
+  card: CardData;
+  isActive: boolean;
+  onClick: () => void;
 }
 
-const CardItem: React.FC<CardItemProps> = ({ card, onClick, className = '', isActive = false }) => {
+const CardItem = ({ card, isActive, onClick }: CardItemProps) => {
   return (
     <div 
-      className={`bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow ${isActive ? 'ring-2 ring-blue-500' : ''} ${className}`}
+      className={`flex items-center p-3 rounded-lg cursor-pointer transition ${
+        isActive 
+          ? 'bg-blue-100 border-l-4 border-blue-500' 
+          : 'bg-white hover:bg-gray-100 border-l-4 border-transparent'
+      }`}
       onClick={onClick}
     >
-      <div className="aspect-[2.5/3.5] overflow-hidden">
-        <img 
-          src={card.imageUrl} 
-          alt={card.title}
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div className="p-3">
-        <h3 className="font-semibold text-sm mb-1 line-clamp-2">{card.title}</h3>
-        <p className="text-xs text-gray-600">
-          {card.player || card.name || 'Unknown'}
-        </p>
-        <p className="text-xs text-gray-500">
-          Jersey: {card.jersey || 'N/A'}
-        </p>
+      <div 
+        className="flex-shrink-0 w-12 h-16 rounded-md overflow-hidden" 
+        style={{ backgroundColor: card.backgroundColor }}
+      ></div>
+      <div className="ml-4">
+        <h4 className="font-medium">{card.name}</h4>
+        <p className="text-sm text-gray-600">{card.team} #{card.jersey}</p>
       </div>
     </div>
   );

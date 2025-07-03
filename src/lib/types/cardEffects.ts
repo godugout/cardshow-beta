@@ -1,7 +1,7 @@
 
-// Use the unified CardEffect from core types
-export type { CardEffect } from './core';
-
+/**
+ * Card effect settings interface
+ */
 export interface CardEffectSettings {
   intensity?: number;
   speed?: number;
@@ -11,38 +11,43 @@ export interface CardEffectSettings {
   [key: string]: any;
 }
 
-export interface PremiumCardEffect {
+/**
+ * Card effect interface
+ */
+export interface CardEffect {
   id: string;
   name: string;
-  description: string;
-  category: string;
-  isPremium: boolean;
-  tier: 'basic' | 'premium' | 'ultra';
-  cssClass: string;
-  previewImage?: string;
-  price?: number;
-  enabled?: boolean;
-  settings?: CardEffectSettings;
+  enabled: boolean;
+  settings: CardEffectSettings;
+  className?: string;
 }
 
+/**
+ * Card effects options for the hook
+ */
+export interface CardEffectsOptions {
+  initialEffects?: Record<string, string[]>;
+  presets?: Record<string, string[]>;
+  defaultIntensity?: number;
+  performanceMode?: 'high' | 'medium' | 'low';
+}
+
+/**
+ * Card effects result from the hook
+ */
 export interface CardEffectsResult {
-  availableEffects: PremiumCardEffect[];
+  cardEffects: Record<string, string[]>;
+  isLoading: boolean;
+  addEffect: (cardId: string, effect: string) => void;
+  removeEffect: (cardId: string, effect: string) => void;
+  toggleEffect: (cardId: string, effect: string) => void;
+  clearEffects: (cardId: string) => void;
+  setCardEffects: (cardId: string, effects: string[]) => void;
   activeEffects: string[];
   setActiveEffects: (effects: string[]) => void;
-  toggleEffect: (effectId: string) => void;
-  applyEffect: (effectId: string) => void;
-  removeEffect: (effectId: string) => void;
-  isEffectActive: (effectId: string) => boolean;
-  getEffectIntensity: (effectId: string) => number;
-  setEffectIntensity: (effectId: string, intensity: number) => void;
-  clearEffects: () => void;
-  
-  // Add missing properties for ImmersiveCardViewerPage
-  cardEffects?: Record<string, string[]>;
-  addEffect?: (cardId: string, effect: string) => void;
-  setCardEffects?: (cardId: string, effects: string[]) => void;
-  premiumEffects?: PremiumCardEffect[];
-  appliedClasses?: string;
-  cssClasses?: string;
-  effectData?: Record<string, any>;
 }
+
+/**
+ * Additional effect settings for premium effects
+ */
+export type EffectSettings = CardEffectSettings;

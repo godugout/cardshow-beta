@@ -1,158 +1,103 @@
 
-import { useState } from 'react';
-import { MemorabiliaType } from '@/components/card-upload/cardDetection';
-import { useImageProcessing } from '@/hooks/useImageProcessing';
-import { toast } from 'sonner';
-import { useMobileOptimization } from '@/hooks/useMobileOptimization';
-import { useConnectivity } from '@/hooks/useConnectivity';
+import { useState, useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { processImage, compressImage } from '@/lib/image-utils';
 
-export type GroupUploadType = 'group' | 'memorabilia' | 'mixed';
-
-export interface UploadFileItem {
-  file: File;
-  url: string;
-  type?: MemorabiliaType;
-}
+export type GroupUploadType = 'individual' | 'team' | 'group';
 
 export interface UseUploadHandlingProps {
-  onComplete?: (cardIds: string[]) => void;
+  multiple?: boolean;
+  maxFiles?: number;
+  maxSize?: number;
+  uploadType?: GroupUploadType;
+  onComplete?: (files: File[], urls: string[]) => void;
 }
 
-export const useUploadHandling = ({ onComplete }: UseUploadHandlingProps) => {
-  const [uploadType, setUploadType] = useState<GroupUploadType>('group');
-  const [uploadedFiles, setUploadedFiles] = useState<UploadFileItem[]>([]); // Updated type
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [showEditor, setShowEditor] = useState(false);
-  const [currentFile, setCurrentFile] = useState<File | null>(null);
-  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
+export const useUploadHandling = ({
+  multiple = false,
+  maxFiles = 10,
+  maxSize = 10 * 1024 * 1024, // 10MB
+  uploadType = 'group',
+  onComplete
+}: UseUploadHandlingProps) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   
-  const { resizeImage, createThumbnail } = useImageProcessing();
-  const { isOnline } = useConnectivity();
-  const { shouldOptimizeAnimations, getImageQuality } = useMobileOptimization();
-  
-  // Handle file selection
-  const handleFileSelected = async (file: File): Promise<void> => {
+  const handleFileSelected = async (files: File[]) => {
     try {
-      // Basic validation
-      if (!file.type.includes('image/')) {
-        toast.error('Please select a valid image file');
-        return;
+      if (!files.length) return;
+      
+      setIsUploading(true);
+      setUploadProgress(10);
+      
+      // Process all files
+      const processedFiles = [];
+      const processedUrls = [];
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Simulate progress update for each file
+        setUploadProgress(10 + Math.round((i / files.length) * 80));
+        
+        // Process and compress image
+        const compressed = await compressImage(file);
+        const { url } = await processImage(compressed);
+        
+        processedFiles.push(compressed);
+        processedUrls.push(url);
       }
       
-      // Resize image for preview with mobile-optimized quality
-      const quality = getImageQuality();
-      // Fix here - createThumbnail expects at most 2 arguments (file and size)
-      const dataUrl = await createThumbnail(file, 800);
+      setUploadProgress(90);
       
-      // Add to uploaded files
-      setUploadedFiles(prev => [...prev, { file, url: dataUrl }]);
-      
-      // Open editor with current file
-      setCurrentFile(file);
-      setCurrentImageUrl(dataUrl);
-      setShowEditor(true);
-    } catch (error) {
-      console.error('Error handling file:', error);
-      toast.error('Failed to process image');
-    }
-  };
-  
-  // Handle batched uploads from editor
-  const handleBatchUpload = (
-    files: File[],
-    urls: string[],
-    types?: MemorabiliaType[]
-  ) => {
-    if (files.length === 0) {
-      toast.error('No files to process');
-      return;
-    }
-    
-    // Create proper upload file items
-    const newUploadItems: UploadFileItem[] = files.map((file, index) => ({
-      file,
-      url: urls[index] || '',
-      type: types?.[index]
-    }));
-    
-    // Add to uploaded files
-    setUploadedFiles(prev => [...prev, ...newUploadItems]);
-    
-    // Generate fake card IDs for demo
-    const cardIds = files.map((_, index) => `card-${Date.now()}-${index}`);
-    
-    // Close editor
-    setShowEditor(false);
-    
-    // Reset current file
-    setCurrentFile(null);
-    setCurrentImageUrl(null);
-    
-    // Call onComplete with card IDs
-    if (onComplete) {
-      onComplete(cardIds);
-    }
-    
-    toast.success(`Successfully processed ${files.length} items`);
-  };
-  
-  // Remove a file from the upload queue
-  const handleRemoveFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
-  };
-  
-  // Process all uploads in queue
-  const processUploads = async () => {
-    if (uploadedFiles.length === 0) {
-      toast.warning('No files to process');
-      return;
-    }
-    
-    setIsProcessing(true);
-    
-    try {
-      // Check online status
-      if (!isOnline) {
-        toast.warning('You are offline. Files will sync when connection is restored.');
-        // In a real app, save to IndexedDB or other offline storage
-      }
-      
-      // In a real app, we would upload each file to the server here
-      // For demo purposes, we'll just simulate server processing
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Generate fake card IDs
-      const cardIds = uploadedFiles.map((_, index) => `card-${Date.now()}-${index}`);
-      
-      // Call onComplete with card IDs
+      // Complete the upload
       if (onComplete) {
-        onComplete(cardIds);
+        onComplete(processedFiles, processedUrls);
       }
       
-      // Clear uploaded files
-      setUploadedFiles([]);
+      setUploadProgress(100);
       
-      toast.success(`Successfully processed ${cardIds.length} images`);
+      // Reset progress after a delay
+      setTimeout(() => {
+        setIsUploading(false);
+        setUploadProgress(0);
+      }, 500);
     } catch (error) {
       console.error('Error processing uploads:', error);
-      toast.error('Failed to process uploads');
-    } finally {
-      setIsProcessing(false);
+      setIsUploading(false);
+      setUploadProgress(0);
     }
   };
   
+  const processUploads = async (acceptedFiles: File[]) => {
+    // If multiple is disabled, only take the first file
+    const filesToProcess = multiple 
+      ? acceptedFiles.slice(0, maxFiles) 
+      : [acceptedFiles[0]];
+    
+    await handleFileSelected(filesToProcess);
+  };
+  
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp']
+    },
+    maxSize,
+    multiple,
+    maxFiles,
+    onDrop: processUploads
+  });
+  
   return {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isUploading,
+    uploadProgress,
     uploadType,
-    setUploadType,
-    uploadedFiles,
-    isProcessing,
-    showEditor,
-    setShowEditor,
-    currentFile,
-    currentImageUrl,
-    handleFileSelected,
-    handleBatchUpload,
-    handleRemoveFile,
+    handleFileSelected, // Add these missing methods
     processUploads
   };
 };
+
+export default useUploadHandling;

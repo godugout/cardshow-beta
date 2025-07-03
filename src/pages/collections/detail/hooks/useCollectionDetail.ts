@@ -2,29 +2,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useCards } from '@/context/CardContext';
 import { toast } from 'sonner';
-import { Card } from '@/lib/types/unifiedCardTypes';
+import { Card, Collection } from '@/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { collectionOperations, convertDbCollectionToApp } from '@/lib/supabase/collections';
-
-// Use the unified Collection type to avoid conflicts
-interface Collection {
-  id: string;
-  name: string;
-  description?: string;
-  coverImageUrl?: string;
-  userId?: string;
-  teamId?: string;
-  visibility?: 'public' | 'private' | 'team';
-  allowComments?: boolean;
-  createdAt: string;
-  updatedAt: string;
-  designMetadata?: any;
-  cards?: Card[];
-  cardIds?: string[];
-  isPublic?: boolean;
-  tags?: string[];
-  featured?: boolean;
-}
 
 export const useCollectionDetail = (collectionId?: string) => {
   const { collections, cards, isLoading, updateCard, updateCollection, deleteCollection, refreshCards } = useCards();
@@ -65,19 +45,9 @@ export const useCollectionDetail = (collectionId?: string) => {
       }
       
       if (data?.collection) {
-        // Convert DB collection to app format with proper type casting
+        // Convert DB collection to app format
         const appCollection = convertDbCollectionToApp(data.collection);
-        
-        // Ensure it matches our local Collection interface with all required properties
-        const localCollection: Collection = {
-          ...appCollection,
-          description: appCollection.description || '',
-          visibility: (appCollection.visibility || 'private') as 'public' | 'private' | 'team',
-          isPublic: appCollection.visibility === 'public',
-          tags: appCollection.tags || [],
-          featured: appCollection.featured || false
-        };
-        setLocalCollection(localCollection);
+        setLocalCollection(appCollection);
         
         if (data.cards?.length > 0) {
           // Process cards

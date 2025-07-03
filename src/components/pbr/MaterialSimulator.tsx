@@ -1,250 +1,349 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { MaterialSimulation } from '@/components/pbr/types';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Slider } from '@/components/ui/slider';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { cn } from '@/lib/utils';
+
+import React, { useEffect, useRef } from 'react';
+import { MaterialSimulation } from '@/hooks/card-effects/types';
+import './fabric-materials.css';
 
 interface MaterialSimulatorProps {
   material: MaterialSimulation;
-  onChange: (newMaterial: Partial<MaterialSimulation>) => void;
+  width?: number;
+  height?: number;
   className?: string;
 }
 
+/**
+ * A component that simulates different fabric materials for uniform textures
+ */
 const MaterialSimulator: React.FC<MaterialSimulatorProps> = ({
   material,
-  onChange,
-  className
+  width = 256,
+  height = 256,
+  className = ''
 }) => {
-  const [albedo, setAlbedo] = useState(material.baseColor || '#ffffff');
-  const [roughness, setRoughness] = useState(material.roughness ?? 0.5);
-  const [metalness, setMetalness] = useState(material.metalness ?? material.metallic ?? 0.5);
-  const [clearcoat, setClearcoat] = useState(material.clearcoat ?? 0);
-  const [clearcoatRoughness, setClearcoatRoughness] = useState(material.clearcoatRoughness ?? 0);
-  const [ior, setIor] = useState(material.ior ?? 1.5);
-  const [transmission, setTransmission] = useState(material.transmission ?? 0);
-  const [reflectivity, setReflectivity] = useState(material.reflectivity ?? 0.5);
-  const [emissive, setEmissive] = useState(material.emissive || '#000000');
-  const [envMapIntensity, setEnvMapIntensity] = useState(material.envMapIntensity ?? 1);
-  const [normalIntensity, setNormalIntensity] = useState(material.normalIntensity ?? 1);
-  const [weathering, setWeathering] = useState(material.weathering ?? 0);
-  
-  const previewRef = useRef<HTMLDivElement>(null);
-  
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Render the material effect onto the canvas
   useEffect(() => {
-    setAlbedo(material.baseColor || '#ffffff');
-    setRoughness(material.roughness ?? 0.5);
-    setMetalness(material.metalness ?? material.metallic ?? 0.5);
-    setClearcoat(material.clearcoat ?? 0);
-    setClearcoatRoughness(material.clearcoatRoughness ?? 0);
-    setIor(material.ior ?? 1.5);
-    setTransmission(material.transmission ?? 0);
-    setReflectivity(material.reflectivity ?? 0.5);
-    setEmissive(material.emissive || '#000000');
-    setEnvMapIntensity(material.envMapIntensity ?? 1);
-    setNormalIntensity(material.normalIntensity ?? 1);
-    setWeathering(material.weathering ?? 0);
-  }, [material]);
-  
-  useEffect(() => {
-    if (previewRef.current) {
-      const element = previewRef.current;
-      element.style.setProperty('--material-albedo', albedo);
-      element.style.setProperty('--material-roughness', String(roughness));
-      element.style.setProperty('--material-metalness', String(metalness));
-      element.style.setProperty('--material-clearcoat', String(clearcoat));
-      element.style.setProperty('--material-clearcoatRoughness', String(clearcoatRoughness));
-      element.style.setProperty('--material-ior', String(ior));
-      element.style.setProperty('--material-transmission', String(transmission));
-      element.style.setProperty('--material-reflectivity', String(reflectivity));
-      element.style.setProperty('--material-emissive', emissive);
-      element.style.setProperty('--material-envMapIntensity', String(envMapIntensity));
-      element.style.setProperty('--material-normalIntensity', String(normalIntensity));
-      element.style.setProperty('--material-weathering', weathering ? String(weathering) : '0');
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas dimensions
+    canvas.width = width;
+    canvas.height = height;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the base color or texture
+    if (material.textureUrl) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        // Draw the image
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // Apply material-specific effects
+        applyMaterialEffect(ctx, canvas.width, canvas.height, material);
+      };
+      img.src = material.textureUrl;
+    } else {
+      // Fill with base color if no texture
+      ctx.fillStyle = material.baseColor || '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      applyMaterialEffect(ctx, canvas.width, canvas.height, material);
     }
-  }, [albedo, roughness, metalness, clearcoat, clearcoatRoughness, ior, transmission, reflectivity, emissive, envMapIntensity, normalIntensity, weathering]);
+  }, [material, width, height]);
+
+  // Apply different effects based on material type
+  const applyMaterialEffect = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    material: MaterialSimulation
+  ) => {
+    // Save context state
+    ctx.save();
+    
+    // Apply different patterns based on material type
+    switch (material.type) {
+      case 'mesh':
+        // Create mesh pattern
+        drawMeshPattern(ctx, width, height, material);
+        break;
+      case 'synthetic':
+        // Create synthetic fabric pattern
+        drawSyntheticPattern(ctx, width, height, material);
+        break;
+      case 'canvas':
+      default:
+        // Create canvas/cotton pattern
+        drawCanvasPattern(ctx, width, height, material);
+        break;
+    }
+    
+    // Apply weathering if specified
+    if (material.weathering) {
+      applyWeatheringEffect(ctx, width, height, material.weathering);
+    }
+    
+    // Apply lighting effects
+    applyLightingEffect(ctx, width, height, material);
+    
+    // Restore context
+    ctx.restore();
+  };
   
+  // Create mesh pattern (basketball jerseys, etc.)
+  const drawMeshPattern = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    material: MaterialSimulation
+  ) => {
+    const meshSize = 4;
+    const opacity = 0.2;
+    
+    // Add mesh texture overlay
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.globalAlpha = opacity;
+    
+    // Draw horizontal lines
+    for (let y = 0; y < height; y += meshSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+    
+    // Draw vertical lines
+    for (let x = 0; x < width; x += meshSize) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+    
+    // Reset composite operation and alpha
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1.0;
+    
+    // Add subtle highlights
+    ctx.globalCompositeOperation = 'overlay';
+    const gradient = ctx.createLinearGradient(0, 0, width, height);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+    gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+    ctx.globalCompositeOperation = 'source-over';
+  };
+  
+  // Create synthetic fabric pattern
+  const drawSyntheticPattern = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    material: MaterialSimulation
+  ) => {
+    // Add smooth gradient sheen
+    ctx.globalCompositeOperation = 'overlay';
+    const gradient = ctx.createLinearGradient(0, 0, width, height / 2);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+    gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+    
+    // Add fine diagonal pattern
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.globalAlpha = 0.05;
+    
+    const patternSize = 2;
+    for (let i = 0; i < width + height; i += patternSize * 2) {
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(i, 0);
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+    
+    // Reset composite operation and alpha
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1.0;
+  };
+  
+  // Create canvas/cotton pattern
+  const drawCanvasPattern = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    material: MaterialSimulation
+  ) => {
+    // Apply canvas texture
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.globalAlpha = 0.1;
+    
+    // Create canvas texture with small dots/noise
+    for (let x = 0; x < width; x += 3) {
+      for (let y = 0; y < height; y += 3) {
+        if (Math.random() > 0.5) {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }
+    
+    // Reset composite operation and alpha
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1.0;
+    
+    // Add subtle fabric grain diagonal lines
+    ctx.globalCompositeOperation = 'overlay';
+    ctx.globalAlpha = 0.05;
+    
+    for (let i = -height; i < width; i += 8) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + height, height);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1.0;
+  };
+  
+  // Apply weathering effects (new, game-worn, vintage)
+  const applyWeatheringEffect = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    weathering: string
+  ) => {
+    switch (weathering) {
+      case 'game-worn':
+        // Add some scuffs and wear marks
+        ctx.globalCompositeOperation = 'multiply';
+        for (let i = 0; i < 10; i++) {
+          const x = Math.random() * width;
+          const y = Math.random() * height;
+          const radius = 5 + Math.random() * 15;
+          const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+          gradient.addColorStop(0, 'rgba(0, 0, 0, 0.2)');
+          gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = gradient;
+          ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+        }
+        break;
+        
+      case 'vintage':
+        // Add yellowing/aging effect
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.fillStyle = 'rgba(255, 240, 200, 0.2)';
+        ctx.fillRect(0, 0, width, height);
+        
+        // Add some fading
+        ctx.globalCompositeOperation = 'overlay';
+        const gradient = ctx.createLinearGradient(0, 0, width, height);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+        gradient.addColorStop(1, 'rgba(200, 200, 160, 0.2)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+        
+        // Add some random aging spots
+        ctx.globalCompositeOperation = 'multiply';
+        for (let i = 0; i < 20; i++) {
+          const x = Math.random() * width;
+          const y = Math.random() * height;
+          const radius = 1 + Math.random() * 5;
+          ctx.fillStyle = 'rgba(139, 69, 19, 0.05)';
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        break;
+        
+      case 'new':
+      default:
+        // New uniforms just have a slight sheen
+        ctx.globalCompositeOperation = 'overlay';
+        const newGradient = ctx.createLinearGradient(0, 0, width, height);
+        newGradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+        newGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+        newGradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+        ctx.fillStyle = newGradient;
+        ctx.fillRect(0, 0, width, height);
+        break;
+    }
+    
+    // Reset composite operation
+    ctx.globalCompositeOperation = 'source-over';
+  };
+  
+  // Apply lighting effect based on material properties
+  const applyLightingEffect = (
+    ctx: CanvasRenderingContext2D, 
+    width: number, 
+    height: number, 
+    material: MaterialSimulation
+  ) => {
+    // Apply reflections based on metalness/roughness
+    const reflectionIntensity = material.metalness ? Math.min(0.5, material.metalness * 0.5) : 0.1;
+    const roughness = material.roughness || 0.5;
+    
+    // Less roughness = sharper reflections
+    const blurAmount = roughness * 20;
+    
+    // Create a diagonal highlight that mimics environmental lighting
+    ctx.globalCompositeOperation = 'overlay';
+    const x = width * 0.2;
+    const y = height * 0.2;
+    const radius = Math.max(width, height) * (1 - roughness * 0.5);
+    
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    gradient.addColorStop(0, `rgba(255, 255, 255, ${reflectionIntensity})`);
+    gradient.addColorStop(0.5, `rgba(255, 255, 255, ${reflectionIntensity * 0.5})`);
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+    
+    // If it's a synthetic material, add a second highlight point
+    if (material.type === 'synthetic') {
+      const x2 = width * 0.8;
+      const y2 = height * 0.8;
+      const radius2 = Math.max(width, height) * 0.7;
+      
+      const gradient2 = ctx.createRadialGradient(x2, y2, 0, x2, y2, radius2);
+      gradient2.addColorStop(0, `rgba(255, 255, 255, ${reflectionIntensity * 0.7})`);
+      gradient2.addColorStop(0.5, `rgba(255, 255, 255, ${reflectionIntensity * 0.2})`);
+      gradient2.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      
+      ctx.fillStyle = gradient2;
+      ctx.fillRect(0, 0, width, height);
+    }
+    
+    // Reset composite operation
+    ctx.globalCompositeOperation = 'source-over';
+  };
+
   return (
-    <div className={cn("grid gap-4", className)}>
-      <div className="grid gap-2">
-        <Label htmlFor="albedo">Albedo</Label>
-        <Input id="albedo" value={albedo} onChange={(e) => {
-          setAlbedo(e.target.value);
-          onChange({ baseColor: e.target.value });
-        }} type="color" />
-      </div>
-      
-      <div className="grid gap-2">
-        <Label htmlFor="roughness">Roughness</Label>
-        <Slider
-          id="roughness"
-          defaultValue={[roughness]}
-          value={[roughness]}
-          max={1}
-          step={0.01}
-          onValueChange={(value) => {
-            setRoughness(value[0]);
-            onChange({ roughness: value[0] });
-          }}
-        />
-      </div>
-      
-      <div className="grid gap-2">
-        <Label htmlFor="metalness">Metalness</Label>
-        <Slider
-          id="metalness"
-          defaultValue={[metalness]}
-          value={[metalness]}
-          max={1}
-          step={0.01}
-          onValueChange={(value) => {
-            setMetalness(value[0]);
-            onChange({ metalness: value[0] });
-          }}
-        />
-      </div>
-      
-      <div className="grid gap-2">
-        <Label htmlFor="clearcoat">Clearcoat</Label>
-        <Slider
-          id="clearcoat"
-          defaultValue={[clearcoat]}
-          value={[clearcoat]}
-          max={1}
-          step={0.01}
-          onValueChange={(value) => {
-            setClearcoat(value[0]);
-            onChange({ clearcoat: value[0] });
-          }}
-        />
-      </div>
-      
-      <div className="grid gap-2">
-        <Label htmlFor="clearcoatRoughness">Clearcoat Roughness</Label>
-        <Slider
-          id="clearcoatRoughness"
-          defaultValue={[clearcoatRoughness]}
-          value={[clearcoatRoughness]}
-          max={1}
-          step={0.01}
-          onValueChange={(value) => {
-            setClearcoatRoughness(value[0]);
-            onChange({ clearcoatRoughness: value[0] });
-          }}
-        />
-      </div>
-      
-      <div className="grid gap-2">
-        <Label htmlFor="ior">Index of Refraction (IOR)</Label>
-        <Slider
-          id="ior"
-          defaultValue={[ior]}
-          value={[ior]}
-          min={1}
-          max={2.5}
-          step={0.01}
-          onValueChange={(value) => {
-            setIor(value[0]);
-            onChange({ ior: value[0] });
-          }}
-        />
-      </div>
-      
-      <div className="grid gap-2">
-        <Label htmlFor="transmission">Transmission</Label>
-        <Slider
-          id="transmission"
-          defaultValue={[transmission]}
-          value={[transmission]}
-          max={1}
-          step={0.01}
-          onValueChange={(value) => {
-            setTransmission(value[0]);
-            onChange({ transmission: value[0] });
-          }}
-        />
-      </div>
-      
-      <div className="grid gap-2">
-        <Label htmlFor="reflectivity">Reflectivity</Label>
-        <Slider
-          id="reflectivity"
-          defaultValue={[reflectivity]}
-          value={[reflectivity]}
-          max={1}
-          step={0.01}
-          onValueChange={(value) => {
-            setReflectivity(value[0]);
-            onChange({ reflectivity: value[0] });
-          }}
-        />
-      </div>
-      
-      <div className="grid gap-2">
-        <Label htmlFor="emissive">Emissive</Label>
-        <Input id="emissive" value={emissive} onChange={(e) => {
-          setEmissive(e.target.value);
-          onChange({ emissive: e.target.value });
-        }} type="color" />
-      </div>
-      
-      <div className="grid gap-2">
-        <Label htmlFor="envMapIntensity">Environment Map Intensity</Label>
-        <Slider
-          id="envMapIntensity"
-          defaultValue={[envMapIntensity]}
-          value={[envMapIntensity]}
-          max={1}
-          step={0.01}
-          onValueChange={(value) => {
-            setEnvMapIntensity(value[0]);
-            onChange({ envMapIntensity: value[0] });
-          }}
-        />
-      </div>
-      
-      <div className="grid gap-2">
-        <Label htmlFor="normalIntensity">Normal Intensity</Label>
-        <Slider
-          id="normalIntensity"
-          defaultValue={[normalIntensity]}
-          value={[normalIntensity]}
-          max={1}
-          step={0.01}
-          onValueChange={(value) => {
-            setNormalIntensity(value[0]);
-            onChange({ normalIntensity: value[0] });
-          }}
-        />
-      </div>
-      
-      <div className="grid gap-2">
-        <Label htmlFor="weathering">Weathering</Label>
-        <Slider
-          id="weathering"
-          defaultValue={[weathering]}
-          value={[weathering]}
-          max={1}
-          step={0.01}
-          onValueChange={(value) => {
-            setWeathering(value[0]);
-            onChange({ weathering: value[0] });
-          }}
-        />
-      </div>
-      
-      <div className="border rounded-md">
-        <AspectRatio ratio={1 / 1}>
-          <div 
-            className="w-full h-full"
-            style={{
-              backgroundColor: albedo,
-            }}
-            ref={previewRef}
-          />
-        </AspectRatio>
-      </div>
+    <div className={`material-simulator ${className}`}>
+      <canvas 
+        ref={canvasRef} 
+        width={width} 
+        height={height}
+        className="material-canvas"
+      />
+      <div className={`material-overlay material-${material.type}`} />
     </div>
   );
 };

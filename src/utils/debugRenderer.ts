@@ -1,72 +1,39 @@
 
 /**
- * Helper functions for debugging rendering issues
+ * Utility functions to help debug rendering issues in 3D scenes
  */
 
-export const logRenderingInfo = (componentName: string, details?: Record<string, any>) => {
-  // Only log in development mode
-  if (process.env.NODE_ENV !== 'development') {
-    return;
-  }
+// Enable debug mode globally
+export const DEBUG_RENDERING = false;
 
-  console.log(
-    `%c[${componentName}]%c rendered${details ? ':' : ''}`,
-    'color: #8B5CF6; font-weight: bold;',
-    'color: inherit;',
-  );
-
-  if (details && Object.keys(details).length > 0) {
-    console.log(
-      '%c Details:',
-      'color: #8B5CF6;',
-      details
-    );
-  }
-};
-
-export const traceRenderCause = (componentName: string) => {
-  // Only trace in development mode
-  if (process.env.NODE_ENV !== 'development') {
-    return;
-  }
-
-  console.log(
-    `%c[${componentName}]%c render trace:`,
-    'color: #EC4899; font-weight: bold;',
-    'color: inherit;',
-  );
-  console.trace();
-};
-
-export const measureRenderTime = (
+// Log visibility issues for debugging
+export const logRenderingInfo = (
   componentName: string, 
-  callback: () => void
-) => {
-  // Only measure in development mode
-  if (process.env.NODE_ENV !== 'development') {
-    callback();
-    return;
+  visibilityInfo: {
+    elementId?: string;
+    visible: boolean;
+    zIndex?: number;
+    opacity?: number;
+    position?: { x?: number; y?: number; z?: number };
   }
-
-  const startTime = performance.now();
-  callback();
-  const endTime = performance.now();
+) => {
+  if (!DEBUG_RENDERING) return;
   
   console.log(
-    `%c[${componentName}]%c rendered in %c${(endTime - startTime).toFixed(2)}ms`,
-    'color: #8B5CF6; font-weight: bold;',
-    'color: inherit;',
-    'color: #10B981; font-weight: bold;'
+    `%c[${componentName}] Rendering debug:`,
+    'background: #334155; color: #94a3b8; padding: 2px 4px; border-radius: 2px;',
+    visibilityInfo
   );
 };
 
-export const debugObject = (label: string, obj: any) => {
-  // Only debug in development mode
-  if (process.env.NODE_ENV !== 'development') {
-    return;
-  }
-
-  console.group(`%c${label}`, 'color: #8B5CF6; font-weight: bold;');
-  console.dir(obj);
-  console.groupEnd();
+// Style object helper for z-index and visibility
+export const getDebugStyles = (zIndex: number, visible: boolean = true) => {
+  if (!DEBUG_RENDERING) return {};
+  
+  return {
+    outline: '1px dashed rgba(255,0,0,0.5)',
+    position: 'relative' as const,
+    zIndex: zIndex,
+    opacity: visible ? 1 : 0.3
+  };
 };

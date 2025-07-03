@@ -11,8 +11,6 @@ import CardEditorNavigation from './components/CardEditorNavigation';
 import CardEditorPreview from './components/CardEditorPreview';
 import CardEditorActions from './components/CardEditorActions';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
-import { Card } from '@/lib/types/core';
-import { adaptToCard } from '@/lib/adapters/cardAdapter';
 
 interface CardEditorContainerProps {
   card?: any;
@@ -59,31 +57,31 @@ const CardEditorContainer: React.FC<CardEditorContainerProps> = ({
     const cardData = {
       ...cardState.getCardData(),
       designMetadata: {
-        ...DEFAULT_DESIGN_METADATA,
         cardStyle: cardState.cardStyle || DEFAULT_DESIGN_METADATA.cardStyle,
         textStyle: DEFAULT_DESIGN_METADATA.textStyle,
         cardMetadata: DEFAULT_DESIGN_METADATA.cardMetadata,
         marketMetadata: DEFAULT_DESIGN_METADATA.marketMetadata,
+        effects: cardState.selectedEffects || [],
+        player: cardState.player,
+        team: cardState.team,
+        year: cardState.year,
       }
     };
     
     try {
-      // Convert to core Card format
-      const coreCard = adaptToCard(cardData);
-      
       // If onSave prop is provided, use it
       if (onSave) {
-        onSave(coreCard);
+        onSave(cardData);
         return;
       }
       
       if (card) {
         // Update existing card
-        await updateCard(card.id, coreCard);
+        await updateCard(card.id, cardData);
         toast.success('CRD updated successfully');
       } else {
         // Add new card
-        await addCard(coreCard);
+        await addCard(cardData);
         toast.success('CRD created successfully');
       }
       

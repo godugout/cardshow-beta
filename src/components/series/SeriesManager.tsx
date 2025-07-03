@@ -8,11 +8,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Upload, SortDesc } from 'lucide-react';
-import { useEnhancedCards, type EnhancedSeries } from '@/context/CardEnhancedContext';
+import { Series } from '@/lib/types/enhancedCardTypes';
+import { useEnhancedCards } from '@/context/CardEnhancedContext';
 import { toast } from 'sonner';
 
 interface SeriesManagerProps {
-  initialSeries?: EnhancedSeries;
+  initialSeries?: Series;
 }
 
 const SeriesManager: React.FC<SeriesManagerProps> = ({ initialSeries }) => {
@@ -20,44 +21,19 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ initialSeries }) => {
   const { addSeries, updateSeries } = useEnhancedCards();
   const [isUploading, setIsUploading] = useState(false);
   
-  // Fix: Ensure state type matches expected interface
-  const [seriesData, setSeriesData] = useState<{
-    id?: string;
-    title: string;
-    description: string;
-    coverImageUrl?: string;
-    artistId?: string;
-    releaseDate?: string;
-    totalCards: number;
-    isPublished: boolean;
-    cardIds: string[];
-    releaseType: 'standard' | 'limited' | 'exclusive';
-  }>(() => {
-    if (initialSeries) {
-      return {
-        id: initialSeries.id,
-        title: initialSeries.title,
-        description: initialSeries.description,
-        coverImageUrl: initialSeries.coverImageUrl,
-        artistId: initialSeries.artistId,
-        releaseDate: initialSeries.releaseDate,
-        totalCards: initialSeries.totalCards,
-        isPublished: initialSeries.isPublished,
-        cardIds: initialSeries.cardIds,
-        releaseType: initialSeries.releaseType || 'standard',
-      };
-    }
-    return {
-      title: '',
-      description: '',
-      coverImageUrl: '',
-      artistId: '',
-      releaseDate: '',
-      totalCards: 0,
-      isPublished: false,
-      cardIds: [],
-      releaseType: 'standard',
-    };
+  const [seriesData, setSeriesData] = useState<Partial<Series>>(initialSeries || {
+    title: '',
+    description: '',
+    coverImageUrl: '',
+    artistId: '',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    releaseDate: '',
+    totalCards: 0,
+    isPublished: false,
+    cardIds: [],
+    cards: [],
+    releaseType: 'standard',
   });
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -85,37 +61,15 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ initialSeries }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const seriesWithId = initialSeries?.id 
+      ? { ...seriesData, updatedAt: new Date().toISOString() } as Series
+      : { ...seriesData, id: uuidv4(), updatedAt: new Date().toISOString() } as Series;
+      
     if (initialSeries?.id) {
-      const updates: Partial<EnhancedSeries> = {
-        title: seriesData.title,
-        description: seriesData.description,
-        coverImageUrl: seriesData.coverImageUrl,
-        artistId: seriesData.artistId,
-        releaseDate: seriesData.releaseDate,
-        totalCards: seriesData.totalCards,
-        isPublished: seriesData.isPublished,
-        cardIds: seriesData.cardIds,
-        releaseType: seriesData.releaseType,
-        updatedAt: new Date().toISOString()
-      };
-      updateSeries(initialSeries.id, updates);
+      updateSeries(initialSeries.id, seriesWithId);
       toast.success('Series updated successfully');
     } else {
-      const newSeries: EnhancedSeries = {
-        id: uuidv4(),
-        title: seriesData.title || '',
-        description: seriesData.description || '',
-        releaseDate: seriesData.releaseDate || new Date().toISOString(),
-        totalCards: 0,
-        artistId: seriesData.artistId || '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        cardIds: [],
-        coverImageUrl: seriesData.coverImageUrl,
-        isPublished: seriesData.isPublished || false,
-        releaseType: seriesData.releaseType || 'standard'
-      };
-      addSeries(newSeries);
+      addSeries(seriesWithId);
       toast.success('Series created successfully');
     }
     

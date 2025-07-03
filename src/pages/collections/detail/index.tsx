@@ -1,3 +1,4 @@
+
 import React, { useEffect, useCallback } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import PageLayout from '@/components/navigation/PageLayout';
@@ -171,21 +172,8 @@ const CollectionDetail = () => {
     );
   }
 
-  // Ensure collection has all required properties for useCollectionHeader
-  const enrichedCollection = {
-    ...collection,
-    description: collection.description || '', // Ensure description is always a string
-    userId: collection.userId || '', // Ensure userId is always a string
-    cardIds: collection.cardIds || [], // Ensure cardIds is always an array
-    visibility: collection.visibility || 'private' as 'public' | 'private' | 'team' | 'unlisted', // Ensure visibility is always defined
-    allowComments: collection.allowComments ?? true, // Ensure allowComments is always a boolean
-    isPublic: collection.isPublic ?? (collection.visibility === 'public'),
-    tags: collection.tags ?? [],
-    featured: collection.featured ?? false
-  };
-
   const { actionButtons, collectionStats } = useCollectionHeader({
-    collection: enrichedCollection,
+    collection,
     onShareCollection: handleShareCollection,
     onEditCollection: () => setIsEditDialogOpen(true),
     onDeleteCollection: () => setIsDeleteDialogOpen(true),

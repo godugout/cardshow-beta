@@ -1,54 +1,12 @@
 
 /**
  * Consolidated Card Types for Cardshow (CRD)
- * This file consolidates all type definitions to prevent conflicts
+ * This file serves as the central source of truth for all card-related types
  */
 
 import { BaseEntity, JsonValue } from './index';
-import { User } from './core';
-
-// Re-export everything from unifiedCardTypes for backward compatibility
-export type {
-  Card,
-  CardStyle,
-  TextStyle,
-  CardMetadata,
-  DesignMetadata,
-  MarketMetadata,
-  CardTemplate,
-  UnifiedCard
-} from './unifiedCardTypes';
-
-// Use the unified CardEffect from core types
-export type { CardEffect } from './core';
-
-/**
- * Instagram Post interface
- */
-export interface InstagramPost {
-  id: string;
-  imageUrl: string;
-  caption: string;
-  timestamp: string;
-  likes: number;
-  comments: number;
-  username: string;
-  avatarUrl?: string;
-}
-
-/**
- * Hotspot data for interactive cards
- */
-export interface HotspotData {
-  id: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  content: string;
-  type: 'text' | 'link' | 'image' | 'video';
-  visible: boolean;
-}
+import { Reaction, Comment } from './interaction';
+import { User } from './user';
 
 /**
  * Fabric Swatch definition for card memorabilia
@@ -74,6 +32,48 @@ export interface CardStats {
   strikeouts?: string;
   careerYears?: string;
   ranking?: string;
+}
+
+/**
+ * Card style definition for visual appearance
+ */
+export interface CardStyle {
+  template: string;      // Required
+  effect: string;        // Required
+  borderRadius: string;  // Required
+  borderWidth?: number;
+  borderColor: string;   // Required
+  backgroundColor?: string;
+  shadowColor: string;   // Required
+  frameWidth: number;    // Required
+  frameColor: string;    // Required
+  [key: string]: JsonValue | undefined;
+}
+
+/**
+ * Text style definition for card typography
+ */
+export interface TextStyle {
+  fontFamily?: string;
+  fontSize?: string;
+  fontWeight?: string;
+  color?: string;
+  titleColor: string;      // Required
+  titleAlignment: string;  // Required
+  titleWeight: string;     // Required
+  descriptionColor: string; // Required
+  [key: string]: JsonValue | undefined;
+}
+
+/**
+ * Card effect definition for visual effects
+ */
+export interface CardEffect {
+  id: string;
+  name: string;
+  enabled: boolean;
+  settings: CardEffectSettings;
+  className?: string;
 }
 
 /**
@@ -125,6 +125,38 @@ export interface CardLayer {
 }
 
 /**
+ * Card metadata for additional card information
+ */
+export interface CardMetadata {
+  edition?: string;
+  serialNumber?: string;
+  certification?: string;
+  gradeScore?: string;
+  category: string;      // Required
+  series: string;        // Required
+  cardType: string;      // Required
+  cardStyle?: CardStyle;
+  textStyle?: TextStyle;
+  effects?: string[];
+  layers?: CardLayer[];
+  effectClasses?: string;
+  [key: string]: JsonValue | undefined;
+}
+
+/**
+ * Market metadata for card marketplace information
+ */
+export interface MarketMetadata {
+  lastSoldPrice?: number;
+  currentAskingPrice?: number;
+  estimatedMarketValue?: number;
+  isPrintable: boolean;      // Required
+  isForSale: boolean;        // Required
+  includeInCatalog: boolean; // Required
+  [key: string]: JsonValue | undefined;
+}
+
+/**
  * Oakland Memory Data definition
  */
 export interface OaklandMemoryData {
@@ -146,36 +178,100 @@ export interface OaklandMemoryData {
 }
 
 /**
- * Card rarity types - now as string to match UnifiedCard
+ * Design metadata for card design information
  */
-export type CardRarity = string;
-
-/**
- * Reaction interface for card interactions - aligned with core types
- */
-export interface Reaction {
-  id: string;
-  userId: string;
-  targetType: 'card' | 'comment' | 'collection';
-  targetId: string;
-  type: 'like' | 'heart' | 'star' | 'thumbs_up' | 'thumbs_down' | 'love' | 'wow' | 'haha' | 'sad' | 'angry';
-  createdAt: string;
-  updatedAt: string;
-  user?: User;
+export interface DesignMetadata {
+  cardStyle: CardStyle;            // Required
+  textStyle: TextStyle;            // Required
+  cardMetadata: CardMetadata;      // Required
+  marketMetadata: MarketMetadata;  // Required
+  oaklandMemory?: OaklandMemoryData;
+  effects?: string[];
+  layers?: CardLayer[];
+  effectClasses?: string;
+  [key: string]: JsonValue | undefined;
 }
 
 /**
- * Comment interface for card comments
+ * Hotspot data for interactive cards
  */
-export interface Comment {
+export interface HotspotData {
   id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
   content: string;
-  userId: string;
-  cardId?: string;
+  type: 'text' | 'link' | 'image' | 'video';
+  visible: boolean;
+}
+
+/**
+ * Card rarity types
+ */
+export type CardRarity = 'common' | 'uncommon' | 'rare' | 'ultra-rare' | 'legendary' | 'one-of-one';
+
+/**
+ * Base Card interface containing common properties
+ */
+export interface BaseCard extends BaseEntity {
+  title: string;
+  description: string;
+  imageUrl: string;
+  backImageUrl?: string; // Added backImageUrl property
+  image?: string; // Legacy support for older components
+  thumbnailUrl: string;
+  tags: string[];
   collectionId?: string;
+  userId: string;
   teamId?: string;
-  parentId?: string;
+  isPublic?: boolean;
+  metadata?: Record<string, any>;
+  effects: string[];
+  reactions?: Reaction[];
+  comments?: Comment[];
+  viewCount?: number;
+  
+  // Baseball card properties
+  player?: string;
+  team?: string;
+  year?: string;
+  jersey?: string;
+  set?: string;
+  cardNumber?: string;
+  cardType?: string;
+  artist?: string; // For backward compatibility
+  backgroundColor?: string;
+  textColor?: string;
+  specialEffect?: string;
+  fabricSwatches?: FabricSwatch[];
+  stats?: CardStats;
+  
+  // Design related
+  name?: string; // Legacy support
+  cardStyle?: string;
+  backTemplate?: string;
+  designMetadata: DesignMetadata;
+  
+  // Market data
+  price?: number;
+  estimatedValue?: string;
+  condition?: string;
+  rarity?: CardRarity;
+  
+  // Additional fields needed by some components
+  creatorId?: string;
   createdAt: string;
   updatedAt: string;
-  user?: User;
 }
+
+/**
+ * Main Card interface that can be extended for specific use cases
+ */
+export interface Card extends BaseCard {}
+
+// Export types from enhancedCardTypes using export type for isolatedModules compatibility
+export type { EnhancedCard, Series, Deck } from './enhancedCardTypes';
+
+// Export renamed Reaction type to avoid conflicts
+export type { Reaction as CardReaction } from './interaction';

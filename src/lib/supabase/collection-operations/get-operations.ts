@@ -1,65 +1,144 @@
 import { supabase } from '../client';
-import { convertDbToCollection } from '../utils/collection-converter';
+import { convertDbCollectionToApp } from '../utils/collection-converter';
 
-export const getUserCollections = async (userId: string) => {
-  try {
-    const { data, error } = await supabase
-      .from('collections')
-      .select('*')
-      .eq('owner_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching user collections:', error);
-      return { data: [], error };
+export const getCollectionOperations = {
+  async getCollectionById(id: string) {
+    try {
+      const { data, error } = await supabase
+        .from('collections')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error) {
+        return { data: null, error };
+      }
+      
+      return { 
+        data: convertDbCollectionToApp(data), 
+        error: null 
+      };
+    } catch (err: any) {
+      console.error('Error fetching collection:', err);
+      return { 
+        data: null, 
+        error: { message: 'Failed to fetch collection: ' + (err.message || 'Unknown error') } 
+      };
     }
-
-    const collections = data.map(convertDbToCollection);
-    return { data: collections, error: null };
-  } catch (error) {
-    console.error('Unexpected error fetching user collections:', error);
-    return { data: [], error: error instanceof Error ? error.message : 'Unexpected error' };
-  }
-};
-
-export const getCollectionById = async (collectionId: string) => {
-  try {
-    const { data, error } = await supabase
-      .from('collections')
-      .select('*')
-      .eq('id', collectionId)
-      .single();
-
-    if (error) {
-      console.error('Error fetching collection by ID:', error);
-      return { data: null, error };
+  },
+  
+  async getUserCollections(userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('collections')
+        .select('*')
+        .eq('owner_id', userId);
+      
+      if (error) {
+        return { data: [], error };
+      }
+      
+      return { 
+        data: data.map(col => convertDbCollectionToApp(col)).filter(Boolean),
+        error: null 
+      };
+    } catch (err: any) {
+      console.error('Error fetching user collections:', err);
+      return { 
+        data: [], 
+        error: { message: 'Failed to fetch collections: ' + (err.message || 'Unknown error') } 
+      };
     }
-
-    const collection = convertDbToCollection(data);
-    return { data: collection, error: null };
-  } catch (error) {
-    console.error('Unexpected error fetching collection by ID:', error);
-    return { data: null, error: error instanceof Error ? error.message : 'Unexpected error' };
-  }
-};
-
-export const getPublicCollections = async () => {
-  try {
-    const { data, error } = await supabase
-      .from('collections')
-      .select('*')
-      .eq('visibility', 'public')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching public collections:', error);
-      return { data: [], error };
+  },
+  
+  async getPublicCollections() {
+    try {
+      const { data, error } = await supabase
+        .from('collections')
+        .select('*')
+        .eq('visibility', 'public');
+      
+      if (error) {
+        return { data: [], error };
+      }
+      
+      return { 
+        data: data.map(col => convertDbCollectionToApp(col)).filter(Boolean),
+        error: null 
+      };
+    } catch (err: any) {
+      console.error('Error fetching public collections:', err);
+      return { 
+        data: [], 
+        error: { message: 'Failed to fetch public collections: ' + (err.message || 'Unknown error') } 
+      };
     }
-
-    const collections = data.map(convertDbToCollection);
-    return { data: collections, error: null };
-  } catch (error) {
-    console.error('Unexpected error fetching public collections:', error);
-    return { data: [], error: error instanceof Error ? error.message : 'Unexpected error' };
+  },
+  
+  async getCollection(id: string) {
+    return this.getCollectionById(id);
+  },
+  
+  async getCollections() {
+    try {
+      const { data, error } = await supabase
+        .from('collections')
+        .select('*');
+      
+      if (error) {
+        return { data: [], error };
+      }
+      
+      return { 
+        data: data.map(col => convertDbCollectionToApp(col)).filter(Boolean),
+        error: null 
+      };
+    } catch (err: any) {
+      console.error('Error fetching collections:', err);
+      return { 
+        data: [], 
+        error: { message: 'Failed to fetch collections: ' + (err.message || 'Unknown error') } 
+      };
+    }
+  },
+  
+  async getCollectionWithCards(collectionId: string) {
+    try {
+      const { data: collection, error: collectionError } = await supabase
+        .from('collections')
+        .select('*')
+        .eq('id', collectionId)
+        .single();
+      
+      if (collectionError) {
+        return { 
+          data: null, 
+          error: collectionError 
+        };
+      }
+      
+      const { data: cards, error: cardsError } = await supabase
+        .from('cards')
+        .select('*')
+        .eq('collection_id', collectionId);
+        
+      if (cardsError) {
+        console.error('Error fetching cards for collection:', cardsError);
+      }
+      
+      return { 
+        data: { 
+          collection, 
+          cards: cards || [] 
+        }, 
+        error: null 
+      };
+    } catch (err: any) {
+      console.error('Error fetching collection with cards:', err);
+      return { 
+        data: null, 
+        error: { message: 'Failed to fetch collection with cards: ' + (err.message || 'Unknown error') } 
+      };
+    }
   }
 };

@@ -1,113 +1,106 @@
 
 import React, { useState } from 'react';
-import { Card, CardEffect } from '@/lib/types/core';
-import { stringToCardEffect } from '@/lib/utils/cardEffectHelpers';
+import PageLayout from '@/components/navigation/PageLayout';
+import CardGrid from '@/components/cards/CardGrid';
+import FilterPanel from '@/components/filters/FilterPanel';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
+import { Card } from '@/lib/types';
+import { sampleCards } from '@/data/sampleCards';
 
-const CardShowcase = () => {
-  const [selectedCard, setSelectedCard] = useState<Card>({
-    id: '1',
-    title: 'Holographic Trading Card',
-    description: 'A stunning holographic effect card',
-    imageUrl: 'https://placehold.co/300x400/png',
-    thumbnailUrl: 'https://placehold.co/150x200/png',
-    tags: ['holographic', 'premium', 'showcase'],
-    effects: [stringToCardEffect('holographic')],
-    userId: 'user1',
-    createdAt: '2023-01-01T00:00:00Z',
-    updatedAt: '2023-01-01T00:00:00Z',
-    designMetadata: DEFAULT_DESIGN_METADATA
-  });
-
-  const cardVariations: Card[] = [
-    {
-      id: '1',
-      title: 'Holographic Trading Card',
-      description: 'A stunning holographic effect card',
-      imageUrl: 'https://placehold.co/300x400/png',
-      thumbnailUrl: 'https://placehold.co/150x200/png',
-      tags: ['holographic', 'premium'],
-      effects: [stringToCardEffect('holographic')],
-      userId: 'user1',
-      createdAt: '2023-01-01T00:00:00Z',
-      updatedAt: '2023-01-01T00:00:00Z',
-      designMetadata: DEFAULT_DESIGN_METADATA
+// Map the basketball player sample cards to the Card type
+const basketballCards: Card[] = sampleCards.map(card => ({
+  id: card.id,
+  title: card.title,
+  description: card.description,
+  imageUrl: card.imageUrl,
+  thumbnailUrl: card.thumbnailUrl || card.imageUrl,
+  tags: card.tags || [],
+  userId: card.userId,
+  effects: card.effects || [],
+  createdAt: card.createdAt,
+  updatedAt: card.updatedAt,
+  designMetadata: {
+    cardStyle: {
+      template: 'classic',
+      effect: 'none',
+      borderRadius: '12px',
+      borderColor: '#000000',
+      shadowColor: 'rgba(0,0,0,0.2)',
+      frameWidth: 2,
+      frameColor: '#000000'
     },
-    {
-      id: '2',
-      title: 'Prismatic Crystal Card',
-      description: 'Beautiful prismatic light effects',
-      imageUrl: 'https://placehold.co/300x400/png',
-      thumbnailUrl: 'https://placehold.co/150x200/png',
-      tags: ['prismatic', 'crystal'],
-      effects: [stringToCardEffect('prismatic')],
-      userId: 'user1',
-      createdAt: '2023-01-01T00:00:00Z',
-      updatedAt: '2023-01-01T00:00:00Z',
-      designMetadata: DEFAULT_DESIGN_METADATA
+    textStyle: {
+      titleColor: '#000000',
+      titleAlignment: 'center',
+      titleWeight: 'bold',
+      descriptionColor: '#666666'
     },
-    {
-      id: '3',
-      title: 'Refractor Sports Card',
-      description: 'Classic refractor finish',
-      imageUrl: 'https://placehold.co/300x400/png',
-      thumbnailUrl: 'https://placehold.co/150x200/png',
-      tags: ['refractor', 'sports'],
-      effects: [stringToCardEffect('refractor')],
-      userId: 'user1',
-      createdAt: '2023-01-01T00:00:00Z',
-      updatedAt: '2023-01-01T00:00:00Z',
-      designMetadata: DEFAULT_DESIGN_METADATA
+    cardMetadata: {
+      category: 'sports',
+      series: 'basketball',
+      cardType: 'player',
+    },
+    marketMetadata: {
+      isPrintable: false,
+      isForSale: false,
+      includeInCatalog: true
     }
-  ];
+  },
+  player: card.player,
+  team: card.team,
+  year: card.year
+}));
+
+const CardShowcase: React.FC = () => {
+  const [filters, setFilters] = useState({
+    searchQuery: '',
+    tags: [],
+    sortBy: 'newest'
+  });
+  const navigate = useNavigate();
+
+  const handleFilterChange = (newFilters: any) => {
+    setFilters({ ...filters, ...newFilters });
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <h1 className="text-4xl font-bold text-center mb-8">Card Effect Showcase</h1>
+    <PageLayout
+      title="Basketball Card Showcase"
+      description="Browse and discover unique basketball player trading cards"
+    >
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Basketball Card Collection</h1>
+          
+          <Button onClick={() => navigate('/cards/create')} className="flex items-center gap-2">
+            <PlusCircle size={18} />
+            Create New
+          </Button>
+        </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Card Display */}
-          <div className="bg-white rounded-lg p-6 shadow-lg">
-            <div className="aspect-[2.5/3.5] bg-gray-200 rounded-lg mb-4 overflow-hidden">
-              <img 
-                src={selectedCard.imageUrl} 
-                alt={selectedCard.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <h2 className="text-xl font-semibold mb-2">{selectedCard.title}</h2>
-            <p className="text-gray-600">{selectedCard.description}</p>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="md:col-span-1">
+            <FilterPanel 
+              filters={filters} 
+              onFilterChange={handleFilterChange}
+            />
           </div>
-
-          {/* Card Selection */}
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold">Select a Card Effect</h3>
-            <div className="grid grid-cols-1 gap-4">
-              {cardVariations.map((card) => (
-                <button
-                  key={card.id}
-                  onClick={() => setSelectedCard(card)}
-                  className={`p-4 border rounded-lg text-left transition-colors ${
-                    selectedCard.id === card.id
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <h4 className="font-medium">{card.title}</h4>
-                  <p className="text-sm text-gray-600">{card.description}</p>
-                  <div className="mt-2">
-                    <span className="inline-block px-2 py-1 bg-gray-100 text-xs rounded">
-                      {card.effects[0]?.type || 'No effect'}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
+          
+          <div className="md:col-span-3">
+            <CardGrid 
+              cards={basketballCards} 
+              searchQuery={filters.searchQuery}
+              selectedTags={filters.tags}
+              sortBy={filters.sortBy}
+              onCardClick={(id) => navigate(`/cards/${id}`)}
+            />
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

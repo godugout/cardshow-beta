@@ -1,13 +1,12 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { Card } from '@/lib/types/unifiedCardTypes';
+import { Card } from '@/lib/types/card';
 import { v4 as uuidv4 } from 'uuid';
-import { adaptToLegacyCard } from '@/lib/adapters/cardAdapter';
-import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
+import { adaptToCard } from '@/lib/adapters/cardAdapter';
 
 // Mock data for development
 const initialCards: Card[] = [
-  adaptToLegacyCard({
+  adaptToCard({
     id: '1',
     title: 'Sample Card',
     description: 'This is a sample card for development',
@@ -17,8 +16,7 @@ const initialCards: Card[] = [
     userId: 'user1',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    effects: [],
-    designMetadata: DEFAULT_DESIGN_METADATA,
+    effects: [], // Add required effects property
   }),
 ];
 
@@ -35,7 +33,7 @@ export const useCardOperations = () => {
         if (savedCards) {
           // Parse stored cards and ensure they match the current Card type requirements
           const parsedCards = JSON.parse(savedCards);
-          setCards(parsedCards.map((card: Partial<Card>) => adaptToLegacyCard(card)));
+          setCards(parsedCards.map((card: Partial<Card>) => adaptToCard(card)));
         }
       } catch (err) {
         console.error('Error loading cards from storage:', err);
@@ -55,7 +53,7 @@ export const useCardOperations = () => {
   }, [cards]);
 
   const addCard = useCallback((card: Omit<Card, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newCard = adaptToLegacyCard({
+    const newCard: Card = adaptToCard({
       ...card,
       id: uuidv4(),
       createdAt: new Date().toISOString(),
@@ -70,7 +68,7 @@ export const useCardOperations = () => {
     setCards(prevCards =>
       prevCards.map(card =>
         card.id === id
-          ? adaptToLegacyCard({ ...card, ...updates, updatedAt: new Date().toISOString() })
+          ? adaptToCard({ ...card, ...updates, updatedAt: new Date().toISOString() })
           : card
       )
     );

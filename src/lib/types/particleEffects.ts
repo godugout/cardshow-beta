@@ -1,134 +1,87 @@
 
-export interface ParticleSystemState {
-  isActive: boolean;
-  effects: Record<string, any>;
-  isTransitioning: boolean;
-  isPerformanceRestricted: boolean;
-  performanceLevel: 'low' | 'medium' | 'high';
-  lastUpdateTime: number;
-}
-
-export interface ParticleEffectSettings {
-  enabled: boolean;
-  intensity: number;
-  color: string;
-  speed: number;
-  density: number;
-}
-
 export type ParticleEffectType = 'sparkle' | 'dust' | 'energy' | 'team';
 
 export interface ParticleSettings {
+  type: ParticleEffectType;
   enabled: boolean;
-  density: number;
-  speed: number;
-  size: number;
-  color: string | string[];
-  opacity: number;
-  lifespan: number;
-  reactivity: number;
-  emissionPattern: 'full' | 'edges' | 'corners' | 'custom';
-  customEmissionPoints?: [number, number][];
-  blendMode?: string;
+  density: number; // 0-1
+  speed: number; // 0-1
+  reactivity: number; // 0-1
+  color: string | string[]; // Primary color or array of colors
+  emissionPattern: 'edges' | 'corners' | 'full' | 'custom';
+  customEmissionPoints?: [number, number][]; // Custom emission coordinates
+  size: number; // 0-1
+  opacity: number; // 0-1
+  lifespan: number; // In seconds
+  blendMode?: 'normal' | 'add' | 'multiply' | 'screen';
 }
 
-export const DEFAULT_PARTICLE_PRESETS: Record<string, { name: string; settings: Record<ParticleEffectType, ParticleSettings> }> = {
-  subtle: {
-    name: 'Subtle',
+export interface ParticleSystemState {
+  effects: Record<ParticleEffectType, ParticleSettings>;
+  isActive: boolean;
+  isTransitioning: boolean;
+  isPerformanceRestricted: boolean;
+  performanceLevel: 'high' | 'medium' | 'low';
+  autoAdjust: boolean;
+}
+
+export type ParticlePreset = {
+  name: string;
+  settings: Partial<ParticleSettings>;
+};
+
+export const DEFAULT_PARTICLE_PRESETS: Record<string, ParticlePreset> = {
+  premium: {
+    name: 'Premium Card',
     settings: {
-      sparkle: {
-        enabled: true,
-        density: 0.3,
-        speed: 0.5,
-        size: 0.8,
-        color: '#ffffff',
-        opacity: 0.6,
-        lifespan: 1.5,
-        reactivity: 0.3,
-        emissionPattern: 'edges'
-      },
-      dust: {
-        enabled: false,
-        density: 0.2,
-        speed: 0.3,
-        size: 0.5,
-        color: '#cccccc',
-        opacity: 0.4,
-        lifespan: 2.0,
-        reactivity: 0.2,
-        emissionPattern: 'full'
-      },
-      energy: {
-        enabled: false,
-        density: 0.1,
-        speed: 0.4,
-        size: 0.6,
-        color: '#00ffff',
-        opacity: 0.5,
-        lifespan: 1.0,
-        reactivity: 0.4,
-        emissionPattern: 'corners'
-      },
-      team: {
-        enabled: false,
-        density: 0.2,
-        speed: 0.3,
-        size: 0.7,
-        color: '#ff0000',
-        opacity: 0.6,
-        lifespan: 1.2,
-        reactivity: 0.3,
-        emissionPattern: 'edges'
-      }
+      type: 'sparkle',
+      density: 0.7,
+      speed: 0.5,
+      reactivity: 0.8,
+      color: ['#FFD700', '#FFFFFF', '#FFF8E0'],
+      emissionPattern: 'edges',
+      size: 0.6,
+      opacity: 0.8,
+      lifespan: 1.5,
+      blendMode: 'screen'
     }
   },
-  dynamic: {
-    name: 'Dynamic',
+  atmospheric: {
+    name: 'Atmospheric',
     settings: {
-      sparkle: {
-        enabled: true,
-        density: 0.7,
-        speed: 1.0,
-        size: 1.2,
-        color: '#ffff00',
-        opacity: 0.8,
-        lifespan: 1.0,
-        reactivity: 0.8,
-        emissionPattern: 'full'
-      },
-      dust: {
-        enabled: true,
-        density: 0.5,
-        speed: 0.8,
-        size: 0.8,
-        color: '#ffffff',
-        opacity: 0.6,
-        lifespan: 1.5,
-        reactivity: 0.6,
-        emissionPattern: 'edges'
-      },
-      energy: {
-        enabled: false,
-        density: 0.3,
-        speed: 1.2,
-        size: 1.0,
-        color: '#00ff00',
-        opacity: 0.7,
-        lifespan: 0.8,
-        reactivity: 0.9,
-        emissionPattern: 'corners'
-      },
-      team: {
-        enabled: false,
-        density: 0.4,
-        speed: 0.9,
-        size: 1.1,
-        color: '#0000ff',
-        opacity: 0.8,
-        lifespan: 1.1,
-        reactivity: 0.7,
-        emissionPattern: 'full'
-      }
+      type: 'dust',
+      density: 0.3,
+      speed: 0.2,
+      reactivity: 0.5,
+      color: ['#FFFFFF', '#F0F0FF'],
+      emissionPattern: 'full',
+      size: 0.3,
+      opacity: 0.4,
+      lifespan: 3,
+      blendMode: 'screen'
+    }
+  },
+  aura: {
+    name: 'Energy Aura',
+    settings: {
+      type: 'energy',
+      density: 0.5,
+      speed: 0.6,
+      reactivity: 0.9,
+      color: ['#00FFFF', '#0080FF', '#FFFFFF'],
+      emissionPattern: 'edges',
+      size: 0.5,
+      opacity: 0.6,
+      lifespan: 1.2,
+      blendMode: 'add'
     }
   }
+};
+
+export const TEAM_COLOR_SCHEMES: Record<string, string[]> = {
+  'Blue Jays': ['#134A8E', '#1D2D5C', '#E8291C'],
+  'Yankees': ['#0C2340', '#FFFFFF', '#C4CED4'],
+  'Red Sox': ['#BD3039', '#0C2340', '#FFFFFF'],
+  'Cubs': ['#0E3386', '#CC3433', '#FFFFFF'],
+  'Dodgers': ['#005A9C', '#FFFFFF', '#EF3E42']
 };

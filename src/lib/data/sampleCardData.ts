@@ -1,8 +1,5 @@
 
-import { Card } from '@/lib/types/unifiedCardTypes';
-import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
-import { convertEffectsToCardEffects } from '@/lib/adapters/cardAdapter';
-import { stringArrayToCardEffects } from '@/lib/utils/cardEffectHelpers';
+import { Card } from '@/lib/types';
 
 // Reliable images from Unsplash
 const RELIABLE_IMAGES = {
@@ -17,133 +14,34 @@ const RELIABLE_IMAGES = {
 
 // Create a base design metadata with all required fields
 const createDesignMetadata = (borderColor: string, frameColor: string) => ({
-  ...DEFAULT_DESIGN_METADATA,
   cardStyle: {
-    ...DEFAULT_DESIGN_METADATA.cardStyle,
+    template: 'classic',
+    effect: 'classic',
+    borderRadius: '8px',
     borderColor,
     frameColor,
+    frameWidth: 3,
     shadowColor: `rgba(${parseInt(borderColor.slice(1, 3), 16)}, ${parseInt(borderColor.slice(3, 5), 16)}, ${parseInt(borderColor.slice(5, 7), 16)}, 0.5)`,
   },
   textStyle: {
-    ...DEFAULT_DESIGN_METADATA.textStyle,
     titleColor: '#FFFFFF',
     titleAlignment: 'left',
     titleWeight: 'bold',
     descriptionColor: '#FFFFFF',
   },
   cardMetadata: {
-    ...DEFAULT_DESIGN_METADATA.cardMetadata,
     category: 'sports',
     cardType: 'collectible',
     series: 'standard'
+  },
+  marketMetadata: {
+    isPrintable: false,
+    isForSale: false,
+    includeInCatalog: true
   }
 });
 
-export const sampleCards: Card[] = [
-  {
-    id: '1',
-    title: 'Ken Griffey Jr. - 1989 Upper Deck',
-    description: 'Rookie card of one of the greatest players of all time.',
-    imageUrl: '/lovable-uploads/f07b9e90-98ec-4e0c-bca4-71acd9ae9924.png',
-    thumbnailUrl: '/lovable-uploads/f07b9e90-98ec-4e0c-bca4-71acd9ae9924.png',
-    tags: ['rookie', 'hall-of-fame', 'mariners'],
-    userId: 'system',
-    effects: convertEffectsToCardEffects(['holographic']),
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    designMetadata: {
-      ...DEFAULT_DESIGN_METADATA,
-      cardStyle: {
-        ...DEFAULT_DESIGN_METADATA.cardStyle,
-        template: 'classic',
-        effect: 'holographic',
-        borderRadius: '8px',
-        borderColor: '#d4af37',
-        frameColor: '#d4af37',
-        frameWidth: 2,
-        shadowColor: 'rgba(212, 175, 55, 0.3)',
-      },
-      textStyle: {
-        ...DEFAULT_DESIGN_METADATA.textStyle,
-        titleColor: '#1a202c',
-        titleAlignment: 'center',
-        titleWeight: 'bold',
-        descriptionColor: '#4a5568',
-      },
-      cardMetadata: {
-        ...DEFAULT_DESIGN_METADATA.cardMetadata,
-        category: 'sports',
-        series: 'upper-deck-1989',
-        cardType: 'rookie',
-        cardNumber: '1',
-        artist: 'Upper Deck',
-        rarity: 'legendary'
-      },
-      marketMetadata: {
-        ...DEFAULT_DESIGN_METADATA.marketMetadata,
-        isPrintable: true,
-        isForSale: false,
-        includeInCatalog: true,
-        price: 299.99,
-        currency: 'USD',
-        availableForSale: false,
-        editionSize: 1000,
-        editionNumber: 1
-      }
-    }
-  },
-  {
-    id: '2',
-    title: 'Tony Gwynn - 1984 Donruss',
-    description: 'Iconic card from Mr. Padre\'s championship season.',
-    imageUrl: '/lovable-uploads/79a099b9-c77a-491e-9755-ba25419791f5.png',
-    thumbnailUrl: '/lovable-uploads/79a099b9-c77a-491e-9755-ba25419791f5.png',
-    tags: ['hall-of-fame', 'padres', 'batting-champion'],
-    userId: 'system',
-    effects: convertEffectsToCardEffects(['chrome']),
-    createdAt: '2024-01-02T00:00:00Z',
-    updatedAt: '2024-01-02T00:00:00Z',
-    designMetadata: {
-      ...DEFAULT_DESIGN_METADATA,
-      cardStyle: {
-        ...DEFAULT_DESIGN_METADATA.cardStyle,
-        template: 'vintage',
-        effect: 'chrome',
-        borderRadius: '12px',
-        borderColor: '#a0522d',
-        frameColor: '#a0522d',
-        frameWidth: 3,
-        shadowColor: 'rgba(160, 82, 45, 0.4)',
-      },
-      textStyle: {
-        ...DEFAULT_DESIGN_METADATA.textStyle,
-        titleColor: '#8b4513',
-        titleAlignment: 'left',
-        titleWeight: 'bold',
-        descriptionColor: '#654321',
-      },
-      cardMetadata: {
-        ...DEFAULT_DESIGN_METADATA.cardMetadata,
-        category: 'sports',
-        series: 'donruss-1984',
-        cardType: 'star',
-        cardNumber: '324',
-        artist: 'Donruss',
-        rarity: 'rare'
-      },
-      marketMetadata: {
-        ...DEFAULT_DESIGN_METADATA.marketMetadata,
-        isPrintable: true,
-        isForSale: true,
-        includeInCatalog: true,
-        price: 89.99,
-        currency: 'USD',
-        availableForSale: true,
-        editionSize: 500,
-        editionNumber: 87
-      }
-    }
-  },
+export const sampleCardData: Card[] = [
   {
     id: 'card-001',
     title: 'Basketball Legend',
@@ -158,7 +56,7 @@ export const sampleCards: Card[] = [
     collectionId: 'collection-001',
     isPublic: true,
     designMetadata: createDesignMetadata('#f43f5e', '#f43f5e'),
-    effects: stringArrayToCardEffects(['Holographic', 'Refractor'])
+    effects: ['Holographic', 'Refractor']
   },
   {
     id: 'card-002',
@@ -174,7 +72,7 @@ export const sampleCards: Card[] = [
     collectionId: 'collection-001',
     isPublic: true,
     designMetadata: createDesignMetadata('#a855f7', '#a855f7'),
-    effects: stringArrayToCardEffects(['Chrome', 'Shimmer'])
+    effects: ['Chrome', 'Shimmer']
   },
   {
     id: 'card-003',
@@ -190,7 +88,7 @@ export const sampleCards: Card[] = [
     collectionId: 'collection-002',
     isPublic: true,
     designMetadata: createDesignMetadata('#22c55e', '#22c55e'),
-    effects: stringArrayToCardEffects(['Vintage'])
+    effects: ['Vintage']
   },
   {
     id: 'card-004',
@@ -206,7 +104,7 @@ export const sampleCards: Card[] = [
     collectionId: 'collection-002',
     isPublic: true,
     designMetadata: createDesignMetadata('#0ea5e9', '#0ea5e9'),
-    effects: stringArrayToCardEffects(['Holographic', 'Gold'])
+    effects: ['Holographic', 'Gold']
   },
   {
     id: 'card-005',
@@ -222,7 +120,7 @@ export const sampleCards: Card[] = [
     collectionId: 'collection-003',
     isPublic: true,
     designMetadata: createDesignMetadata('#fbbf24', '#fbbf24'),
-    effects: stringArrayToCardEffects(['Refractor', 'Shimmer'])
+    effects: ['Refractor', 'Shimmer']
   },
   {
     id: 'card-006',
@@ -238,8 +136,8 @@ export const sampleCards: Card[] = [
     collectionId: 'collection-003',
     isPublic: true,
     designMetadata: createDesignMetadata('#92400e', '#92400e'),
-    effects: stringArrayToCardEffects(['Vintage', 'Gold'])
+    effects: ['Vintage', 'Gold']
   }
 ];
 
-export default sampleCards;
+export default sampleCardData;

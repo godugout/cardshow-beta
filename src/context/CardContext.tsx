@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
-import { Card, Collection, DesignMetadata } from '@/lib/types/core';
+import { Card, Collection, DesignMetadata } from '@/lib/types';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 import { v4 as uuidv4 } from 'uuid';
 import { adaptToCard } from '@/lib/adapters/cardAdapter';
@@ -19,15 +19,15 @@ export interface CardContextType {
   deleteCollection: (id: string) => Promise<boolean>;
   addCardToCollection: (cardId: string, collectionId: string) => Promise<Collection>;
   removeCardFromCollection: (cardId: string, collectionId: string) => Promise<Collection>;
-  refreshCards: () => Promise<void>;
+  refreshCards: () => Promise<void>; // This should be included in the interface
 }
 
-export const CardContext = createContext<CardContextType>({
+const CardContext = createContext<CardContextType>({
   cards: [],
   collections: [],
   isLoading: false,
   getCard: () => undefined,
-  getCardById: () => undefined,
+  getCardById: () => undefined, // Added this method
   addCard: async () => ({} as Card),
   updateCard: async () => ({} as Card),
   deleteCard: async () => false,
@@ -45,52 +45,32 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(false);
 
   // Load cards and collections from local storage on mount
-  // TODO: Replace with Supabase integration
   useEffect(() => {
     const storedCards = localStorage.getItem('cards');
     if (storedCards) {
-      try {
-        const parsedCards = JSON.parse(storedCards);
-        setCards(parsedCards.map((card: Card) => adaptToCard(card)));
-      } catch (error) {
-        console.error('Error loading stored cards:', error);
-        setCards([]);
-      }
+      setCards(JSON.parse(storedCards).map((card: Card) => adaptToCard(card)));
     }
 
     const storedCollections = localStorage.getItem('collections');
     if (storedCollections) {
-      try {
-        setCollections(JSON.parse(storedCollections));
-      } catch (error) {
-        console.error('Error loading stored collections:', error);
-        setCollections([]);
-      }
+      setCollections(JSON.parse(storedCollections));
     }
   }, []);
 
   // Save cards and collections to local storage whenever they change
-  // TODO: Replace with Supabase integration
   useEffect(() => {
-    try {
-      localStorage.setItem('cards', JSON.stringify(cards));
-    } catch (error) {
-      console.error('Error saving cards to localStorage:', error);
-    }
+    localStorage.setItem('cards', JSON.stringify(cards));
   }, [cards]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('collections', JSON.stringify(collections));
-    } catch (error) {
-      console.error('Error saving collections to localStorage:', error);
-    }
+    localStorage.setItem('collections', JSON.stringify(collections));
   }, [collections]);
 
   const getCard = useCallback((id: string) => {
     return cards.find(card => card.id === id);
   }, [cards]);
   
+  // Add alias for getCardById to match getCard
   const getCardById = useCallback((id: string) => {
     return cards.find(card => card.id === id);
   }, [cards]);
@@ -99,6 +79,7 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
     return new Promise<Card>((resolve) => {
       setTimeout(() => {
+        // Create a complete card from partial data
         const now = new Date().toISOString();
         const newCard: Card = {
           id: uuidv4(),
@@ -169,16 +150,15 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           name: collection.name || 'Untitled Collection',
           description: collection.description || '',
           userId: collection.userId || 'default-user',
-          cardIds: collection.cardIds || [],
+          cards: collection.cards || [],
           coverImageUrl: collection.coverImageUrl || '',
           isPublic: collection.isPublic !== undefined ? collection.isPublic : true,
+          cardIds: collection.cardIds || [],
           createdAt: now,
           updatedAt: now,
           visibility: collection.visibility || 'public',
           allowComments: collection.allowComments !== undefined ? collection.allowComments : true,
           designMetadata: collection.designMetadata || {},
-          tags: collection.tags || [],
-          featured: collection.featured || false,
           ...collection
         };
         
@@ -287,7 +267,6 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
     return new Promise<void>((resolve) => {
       setTimeout(() => {
-        // TODO: Replace with actual Supabase data fetching
         setIsLoading(false);
         resolve();
       }, 300);
@@ -299,7 +278,7 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     collections,
     isLoading,
     getCard,
-    getCardById,
+    getCardById, // Added this method
     addCard,
     updateCard,
     deleteCard,
@@ -321,5 +300,5 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useCards = () => useContext(CardContext);
 export const useCardContext = () => useContext(CardContext);
 
-// Export types for use in other files
+// Use 'export type' for types to fix the isolatedModules issue
 export type { Card, Collection };

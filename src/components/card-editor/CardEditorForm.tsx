@@ -1,19 +1,19 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Card } from '@/lib/types';
 import { useCards } from '@/context/CardContext';
 import { toast } from 'sonner';
 import TagInput from './TagInput';
 import ImageSelector from './ImageSelector';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
-import { adaptToCard } from '@/lib/adapters/cardAdapter';
-import { Card } from '@/lib/types/core';
 
 interface CardEditorFormProps {
-  card?: any;
+  card?: Card;
   onSave?: (card: Card) => void;
   className?: string;
 }
@@ -53,7 +53,7 @@ const CardEditorForm: React.FC<CardEditorFormProps> = ({
     try {
       setIsLoading(true);
       
-      const cardData = {
+      const cardData: Partial<Card> = {
         title,
         description,
         imageUrl,
@@ -62,15 +62,12 @@ const CardEditorForm: React.FC<CardEditorFormProps> = ({
         designMetadata: card?.designMetadata || DEFAULT_DESIGN_METADATA
       };
       
-      // Convert to core Card format
-      const adaptedCardData = adaptToCard(cardData);
-      
       let savedCard;
       if (isEditing && card?.id) {
-        savedCard = await updateCard(card.id, adaptedCardData);
+        savedCard = await updateCard(card.id, cardData);
         toast.success('Card updated successfully');
       } else {
-        savedCard = await addCard(adaptedCardData);
+        savedCard = await addCard(cardData);
         toast.success('Card created successfully');
       }
       

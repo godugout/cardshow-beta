@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { Collection, serializeMetadata } from '@/lib/types';
 
@@ -28,7 +27,7 @@ export const collectionRepository = {
         name: dbCollection.title,
         description: dbCollection.description || '',
         coverImageUrl: dbCollection.cover_image_url || undefined,
-        visibility: dbCollection.visibility as 'public' | 'private' | 'unlisted' | 'team',
+        visibility: dbCollection.visibility as 'public' | 'private' | 'team' | 'unlisted',
         allowComments: dbCollection.allow_comments || false,
         designMetadata: dbCollection.design_metadata,
         createdAt: dbCollection.created_at,
@@ -38,8 +37,6 @@ export const collectionRepository = {
         cardIds: [],
         cards: [],
         isPublic: dbCollection.visibility === 'public',
-        tags: [],
-        featured: false,
       };
       
       return { data: collection, error: null };
@@ -63,7 +60,7 @@ export const collectionRepository = {
       }
       if (collectionUpdates.allowComments !== undefined) updateCollectionData.allow_comments = collectionUpdates.allowComments;
       if (collectionUpdates.designMetadata !== undefined) {
-        updateCollectionData.design_metadata = JSON.stringify(collectionUpdates.designMetadata);
+        updateCollectionData.design_metadata = serializeMetadata(collectionUpdates.designMetadata);
       }
       if (collectionUpdates.teamId !== undefined) updateCollectionData.team_id = collectionUpdates.teamId;
       
@@ -84,7 +81,7 @@ export const collectionRepository = {
         name: dbCollection.title,
         description: dbCollection.description || '',
         coverImageUrl: dbCollection.cover_image_url || undefined,
-        visibility: dbCollection.visibility as 'public' | 'private' | 'unlisted' | 'team',
+        visibility: dbCollection.visibility as 'public' | 'private' | 'team' | 'unlisted',
         allowComments: dbCollection.allow_comments || false,
         designMetadata: dbCollection.design_metadata,
         createdAt: dbCollection.created_at,
@@ -94,8 +91,6 @@ export const collectionRepository = {
         cardIds: [],
         cards: [],
         isPublic: dbCollection.visibility === 'public',
-        tags: [],
-        featured: false,
       };
       
       return { data: collection, error: null };
@@ -141,7 +136,7 @@ export const collectionRepository = {
         name: dbCollection.title,
         description: dbCollection.description || '',
         coverImageUrl: dbCollection.cover_image_url || undefined,
-        visibility: dbCollection.visibility as 'public' | 'private' | 'unlisted' | 'team',
+        visibility: dbCollection.visibility as 'public' | 'private' | 'team' | 'unlisted',
         allowComments: dbCollection.allow_comments || false,
         designMetadata: dbCollection.design_metadata,
         createdAt: dbCollection.created_at,
@@ -151,8 +146,6 @@ export const collectionRepository = {
         cardIds: [],
         cards: [],
         isPublic: dbCollection.visibility === 'public',
-        tags: [],
-        featured: false,
       }));
       
       return { data: collections, error: null };
@@ -175,7 +168,7 @@ export const collectionRepository = {
         allow_comments: collection.allowComments !== undefined ? collection.allowComments : true,
         owner_id: collection.userId,
         team_id: collection.teamId || null,
-        design_metadata: collection.designMetadata ? JSON.stringify(collection.designMetadata) : {}
+        design_metadata: collection.designMetadata ? serializeMetadata(collection.designMetadata) : {}
       };
       
       const { data, error } = await supabase
@@ -194,7 +187,7 @@ export const collectionRepository = {
         name: dbCollection.title,
         description: dbCollection.description || '',
         coverImageUrl: dbCollection.cover_image_url || undefined,
-        visibility: dbCollection.visibility as 'public' | 'private' | 'unlisted' | 'team',
+        visibility: dbCollection.visibility as 'public' | 'private' | 'team' | 'unlisted',
         allowComments: dbCollection.allow_comments || false,
         designMetadata: dbCollection.design_metadata,
         createdAt: dbCollection.created_at,
@@ -204,8 +197,6 @@ export const collectionRepository = {
         cardIds: [],
         cards: [],
         isPublic: dbCollection.visibility === 'public',
-        tags: [],
-        featured: false,
       };
       
       return { data: newCollection, error: null };

@@ -1,5 +1,6 @@
+
 import { useState, useEffect, useCallback } from 'react';
-import { Card } from '@/lib/types/unifiedCardTypes';
+import { Card } from '@/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { adaptToCard } from '@/lib/adapters/cardAdapter';
@@ -40,6 +41,7 @@ export const useCardData = () => {
         setError(error.message);
         toast.error('Failed to load cards');
         
+        // Increment retry count for auto-retry mechanism
         setRetryCount(prevCount => prevCount + 1);
         return;
       }
@@ -60,7 +62,7 @@ export const useCardData = () => {
       }));
 
       setCards(formattedCards);
-      setRetryCount(0);
+      setRetryCount(0); // Reset retry count on success
     } catch (err: any) {
       console.error('Unexpected error fetching cards:', err);
       setError(err?.message || 'An unexpected error occurred');

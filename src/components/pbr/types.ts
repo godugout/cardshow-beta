@@ -1,58 +1,48 @@
 
-export interface MaterialSimulation {
-  id: string;
-  name: string;
-  type: string;
-  textureUrl?: string;
-  baseColor?: string;
-  weathering?: number;
-  metallic?: number;
-  metalness?: number;
-  roughness?: number;
-  normalIntensity?: number;
-  emissive?: string;
-  clearcoat?: number;
-  clearcoatRoughness?: number;
-  ior?: number;
-  transmission?: number;
-  reflectivity?: number;
-  envMapIntensity?: number;
-}
-
-export interface PBRMaterial {
-  albedo: string;
-  metallic: number;
-  roughness: number;
-  normal: number;
-  emissive: string;
-  ao: number;
-}
-
-export interface MaterialPreset {
-  name: string;
-  material: PBRMaterial;
-  weathering?: number;
-}
-
+/**
+ * PBR (Physically-Based Rendering) material settings
+ */
 export interface PbrSettings {
-  metallic: number;
-  roughness: number;
-  clearcoat: number;
-  clearcoatRoughness: number;
-  ior: number;
-  transmission: number;
-  reflectivity: number;
-  emissive: string;
-  envMapIntensity: number;
-  metalness?: number;
-  exposure?: number;
-  reflectionStrength?: number;
+  roughness: number;  // Controls how rough/smooth the surface appears (0-1)
+  metalness: number;  // Controls how metallic the material appears (0-1)
+  exposure: number;   // Controls the overall brightness of the scene
+  envMapIntensity: number;  // Controls the intensity of environment reflections
+  reflectionStrength: number;  // Controls how reflective the surface is
 }
 
+/**
+ * Material presets for different card finishes
+ */
+export enum MaterialPreset {
+  GLOSSY = 'glossy',
+  MATTE = 'matte',
+  FOIL = 'foil',
+  CHROME = 'chrome',
+  HOLOGRAPHIC = 'holographic',
+  REFRACTOR = 'refractor',
+  TEXTURED = 'textured'
+}
+
+/**
+ * Option interface for material presets
+ */
+export interface MaterialPresetOption {
+  label: string;
+  value: MaterialPreset;
+  settings: PbrSettings;
+}
+
+/**
+ * Scene options for the PBR renderer
+ */
 export interface PbrSceneOptions {
-  lighting: 'studio' | 'outdoor' | 'dramatic';
-  environment: string;
-  exposure: number;
-  background: boolean;
   cleanup: () => void;
+}
+
+/**
+ * Material property extension for Card type
+ */
+export interface CardMaterialProperties {
+  preset: MaterialPreset;
+  customSettings?: PbrSettings;
 }

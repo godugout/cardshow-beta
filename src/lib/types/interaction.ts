@@ -11,7 +11,7 @@ export interface Reaction extends BaseEntity {
   collectionId?: string;
   commentId?: string;
   type: 'like' | 'love' | 'wow' | 'haha' | 'sad' | 'angry';
-  targetType: 'card' | 'comment' | 'collection';
+  targetType: 'card' | 'comment' | 'collection' | string;
   targetId: string;
   user?: User;
 }

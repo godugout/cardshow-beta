@@ -1,80 +1,90 @@
 
 import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { InstagramPost } from '@/lib/types';
+import { format } from 'date-fns';
+import { Instagram, MessageCircle, Heart } from 'lucide-react';
+import { CardEffect } from '@/hooks/card-effects';
 
 interface InstagramCardProps {
   post: InstagramPost;
+  username: string;
+  onClick?: () => void;
+  effects?: CardEffect[];
 }
 
-const InstagramCard: React.FC<InstagramCardProps> = ({ post }) => {
-  // Handle media type comparison correctly
-  const isVideo = post.mediaType === 'video' || post.mediaType === 'VIDEO';
+const InstagramCard = ({ post, username, onClick, effects = [] }: InstagramCardProps) => {
+  const formattedDate = format(new Date(post.timestamp), 'MMM d, yyyy');
+  const isVideo = post.mediaType === 'VIDEO';
   
+  // Build effect classes
+  const effectClasses = effects.map(effect => effect.className).join(' ');
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <Card 
+      className={`overflow-hidden cursor-pointer hover:shadow-md transition-shadow ${effectClasses}`}
+      onClick={onClick}
+    >
       <div className="relative">
-        <img 
-          src={post.thumbnailUrl || post.imageUrl}
-          alt={post.caption}
-          className="w-full h-64 object-cover"
-        />
-        {isVideo && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-gray-800 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M8 5v10l8-5-8-5z"/>
-              </svg>
-            </div>
+        <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/50 to-transparent p-3 z-10">
+          <div className="flex items-center">
+            <Instagram className="h-4 w-4 text-white mr-2" />
+            <span className="text-white text-sm font-medium">@{username}</span>
           </div>
-        )}
-      </div>
-      
-      <div className="p-4">
-        <div className="flex items-center mb-3">
-          {post.avatarUrl && (
+        </div>
+        
+        <div className="aspect-square bg-gray-100">
+          {isVideo ? (
+            <div className="w-full h-full flex items-center justify-center relative">
+              <img 
+                src={post.thumbnailUrl || post.mediaUrl} 
+                alt={post.caption || 'Instagram post'} 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 0C4.5 0 0 4.5 0 10s4.5 10 10 10 10-4.5 10-10S15.5 0 10 0zm3.5 10.5l-5 3.5v-7l5 3.5z"/>
+                </svg>
+              </div>
+            </div>
+          ) : (
             <img 
-              src={post.avatarUrl}
-              alt={post.username}
-              className="w-8 h-8 rounded-full mr-3"
+              src={post.mediaUrl} 
+              alt={post.caption || 'Instagram post'} 
+              className="w-full h-full object-cover"
             />
           )}
-          <div>
-            <h3 className="font-semibold text-sm">{post.username}</h3>
-            <p className="text-xs text-gray-500">{new Date(post.timestamp).toLocaleDateString()}</p>
-          </div>
         </div>
         
-        <p className="text-sm text-gray-700 mb-3 line-clamp-3">{post.caption}</p>
-        
-        <div className="flex items-center justify-between text-sm text-gray-500">
-          <div className="flex items-center space-x-4">
-            <span className="flex items-center">
-              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"/>
-              </svg>
-              {post.likes}
-            </span>
-            <span className="flex items-center">
-              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd"/>
-              </svg>
-              {post.comments}
-            </span>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-white z-10">
+          <div className="flex items-center justify-between">
+            <span className="text-sm">{formattedDate}</span>
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center">
+                <Heart className="h-4 w-4 mr-1" />
+                <span className="text-xs">
+                  {Math.floor(Math.random() * 1000) + 10}
+                </span>
+              </div>
+              <div className="flex items-center">
+                <MessageCircle className="h-4 w-4 mr-1" />
+                <span className="text-xs">
+                  {Math.floor(Math.random() * 100)}
+                </span>
+              </div>
+            </div>
           </div>
-          
-          {isVideo && post.mediaUrl && (
-            <a 
-              href={post.mediaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800"
-            >
-              Watch
-            </a>
-          )}
         </div>
       </div>
-    </div>
+      
+      <CardContent className="p-3">
+        {post.caption && (
+          <p className="text-sm line-clamp-3">
+            {post.caption}
+          </p>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

@@ -1,118 +1,238 @@
 
-import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import TagInput from '@/components/card-editor/TagInput';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { ChevronRight, X, Plus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface CardTextStepProps {
-  cardData: {
-    title: string;
-    description: string;
-    tags: string[];
-    player?: string;
-    team?: string;
-    year?: string;
-    [key: string]: any;
-  };
-  onUpdate: (updates: any) => void;
-  onContinue?: () => void;
+  cardData: any;
+  setCardData: (data: any) => void;
+  onContinue: () => void;
 }
 
-const CardTextStep: React.FC<CardTextStepProps> = ({ 
-  cardData, 
-  onUpdate, 
-  onContinue 
+const CARD_CATEGORIES = ['Sports', 'Movies', 'Music', 'Art', 'Collectibles'];
+const CARD_SERIES = ['80s VCR', 'Retro', 'Modern', 'Vintage', 'Limited Edition'];
+
+const CardTextStep: React.FC<CardTextStepProps> = ({
+  cardData,
+  setCardData,
+  onContinue
 }) => {
-  const handleInputChange = (field: string, value: any) => {
-    onUpdate({ [field]: value });
+  const [tagInput, setTagInput] = useState('');
+  
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setCardData({
+      ...cardData,
+      [e.target.name]: e.target.value
+    });
   };
-
-  const handleAddTag = (tag: string) => {
-    const newTags = [...cardData.tags, tag];
-    onUpdate({ tags: newTags });
+  
+  const handleCategoryChange = (value: string) => {
+    setCardData({
+      ...cardData,
+      category: value
+    });
   };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    const newTags = cardData.tags.filter(tag => tag !== tagToRemove);
-    onUpdate({ tags: newTags });
+  
+  const handleSeriesChange = (value: string) => {
+    setCardData({
+      ...cardData,
+      series: value
+    });
+  };
+  
+  const handleToggleChange = (field: string, value: boolean) => {
+    setCardData({
+      ...cardData,
+      [field]: value
+    });
+  };
+  
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && tagInput.trim()) {
+      e.preventDefault();
+      if (!cardData.tags.includes(tagInput.trim())) {
+        setCardData({
+          ...cardData,
+          tags: [...cardData.tags, tagInput.trim()]
+        });
+        setTagInput('');
+      }
+    }
+  };
+  
+  const handleRemoveTag = (tag: string) => {
+    setCardData({
+      ...cardData,
+      tags: cardData.tags.filter((t: string) => t !== tag)
+    });
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-4">Card Information</h3>
-        
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="title">Card Title</Label>
-            <Input
-              id="title"
-              value={cardData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
-              placeholder="Enter card title"
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={cardData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              placeholder="Enter card description"
-              rows={4}
-            />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="player">Player</Label>
-              <Input
-                id="player"
-                value={cardData.player || ''}
-                onChange={(e) => handleInputChange('player', e.target.value)}
-                placeholder="Player name"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="team">Team</Label>
-              <Input
-                id="team"
-                value={cardData.team || ''}
-                onChange={(e) => handleInputChange('team', e.target.value)}
-                placeholder="Team name"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="year">Year</Label>
-              <Input
-                id="year"
-                value={cardData.year || ''}
-                onChange={(e) => handleInputChange('year', e.target.value)}
-                placeholder="Year"
-              />
-            </div>
-          </div>
-          
-          <TagInput
-            tags={cardData.tags}
-            onAddTag={handleAddTag}
-            onRemoveTag={handleRemoveTag}
+        <h2 className="text-2xl font-bold mb-4">Text & Details</h2>
+        <p className="text-gray-500 mb-4">
+          Add information and details to your card
+        </p>
+      </div>
+      
+      <div className="space-y-6">
+        <div className="space-y-3">
+          <Label htmlFor="title">Title</Label>
+          <Input
+            id="title"
+            name="title"
+            value={cardData.title}
+            onChange={handleTextChange}
+            placeholder="Enter title for your card"
           />
+        </div>
+        
+        <div className="space-y-3">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            name="description"
+            value={cardData.description}
+            onChange={handleTextChange}
+            placeholder="Describe your card"
+            rows={3}
+          />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Select 
+              value={cardData.category} 
+              onValueChange={handleCategoryChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {CARD_CATEGORIES.map(cat => (
+                  <SelectItem key={cat} value={cat.toLowerCase()}>{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="series">Series</Label>
+            <Select 
+              value={cardData.series} 
+              onValueChange={handleSeriesChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Series" />
+              </SelectTrigger>
+              <SelectContent>
+                {CARD_SERIES.map(series => (
+                  <SelectItem key={series} value={series.toLowerCase()}>{series}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="year">Year/Edition</Label>
+            <Input
+              id="year"
+              name="year"
+              value={cardData.year}
+              onChange={handleTextChange}
+              placeholder="Year or edition"
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-3">
+          <Label htmlFor="tags">Tags</Label>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {cardData.tags.map((tag: string) => (
+              <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                #{tag}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleRemoveTag(tag)}
+                  className="h-auto p-0 ml-1"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            ))}
+          </div>
+          <div className="flex items-center">
+            <Input
+              id="tags"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={handleTagKeyDown}
+              placeholder="Add tags and press Enter"
+              className="flex-1"
+            />
+            <Button
+              variant="outline"
+              className="ml-2"
+              onClick={() => {
+                if (tagInput.trim() && !cardData.tags.includes(tagInput.trim())) {
+                  setCardData({
+                    ...cardData,
+                    tags: [...cardData.tags, tagInput.trim()]
+                  });
+                  setTagInput('');
+                }
+              }}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        
+        <div className="bg-gray-50 rounded-lg p-4 space-y-4 border">
+          <h3 className="font-medium">Card Options</h3>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium">Make available for printing</h4>
+              <p className="text-sm text-gray-500">
+                Let us know if anyone requests prints and you can work with a printer
+              </p>
+            </div>
+            <Switch 
+              checked={cardData.makePrintAvailable} 
+              onCheckedChange={(value) => handleToggleChange('makePrintAvailable', value)} 
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium">Include in CRD Catalog</h4>
+              <p className="text-sm text-gray-500">
+                Contribute to our official CRD Catalog for limited print releases
+              </p>
+            </div>
+            <Switch 
+              checked={cardData.includeInCatalog} 
+              onCheckedChange={(value) => handleToggleChange('includeInCatalog', value)} 
+            />
+          </div>
         </div>
       </div>
       
-      {onContinue && (
-        <div className="flex justify-end">
-          <Button onClick={onContinue}>
-            Continue
-          </Button>
-        </div>
-      )}
+      <div className="flex justify-end mt-6">
+        <Button onClick={onContinue} className="flex items-center gap-2">
+          Continue <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 };

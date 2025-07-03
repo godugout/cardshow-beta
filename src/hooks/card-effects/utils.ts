@@ -1,153 +1,308 @@
+
+import { Card } from '@/lib/types';
+import { debounce } from 'lodash-es';
 import { PremiumCardEffect } from './types';
 
-export const defaultEffectSettings = {
-  intensity: 1.0,
-  speed: 1.0,
-  pattern: 'none',
-  color: '#FFFFFF',
-  animationEnabled: true,
-};
-
-export const applyEffect = (element: HTMLElement, effectId: string, settings: Record<string, any>) => {
-  // Check if the element already has the effect applied
-  if (element.classList.contains(effectId)) {
-    console.warn(`Effect "${effectId}" already applied to element. Skipping.`);
-    return;
+/**
+ * Get default effects based on card metadata
+ */
+export function getDefaultEffectsForCard(card: Card): string[] {
+  const defaultEffects: string[] = [];
+  
+  // Add default effects based on tags
+  if (card.tags?.includes('premium') || card.tags?.includes('rare')) {
+    defaultEffects.push('Holographic');
   }
   
-  // Add the effect class to the element
-  element.classList.add(effectId);
-  
-  // Apply the settings to the element as CSS variables
-  Object.keys(settings).forEach(key => {
-    element.style.setProperty(`--${effectId}-${key}`, settings[key]);
-  });
-};
-
-export const removeEffect = (element: HTMLElement, effectId: string) => {
-  // Remove the effect class from the element
-  element.classList.remove(effectId);
-  
-  // Remove the settings from the element
-  Object.keys(element.style).forEach(key => {
-    if (key.startsWith(`--${effectId}`)) {
-      element.style.removeProperty(key);
-    }
-  });
-};
-
-export const toggleEffect = (element: HTMLElement, effectId: string, settings: Record<string, any>) => {
-  if (element.classList.contains(effectId)) {
-    removeEffect(element, effectId);
-  } else {
-    applyEffect(element, effectId, settings);
+  if (card.tags?.includes('ultra-rare') || card.tags?.includes('limited')) {
+    defaultEffects.push('Refractor');
   }
-};
+  
+  if (card.tags?.includes('legendary') || card.tags?.includes('one-of-one')) {
+    defaultEffects.push('Superfractor');
+  }
+  
+  // Add effects based on collection
+  if (card.collectionId?.includes('chrome')) {
+    defaultEffects.push('Chrome');
+  }
+  
+  if (card.collectionId?.includes('prizm')) {
+    defaultEffects.push('Prizm');
+  }
+  
+  // Add default effect if no match
+  if (defaultEffects.length === 0 && card.imageUrl) {
+    // Default to no effects for regular cards
+  }
+  
+  return defaultEffects;
+}
 
-export const updateEffectSettings = (element: HTMLElement, effectId: string, settings: Record<string, any>) => {
-  Object.keys(settings).forEach(key => {
-    element.style.setProperty(`--${effectId}-${key}`, settings[key]);
-  });
-};
+/**
+ * Process cards in batches to prevent UI blocking
+ */
+export async function processCardsBatch(
+  cards: Card[],
+  initialEffects: Record<string, string[]>
+): Promise<Record<string, string[]>> {
+  const updatedEffects = { ...initialEffects };
+  const batchSize = 10;
+  
+  for (let i = 0; i < cards.length; i += batchSize) {
+    const batch = cards.slice(i, i + batchSize);
+    
+    // Process this batch
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        batch.forEach(card => {
+          if (!updatedEffects[card.id]) {
+            const defaultEffects = getDefaultEffectsForCard(card);
+            if (defaultEffects.length > 0) {
+              updatedEffects[card.id] = defaultEffects;
+            }
+          }
+        });
+        resolve();
+      }, 0);
+    });
+  }
+  
+  return updatedEffects;
+}
 
-export const getEffectSettings = (element: HTMLElement, effectId: string) => {
-  const settings: Record<string, any> = {};
-  Object.keys(element.style).forEach(key => {
-    if (key.startsWith(`--${effectId}`)) {
-      const settingName = key.replace(`--${effectId}-`, '');
-      settings[settingName] = element.style.getPropertyValue(key);
-    }
-  });
-  return settings;
-};
-
+/**
+ * Predefined premium effects for cards
+ */
 export const premiumEffects: Record<string, PremiumCardEffect> = {
-  holographic: {
+  'Holographic': {
     id: 'holographic',
     name: 'Holographic',
-    category: 'premium',
-    className: 'effect-holographic',
+    category: 'holographic',
     settings: {
-      intensity: 1.0,
-      speed: 1.0,
+      intensity: 0.8,
+      speed: 1.0
     },
-    description: 'Creates a rainbow holographic effect that shifts with viewing angle',
+    description: 'Classic rainbow holographic effect that shifts colors as the card moves',
     premium: false,
-    iconUrl: '/icons/holographic.svg',
+    iconUrl: '/icons/effects/holographic.svg'
   },
-  
-  prismatic: {
-    id: 'prismatic',
-    name: 'Prismatic',
-    category: 'premium',
-    className: 'effect-prismatic',
-    settings: {
-      intensity: 1.0,
-      speed: 1.0,
-    },
-    description: 'Disperses light into beautiful rainbow patterns',
-    premium: false,
-    iconUrl: '/icons/prismatic.svg',
-  },
-  
-  refractor: {
+  'Refractor': {
     id: 'refractor',
     name: 'Refractor',
-    category: 'premium',
-    className: 'effect-refractor',
+    category: 'refractor',
     settings: {
       intensity: 1.0,
-      speed: 1.0,
-      pattern: 'diamond',
+      speed: 0.8
     },
-    description: 'Creates complex light refraction patterns',
-    premium: true,
-    iconUrl: '/icons/refractor.svg',
+    description: 'Light-refracting pattern that creates a prism effect',
+    premium: false,
+    iconUrl: '/icons/effects/refractor.svg'
   },
-  
-  metallic: {
-    id: 'metallic',
-    name: 'Metallic Shine',
-    category: 'premium',
-    className: 'effect-metallic',
+  'Superfractor': {
+    id: 'superfractor',
+    name: 'Superfractor',
+    category: 'refractor',
     settings: {
       intensity: 1.0,
-      speed: 1.0,
-      pattern: 'brushed',
+      speed: 1.2,
+      pattern: 'extreme'
     },
-    description: 'Simulates brushed metal surface with realistic shine',
+    description: 'Extreme rainbow refractor pattern with intense light diffraction',
     premium: true,
-    iconUrl: '/icons/metallic.svg',
+    iconUrl: '/icons/effects/superfractor.svg'
   },
-  
-  goldFoil: {
+  'Cracked Ice': {
+    id: 'cracked-ice',
+    name: 'Cracked Ice',
+    category: 'refractor',
+    settings: {
+      intensity: 0.9,
+      speed: 0.7,
+      pattern: 'geometric'
+    },
+    description: 'Geometric pattern with multi-layered reflective surfaces',
+    premium: true,
+    iconUrl: '/icons/effects/cracked-ice.svg'
+  },
+  'Mojo': {
+    id: 'mojo',
+    name: 'Mojo',
+    category: 'refractor',
+    settings: {
+      intensity: 0.85,
+      speed: 1.1,
+      pattern: 'spiral'
+    },
+    description: 'Spiral pattern with contrasting color shifting properties',
+    premium: true,
+    iconUrl: '/icons/effects/mojo.svg'
+  },
+  'Pulsar': {
+    id: 'pulsar',
+    name: 'Pulsar',
+    category: 'special',
+    settings: {
+      intensity: 0.75,
+      speed: 1.5,
+      pattern: 'radial',
+      animationEnabled: true
+    },
+    description: 'Pulsating radial pattern with animated glow',
+    premium: true,
+    iconUrl: '/icons/effects/pulsar.svg'
+  },
+  'Scope': {
+    id: 'scope',
+    name: 'Scope',
+    category: 'special',
+    settings: {
+      intensity: 0.7,
+      speed: 0.9,
+      pattern: 'circular'
+    },
+    description: 'Lens-like circular patterns with magnification effects',
+    premium: true,
+    iconUrl: '/icons/effects/scope.svg'
+  },
+  'Gold Foil': {
     id: 'gold-foil',
     name: 'Gold Foil',
-    category: 'premium',
-    className: 'effect-gold-foil',
+    category: 'foil',
     settings: {
-      intensity: 1.0,
-      speed: 1.0,
-      pattern: 'foil',
+      intensity: 0.8,
+      speed: 0.5,
+      color: '#FFD700'
     },
-    description: 'Luxurious gold foil finish with authentic metallic luster',
-    premium: true,
-    iconUrl: '/icons/gold-foil.svg',
+    description: 'Metallic gold foil effect with subtle light reflection',
+    premium: false,
+    iconUrl: '/icons/effects/gold-foil.svg'
   },
-  
-  animated: {
-    id: 'animated',
-    name: 'Animated',
-    category: 'special',
-    className: 'effect-animated',
+  'Silver Foil': {
+    id: 'silver-foil',
+    name: 'Silver Foil',
+    category: 'foil',
     settings: {
-      intensity: 1.0,
-      speed: 1.0,
-      pattern: 'wave',
-      animationEnabled: true,
+      intensity: 0.8,
+      speed: 0.5,
+      color: '#C0C0C0'
     },
-    description: 'Dynamic animated effects that bring cards to life',
+    description: 'Metallic silver foil effect with subtle light reflection',
+    premium: false,
+    iconUrl: '/icons/effects/silver-foil.svg'
+  },
+  'Chrome': {
+    id: 'chrome',
+    name: 'Chrome',
+    category: 'texture',
+    settings: {
+      intensity: 0.9,
+      speed: 0.6
+    },
+    description: 'Chrome-style metallic finish with realistic reflections',
+    premium: false,
+    iconUrl: '/icons/effects/chrome.svg'
+  },
+  'Prizm': {
+    id: 'prizm',
+    name: 'Prizm',
+    category: 'refractor',
+    settings: {
+      intensity: 0.85,
+      speed: 0.9,
+      pattern: 'geometric'
+    },
+    description: 'Prizm-inspired geometric patterns with refractor capability',
+    premium: false,
+    iconUrl: '/icons/effects/prizm.svg'
+  },
+  'Vintage': {
+    id: 'vintage',
+    name: 'Vintage',
+    category: 'texture',
+    settings: {
+      intensity: 0.6,
+      speed: 0.3
+    },
+    description: 'Classic vintage card look with subtle texture',
+    premium: false,
+    iconUrl: '/icons/effects/vintage.svg'
+  },
+  'Canvas': {
+    id: 'canvas',
+    name: 'Canvas',
+    category: 'texture',
+    settings: {
+      intensity: 0.7,
+      speed: 0.4
+    },
+    description: 'Canvas texture for a classic art card feel',
+    premium: false,
+    iconUrl: '/icons/effects/canvas.svg'
+  },
+  'Linen': {
+    id: 'linen',
+    name: 'Linen',
+    category: 'texture',
+    settings: {
+      intensity: 0.65,
+      speed: 0.4
+    },
+    description: 'Subtle linen texture for vintage card designs',
+    premium: false,
+    iconUrl: '/icons/effects/linen.svg'
+  },
+  'Spectral': {
+    id: 'spectral',
+    name: 'Spectral',
+    category: 'holographic',
+    settings: {
+      intensity: 0.9,
+      speed: 1.1,
+      animationEnabled: true
+    },
+    description: 'Advanced holographic effect with depth and motion',
     premium: true,
-    iconUrl: '/icons/animated.svg',
+    iconUrl: '/icons/effects/spectral.svg'
   }
 };
+
+/**
+ * Get the CSS class for a specific effect
+ */
+export function getEffectClass(effectName: string): string {
+  // Normalize effect name for CSS class
+  const normalizedName = effectName.toLowerCase().replace(/\s+/g, '-');
+  return `card-${normalizedName}`;
+}
+
+/**
+ * Generate CSS classes for active effects
+ */
+export function generateEffectClasses(activeEffects: string[]): string {
+  return activeEffects.map(effect => getEffectClass(effect)).join(' ');
+}
+
+/**
+ * Check if a device supports advanced effects
+ */
+export function supportsAdvancedEffects(): boolean {
+  // Check for WebGL support
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && (
+      canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+    ));
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Optimized debounced function for updating effects
+ */
+export const debouncedEffectUpdate = debounce(
+  (callback: () => void) => {
+    callback();
+  }, 100
+);

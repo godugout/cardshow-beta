@@ -1,131 +1,54 @@
 
-import { Card as CoreCard, CardEffect } from '@/lib/types/core';
-import { Card as UnifiedCard } from '@/lib/types/unifiedCardTypes';
+import { Card, DesignMetadata } from '@/lib/types';
 import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 
 /**
- * Converts string effects to CardEffect objects
+ * Adapts partial card data to a complete Card object
  */
-export function convertEffectsToCardEffects(effects: string[] | CardEffect[]): CardEffect[] {
-  if (!effects) return [];
+export const adaptToCard = (data: Partial<Card>): Card => {
+  const now = new Date().toISOString();
   
-  return effects.map((effect, index) => {
-    if (typeof effect === 'string') {
-      return {
-        id: `effect-${index}-${Date.now()}`,
-        type: effect as any,
-        intensity: 1,
-        parameters: {},
-        name: effect,
-        enabled: true,
-        settings: { intensity: 1 },
-        className: `effect-${effect.toLowerCase()}`
-      };
-    }
-    return effect;
-  });
-}
-
-/**
- * Converts CardEffect objects to string array for legacy compatibility
- */
-export function convertCardEffectsToStrings(effects: CardEffect[] | string[]): string[] {
-  if (!effects) return [];
-  
-  return effects.map(effect => {
-    if (typeof effect === 'string') {
-      return effect;
-    }
-    return effect.type || effect.name || 'unknown';
-  });
-}
-
-/**
- * Adapts legacy card format to core Card format
- */
-export function adaptToLegacyCard(card: any): any {
-  return {
-    ...card,
-    effects: convertCardEffectsToStrings(card.effects || [])
-  };
-}
-
-/**
- * Adapts any card format to the core Card interface
- */
-export function adaptToCard(card: any): CoreCard {
-  return {
-    id: card.id,
-    title: card.title || 'Untitled Card',
-    description: card.description || '',
-    imageUrl: card.imageUrl || '',
-    thumbnailUrl: card.thumbnailUrl || card.imageUrl || '',
-    userId: card.userId || card.creator_id || 'unknown',
-    tags: card.tags || [],
-    effects: convertEffectsToCardEffects(card.effects || []),
-    createdAt: card.createdAt || card.created_at || new Date().toISOString(),
-    updatedAt: card.updatedAt || card.updated_at || new Date().toISOString(),
-    designMetadata: {
-      ...DEFAULT_DESIGN_METADATA,
-      ...card.designMetadata,
-      cardStyle: {
-        ...DEFAULT_DESIGN_METADATA.cardStyle,
-        ...card.designMetadata?.cardStyle,
-      },
-      textStyle: {
-        ...DEFAULT_DESIGN_METADATA.textStyle,
-        ...card.designMetadata?.textStyle,
-      },
-      cardMetadata: {
-        ...DEFAULT_DESIGN_METADATA.cardMetadata,
-        ...card.designMetadata?.cardMetadata,
-      },
-      marketMetadata: {
-        ...DEFAULT_DESIGN_METADATA.marketMetadata,
-        ...card.designMetadata?.marketMetadata,
-      }
+  // Ensure designMetadata has all required properties
+  const designMetadata: DesignMetadata = {
+    ...DEFAULT_DESIGN_METADATA,
+    ...data.designMetadata,
+    cardStyle: {
+      ...DEFAULT_DESIGN_METADATA.cardStyle,
+      ...data.designMetadata?.cardStyle
     },
-    rarity: card.rarity,
-    isPublic: card.isPublic,
-    collectionId: card.collectionId,
-    teamId: card.teamId,
-    verificationStatus: card.verificationStatus,
-    price: card.price,
-    editionSize: card.editionSize,
-    printAvailable: card.printAvailable,
-    artist: card.artist,
-    year: card.year,
-    set: card.set,
-    player: card.player,
-    team: card.team,
-    reactions: card.reactions,
-    name: card.name,
-    jersey: card.jersey,
-    cardType: card.cardType,
-    cardNumber: card.cardNumber,
-    backgroundColor: card.backgroundColor,
-    specialEffect: card.specialEffect,
-    fabricSwatches: card.fabricSwatches || [],
-    viewCount: card.viewCount || 0
-  };
-}
-
-/**
- * Converts core Card to UnifiedCard format
- */
-export function adaptToUnifiedCard(card: CoreCard): UnifiedCard {
-  return {
-    ...card,
-    effects: card.effects, // Keep as CardEffect[] for unified format
-    designMetadata: {
-      cardStyle: card.designMetadata.cardStyle,
-      textStyle: card.designMetadata.textStyle,
-      cardMetadata: {
-        ...card.designMetadata.cardMetadata,
-        effects: convertCardEffectsToStrings(card.effects)
-      },
-      marketMetadata: card.designMetadata.marketMetadata,
-      oaklandMemory: card.designMetadata.oaklandMemory
+    textStyle: {
+      ...DEFAULT_DESIGN_METADATA.textStyle,
+      ...data.designMetadata?.textStyle
+    },
+    cardMetadata: {
+      ...DEFAULT_DESIGN_METADATA.cardMetadata,
+      ...data.designMetadata?.cardMetadata
+    },
+    marketMetadata: {
+      ...DEFAULT_DESIGN_METADATA.marketMetadata,
+      ...data.designMetadata?.marketMetadata
     }
   };
-}
+
+  return {
+    id: data.id || `card-${Date.now()}`,
+    title: data.title || 'Untitled Card',
+    description: data.description || '',
+    imageUrl: data.imageUrl || '/placeholder-card.png',
+    thumbnailUrl: data.thumbnailUrl || data.imageUrl || '/placeholder-card-thumb.png',
+    tags: data.tags || [],
+    userId: data.userId || 'anonymous',
+    effects: data.effects || [],
+    createdAt: data.createdAt || now,
+    updatedAt: data.updatedAt || now,
+    player: data.player,
+    team: data.team,
+    year: data.year,
+    collectionId: data.collectionId,
+    reactions: data.reactions || [],
+    comments: data.comments || [],
+    rarity: data.rarity,
+    fabricSwatches: data.fabricSwatches || [],
+    designMetadata
+  };
+};

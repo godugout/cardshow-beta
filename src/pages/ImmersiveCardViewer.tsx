@@ -1,284 +1,164 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardEffect } from '@/lib/types/core';
-import { stringToCardEffect } from '@/lib/utils/cardEffectHelpers';
-import { DEFAULT_DESIGN_METADATA } from '@/lib/utils/cardDefaults';
 
-interface ImmersiveCardViewerProps {
-  card?: Card;
-  onClose?: () => void;
-}
+import React, { useEffect, useState } from 'react';
+import { Card } from '@/lib/types';
+import { useParams } from 'react-router-dom';
+import { useCardContext } from '@/context/CardContext';
+import { useToast } from '@/hooks/use-toast';
 
-const ImmersiveCardViewer: React.FC<ImmersiveCardViewerProps> = ({ 
-  card: propCard, 
-  onClose 
-}) => {
-  const [currentCard, setCurrentCard] = useState<Card>(propCard || {
-    id: '1',
-    title: 'Sample Holographic Card',
-    description: 'A beautiful card with holographic effects',
-    imageUrl: 'https://placehold.co/400x600/4f46e5/ffffff?text=Holographic+Card',
-    thumbnailUrl: 'https://placehold.co/200x300/4f46e5/ffffff?text=Holographic+Card',
-    tags: ['holographic', 'premium', 'showcase'],
-    effects: [stringToCardEffect('holographic'), stringToCardEffect('prismatic')],
-    userId: 'user1',
-    createdAt: '2023-01-01T00:00:00Z',
-    updatedAt: '2023-01-01T00:00:00Z',
-    designMetadata: DEFAULT_DESIGN_METADATA
-  });
-
-  const [activeEffects, setActiveEffects] = useState<CardEffect[]>(currentCard.effects || []);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+const ImmersiveCardViewer = ({ card: initialCard }: { card: Card }) => {
+  const { id } = useParams();
+  const { getCardById } = useCardContext();
+  const [card, setCard] = useState<Card>(initialCard);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const { toast } = useToast();
+  
+  // Fall back image for when the card image doesn't load
+  const fallbackImage = 'https://images.unsplash.com/photo-1518770660439-4636190af475';
+  
+  useEffect(() => {
+    if (id) {
+      const foundCard = getCardById(id);
+      if (foundCard) {
+        console.log("Found card in context:", foundCard);
+        setCard(foundCard);
+      } else {
+        console.warn("Card not found in context:", id);
+      }
+    }
+  }, [id, getCardById]);
 
   useEffect(() => {
-    if (propCard) {
-      setCurrentCard(propCard);
-      setActiveEffects(propCard.effects || []);
-    }
-  }, [propCard]);
-
-  const toggleEffect = (effectType: string) => {
-    const effect = stringToCardEffect(effectType);
-    setActiveEffects(prev => {
-      const exists = prev.some(e => e.type === effect.type);
-      if (exists) {
-        return prev.filter(e => e.type !== effect.type);
-      } else {
-        return [...prev, effect];
+    if (card) {
+      console.log("Current card data:", card);
+      if (!card.imageUrl) {
+        console.warn("Card has no image URL:", card.id);
+        toast({
+          title: "Image not available",
+          description: "Using a fallback image for this card"
+        });
       }
+    }
+  }, [card, toast]);
+  
+  const handleImageError = () => {
+    console.error("Failed to load image:", card.imageUrl);
+    setImageError(true);
+    toast({
+      title: "Image failed to load",
+      description: "Using a fallback image",
+      variant: "destructive"
     });
   };
 
-  const getEffectClasses = () => {
-    return activeEffects.map(effect => {
-      switch (effect.type) {
-        case 'holographic':
-          return 'holographic-effect';
-        case 'prismatic':
-          return 'prismatic-effect';
-        case 'refractor':
-          return 'refractor-effect';
-        case 'sparkle':
-          return 'sparkle-effect';
-        case 'foil':
-          return 'foil-effect';
-        case 'rainbow':
-          return 'rainbow-effect';
-        default:
-          return '';
-      }
-    }).join(' ');
-  };
-
   return (
-    <div className={`immersive-viewer ${isFullscreen ? 'fullscreen' : ''}`}>
-      <div className="viewer-container">
-        <div className="card-display">
-          <div className={`card-wrapper ${getEffectClasses()}`}>
-            <img 
-              src={currentCard.imageUrl} 
-              alt={currentCard.title}
-              className="card-image"
-            />
-          </div>
+    <div className="p-4 h-full flex flex-col items-center justify-center">
+      <h2 className="text-xl font-bold mb-4 text-white">{card.title}</h2>
+      <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-auto">
+        {/* Card image with fallback handling */}
+        <div className="relative aspect-[3/4] w-full mb-4 bg-gray-700 rounded overflow-hidden">
+          {!imageLoaded && !imageError && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-12 h-12 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
+            </div>
+          )}
+          
+          {imageError && (
+            <div className="absolute inset-0 flex items-center justify-center text-gray-300">
+              <div className="text-center">
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-12 w-12 mx-auto mb-2" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
+                  />
+                </svg>
+                <p>Failed to load image</p>
+              </div>
+            </div>
+          )}
+          
+          <img 
+            src={card.imageUrl || fallbackImage} 
+            alt={card.title} 
+            className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+            onLoad={() => setImageLoaded(true)}
+            onError={(e) => {
+              // Try the fallback image if the original fails
+              if (e.currentTarget.src !== fallbackImage) {
+                e.currentTarget.src = fallbackImage;
+              } else {
+                handleImageError();
+              }
+            }}
+          />
         </div>
-
-        <div className="controls-panel">
-          <h2>{currentCard.title}</h2>
-          <p>{currentCard.description}</p>
-
-          <div className="effects-controls">
-            <h3>Effects</h3>
-            {['holographic', 'prismatic', 'refractor', 'sparkle', 'foil', 'rainbow'].map(effectType => (
-              <button
-                key={effectType}
-                onClick={() => toggleEffect(effectType)}
-                className={`effect-button ${
-                  activeEffects.some(e => e.type === effectType) ? 'active' : ''
-                }`}
-              >
-                {effectType}
-              </button>
-            ))}
-          </div>
-
-          <div className="viewer-controls">
-            <button onClick={() => setIsFullscreen(!isFullscreen)}>
-              {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
-            </button>
-            {onClose && (
-              <button onClick={onClose}>Close</button>
+        
+        {card.description && (
+          <p className="text-gray-300 mb-4">{card.description}</p>
+        )}
+        
+        {/* Display card stats if available */}
+        {card.stats && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+            {card.stats.battingAverage && (
+              <div className="stat-item">
+                <span className="text-sm text-gray-400">Batting Average</span>
+                <span className="block text-lg font-medium text-white">{card.stats.battingAverage}</span>
+              </div>
+            )}
+            {card.stats.homeRuns && (
+              <div className="stat-item">
+                <span className="text-sm text-gray-400">Home Runs</span>
+                <span className="block text-lg font-medium text-white">{card.stats.homeRuns}</span>
+              </div>
+            )}
+            {card.stats.rbis && (
+              <div className="stat-item">
+                <span className="text-sm text-gray-400">RBIs</span>
+                <span className="block text-lg font-medium text-white">{card.stats.rbis}</span>
+              </div>
+            )}
+            {card.stats.era && (
+              <div className="stat-item">
+                <span className="text-sm text-gray-400">ERA</span>
+                <span className="block text-lg font-medium text-white">{card.stats.era}</span>
+              </div>
+            )}
+            {card.stats.wins && (
+              <div className="stat-item">
+                <span className="text-sm text-gray-400">Wins</span>
+                <span className="block text-lg font-medium text-white">{card.stats.wins}</span>
+              </div>
+            )}
+            {card.stats.strikeouts && (
+              <div className="stat-item">
+                <span className="text-sm text-gray-400">Strikeouts</span>
+                <span className="block text-lg font-medium text-white">{card.stats.strikeouts}</span>
+              </div>
+            )}
+            {card.stats.careerYears && (
+              <div className="stat-item">
+                <span className="text-sm text-gray-400">Career Years</span>
+                <span className="block text-lg font-medium text-white">{card.stats.careerYears}</span>
+              </div>
+            )}
+            {card.stats.ranking && (
+              <div className="stat-item">
+                <span className="text-sm text-gray-400">Ranking</span>
+                <span className="block text-lg font-medium text-white">{card.stats.ranking}</span>
+              </div>
             )}
           </div>
-        </div>
+        )}
       </div>
-
-      <style>
-        {`
-        .immersive-viewer {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: linear-gradient(135deg, #1e1e2e 0%, #2d1b69 100%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-        }
-
-        .viewer-container {
-          display: grid;
-          grid-template-columns: 1fr 300px;
-          gap: 2rem;
-          max-width: 1200px;
-          width: 100%;
-          height: 80vh;
-          padding: 2rem;
-        }
-
-        .card-display {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .card-wrapper {
-          position: relative;
-          width: 400px;
-          height: 600px;
-          border-radius: 20px;
-          overflow: hidden;
-          transition: transform 0.3s ease;
-        }
-
-        .card-wrapper:hover {
-          transform: scale(1.05);
-        }
-
-        .card-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-
-        .controls-panel {
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(10px);
-          border-radius: 20px;
-          padding: 2rem;
-          color: white;
-        }
-
-        .effects-controls {
-          margin: 2rem 0;
-        }
-
-        .effect-button {
-          display: block;
-          width: 100%;
-          margin: 0.5rem 0;
-          padding: 0.75rem;
-          background: rgba(255, 255, 255, 0.1);
-          border: none;
-          border-radius: 10px;
-          color: white;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          text-transform: capitalize;
-        }
-
-        .effect-button:hover {
-          background: rgba(255, 255, 255, 0.2);
-        }
-
-        .effect-button.active {
-          background: rgba(79, 70, 229, 0.8);
-        }
-
-        .viewer-controls button {
-          margin: 0.5rem 0;
-          padding: 0.75rem 1.5rem;
-          background: rgba(79, 70, 229, 0.8);
-          border: none;
-          border-radius: 10px;
-          color: white;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .viewer-controls button:hover {
-          background: rgba(79, 70, 229, 1);
-        }
-
-        /* Effect styles */
-        .holographic-effect {
-          background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
-          background-size: 400% 400%;
-          animation: holographic 3s ease-in-out infinite;
-        }
-
-        .prismatic-effect {
-          background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
-          background-size: 400% 400%;
-          animation: prismatic 4s linear infinite;
-        }
-
-        .refractor-effect {
-          background: linear-gradient(45deg, #c0c0c0, #ffffff, #c0c0c0);
-          background-size: 200% 200%;
-          animation: refractor 2s ease-in-out infinite;
-        }
-
-        .sparkle-effect {
-          position: relative;
-          overflow: hidden;
-        }
-
-        .sparkle-effect::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
-          animation: sparkle 2s linear infinite;
-        }
-
-        @keyframes holographic {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-
-        @keyframes prismatic {
-          0% { background-position: 0% 50%; }
-          100% { background-position: 100% 50%; }
-        }
-
-        @keyframes refractor {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-
-        @keyframes sparkle {
-          0% { left: -100%; }
-          100% { left: 100%; }
-        }
-
-        .fullscreen .viewer-container {
-          grid-template-columns: 1fr 400px;
-          max-width: none;
-          width: 100vw;
-          height: 100vh;
-        }
-
-        .fullscreen .card-wrapper {
-          width: 500px;
-          height: 750px;
-        }
-      `}
-      </style>
     </div>
   );
 };

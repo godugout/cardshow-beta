@@ -18,6 +18,10 @@ import { useCardEffectsStack } from '@/components/card-creation/hooks/useCardEff
 import { useLayers } from '@/components/card-creation/hooks/useLayers';
 import { CardDesignState, CardLayer } from '@/components/card-creation/types/cardTypes';
 
+/**
+ * Unified Card Creator page that combines the functionality of the current
+ * CardCreatorPage and Editor components
+ */
 const CardCreator: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const { cards, getCardById, addCard, updateCard } = useCards();
@@ -225,7 +229,7 @@ const CardCreator: React.FC = () => {
                 {currentStep === 3 && (
                   <CardTextStep 
                     cardData={cardData}
-                    onUpdate={setCardData}
+                    setCardData={setCardData}
                     onContinue={goToNextStep}
                   />
                 )}
@@ -233,8 +237,8 @@ const CardCreator: React.FC = () => {
                 {currentStep === 4 && (
                   <CardPreviewStep 
                     cardData={cardData}
-                    onSave={handleSaveCard}
                     effectClasses={getEffectClasses()}
+                    onSave={handleSaveCard}
                   />
                 )}
               </CardContent>

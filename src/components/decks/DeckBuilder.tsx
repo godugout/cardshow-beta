@@ -8,8 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Upload, Search } from 'lucide-react';
-import { useEnhancedCards, type EnhancedCard, type Deck } from '@/context/CardEnhancedContext';
+import { useEnhancedCards } from '@/context/CardEnhancedContext';
 import CardCollectionView from '@/components/card-experiences/CardCollectionView';
+import { Deck, EnhancedCard } from '@/lib/types/enhancedCardTypes';
 import { toast } from 'sonner';
 
 interface DeckBuilderProps {
@@ -92,29 +93,15 @@ const DeckBuilder: React.FC<DeckBuilderProps> = ({ initialDeck }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const deckWithId = initialDeck?.id 
+      ? { ...deckData, updatedAt: new Date().toISOString() }
+      : { ...deckData, id: uuidv4(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+      
     if (initialDeck?.id) {
-      // For update, we need to ensure the type matches
-      const updates: Partial<Deck> = {
-        ...deckData,
-        updatedAt: new Date().toISOString()
-      };
-      updateDeck(initialDeck.id, updates);
+      updateDeck(initialDeck.id, deckWithId as Deck);
       toast.success('Deck updated successfully');
     } else {
-      // For create, ensure all required fields are present
-      const newDeck: Deck = {
-        id: uuidv4(),
-        name: deckData.name || '',
-        description: deckData.description || '',
-        cards: selectedCards,
-        cardIds: selectedCards.map(card => card.id),
-        ownerId: deckData.ownerId || 'current-user',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        isPublic: deckData.isPublic || false,
-        coverImageUrl: deckData.coverImageUrl
-      };
-      addDeck(newDeck);
+      addDeck(deckWithId as Deck);
       toast.success('Deck created successfully');
     }
     

@@ -5,7 +5,7 @@ import { cva } from "class-variance-authority"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toastStyles } from "@/config/toast"
-import type { ToasterToast } from "@/types/toast"
+import type { ToasterToastWithStatus } from "@/types/toast"
 
 const ToastProvider = ToastPrimitives.Provider
 
@@ -26,12 +26,18 @@ ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
 const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & Pick<ToasterToast, "variant">
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & Pick<ToasterToastWithStatus, "variant">
 >(({ className, variant, ...props }, ref) => {
+  // Convert "error" variant to "destructive" for radix-ui compatibility
+  let safeVariant = variant;
+  if (variant === "error") {
+    safeVariant = "destructive";
+  }
+  
   return (
     <ToastPrimitives.Root
       ref={ref}
-      className={cn(toastStyles({ variant }), className)}
+      className={cn(toastStyles({ variant: safeVariant }), className)}
       {...props}
     />
   )
@@ -96,11 +102,12 @@ const ToastDescription = React.forwardRef<
 ))
 ToastDescription.displayName = ToastPrimitives.Description.displayName
 
-export type { 
-  ToasterToast as ToastProps
-}
+type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
+
+type ToastActionElement = React.ReactElement<typeof ToastAction>
 
 export {
+  type ToasterToastWithStatus as ToastProps,
   ToastProvider,
   ToastViewport,
   Toast,

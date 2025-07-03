@@ -1,46 +1,79 @@
-import { TeamMember } from '@/lib/types';
-import { mapTeamMember } from './mappers';
+
 import { supabase } from '@/integrations/supabase/client';
+import { TeamMember } from '@/lib/types';
+import { mapTeamMemberFromDb } from './mappers';
 
-export const teamMembersService = {
-  async getTeamMembers(teamId: string): Promise<TeamMember[]> {
-    // Mock implementation
+/**
+ * Get all members of a team
+ */
+export const getTeamMembers = async (teamId: string): Promise<TeamMember[]> => {
+  const { data, error } = await supabase
+    .from('team_members')
+    .select('*, users(*)')
+    .eq('team_id', teamId);
+
+  if (error) {
+    console.error("Error fetching team members:", error);
     return [];
-  },
-
-  async addTeamMember(teamId: string, userId: string, role: string): Promise<TeamMember> {
-    const memberData = {
-      id: `member-${Date.now()}`,
-      teamId,
-      userId,
-      role,
-      joinedAt: new Date().toISOString(),
-      permissions: []
-    };
-    
-    return mapTeamMember(memberData);
-  },
-
-  async removeTeamMember(teamId: string, userId: string): Promise<void> {
-    // Mock implementation
-  },
-
-  async updateTeamMemberRole(teamId: string, userId: string, role: string): Promise<TeamMember> {
-    const memberData = {
-      id: `member-${Date.now()}`,
-      teamId,
-      userId,
-      role,
-      joinedAt: new Date().toISOString(),
-      permissions: []
-    };
-    
-    return mapTeamMember(memberData);
   }
+
+  return data ? data.map(mapTeamMemberFromDb) : [];
 };
 
-// Export individual functions for backward compatibility
-export const getTeamMembers = teamMembersService.getTeamMembers;
-export const addTeamMember = teamMembersService.addTeamMember;
-export const updateTeamMemberRole = teamMembersService.updateTeamMemberRole;
-export const removeTeamMember = teamMembersService.removeTeamMember;
+/**
+ * Add a new member to a team
+ */
+export const addTeamMember = async (teamId: string, userId: string, role: string): Promise<TeamMember | null> => {
+  const { data, error } = await supabase
+    .from('team_members')
+    .insert({
+      team_id: teamId,
+      user_id: userId,
+      role: role
+    })
+    .select('*, users(*)')
+    .single();
+
+  if (error) {
+    console.error("Error adding team member:", error);
+    return null;
+  }
+
+  return data ? mapTeamMemberFromDb(data) : null;
+};
+
+/**
+ * Update a team member's role
+ */
+export const updateTeamMemberRole = async (teamMemberId: string, role: string): Promise<TeamMember | null> => {
+  const { data, error } = await supabase
+    .from('team_members')
+    .update({ role: role })
+    .eq('id', teamMemberId)
+    .select('*, users(*)')
+    .single();
+
+  if (error) {
+    console.error("Error updating team member role:", error);
+    return null;
+  }
+
+  return data ? mapTeamMemberFromDb(data) : null;
+};
+
+/**
+ * Remove a member from a team
+ */
+export const removeTeamMember = async (teamMemberId: string): Promise<boolean> => {
+  const { error } = await supabase
+    .from('team_members')
+    .delete()
+    .eq('id', teamMemberId);
+
+  if (error) {
+    console.error("Error removing team member:", error);
+    return false;
+  }
+
+  return true;
+};
